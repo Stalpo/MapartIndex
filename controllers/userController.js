@@ -24,8 +24,8 @@ const registerUser = async (username, password) => {
   }
 
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await userModel.createUser({ username, password: hashedPassword });
+    const hashedPw = await bcrypt.hash(password, 10);
+    await userModel.createUser({ username, hashedPw });
 
     return { message: 'User registered successfully' };
   } catch (error) {
@@ -42,7 +42,7 @@ const loginUser = async (username, password) => {
     return { error: 'Invalid username or password' };
   }
 
-  const passwordMatch = await bcrypt.compare(password, user.password);
+  const passwordMatch = await bcrypt.compare(password, user.hashedPw);
   if (!passwordMatch) {
     return { error: 'Invalid username or password' };
   }

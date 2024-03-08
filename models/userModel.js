@@ -1,26 +1,17 @@
-const { MongoClient } = require('mongodb');
-
-const mongoURI = 'mongodb://localhost:27017/your-database-name';
-
-const connectToMongo = async () => {
-  const client = new MongoClient(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
-  await client.connect();
-  return client;
-};
-
+const db = require('../util/db');
+const prisma = db.prisma;
 const getUserByUsername = async (username) => {
-  const client = await connectToMongo();
-  const usersCollection = client.db().collection('users');
-  const user = await usersCollection.findOne({ username });
-  client.close();
-  return user;
+  return prisma.user.findUnique({where: {username: username}});
 };
 
-const createUser = async ({ username, password }) => {
-  const client = await connectToMongo();
-  const usersCollection = client.db().collection('users');
-  await usersCollection.insertOne({ username, password });
-  client.close();
+const getUserById = async (id) => {
+  return prisma.user.findUnique({where: { id : id }});
+};
+
+const createUser = async ({ username, hashedPw }) => {
+  const discordId = "";
+  const mcUuid = "";
+  await prisma.user.create({data: {username,hashedPw,discordId,mcUuid}});
 };
 
 module.exports = {
