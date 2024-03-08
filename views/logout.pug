@@ -10,22 +10,7 @@ html
         span#countdown 5
         |  seconds...
 
-    script.
-      let countdown = 5;
-
-      const updateCountdown = () => {
-        document.getElementById('countdown').textContent = countdown;
-        countdown--;
-
-        if (countdown >= 0) {
-          setTimeout(updateCountdown, 1000);
-        } else {
-          document.cookie = 'token=; path=/;';
-          window.location.href = '/';
-        }
-      };
-
-      updateCountdown();
+    script(src="./public/js/logout.js")
 
     include includes/footer.pug
     include includes/scripts.pug
