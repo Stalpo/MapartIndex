@@ -57,13 +57,14 @@ const verifyToken = (username, token) => {
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
     
     if (decoded.username === username) {
-      return true;
+      // Success
+      return { username: decoded.username, token: token, valid: true };
     } else {
-      return 'Token does not match the provided username';
+      return { error: 'Token does not match the provided username' };
     }
   } catch (error) {
     console.error('Error verifying token:', error);
-    return 'Invalid token';
+    return { error: 'Invalid token' };
   }
 };
 
