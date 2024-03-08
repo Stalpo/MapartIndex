@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 const moment = require('moment');
-
+const discord = require('./routes/discord');
 // Init express
 const app = express();
 const PORT = 3000;
@@ -99,6 +99,7 @@ app.get('/profile', (req, res) => {
 app.post('/profile', async (req, res) => {
   // This does nothing until I make the profile model and controller.
 });
+app.use('/api/discord', discord);
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

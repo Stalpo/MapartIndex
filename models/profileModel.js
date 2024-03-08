@@ -15,7 +15,6 @@ const updateProfile = async (userId, {
   username,
   location,
   email,
-  discordId,
   mcUuid,
   lastSeen,
   bio,
@@ -29,7 +28,6 @@ const updateProfile = async (userId, {
       username,
       location,
       email,
-      discordId,
       mcUuid,
       lastSeen,
       bio,
@@ -67,16 +65,6 @@ const updateEmail = async (userId, email) => {
         },
         data: {
         email
-        }
-    });
-}
-const updateDiscordId = async (userId, discordId) => {
-    await prisma.profile.update({
-        where: {
-        userId
-        },
-        data: {
-        discordId
         }
     });
 }
@@ -139,7 +127,6 @@ module.exports = {
   updateUsername,
   updateLocation,
   updateEmail,
-  updateDiscordId,
   updateMcUuid,
   updateLastSeen,
   updateBio,

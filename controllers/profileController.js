@@ -9,7 +9,6 @@ const createProfile = async ({
   username,
   location,
   email,
-  discordId,
   mcUid,
   joinDate,
   lastSeenDate
@@ -19,7 +18,6 @@ const createProfile = async ({
     username,
     location,
     email,
-    discordId,
     mcUid,
     joinDate,
     lastSeenDate

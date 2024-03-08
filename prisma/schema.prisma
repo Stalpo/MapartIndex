@@ -19,10 +19,11 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   username  String   @unique
-  hashedPw  String
+  hashedPw  String?
   mapIds    MapId[]
   mapArts   MapArt[]
   Profile   Profile?
+  discordId String?  @unique
 }
 
 model Profile {
@@ -32,14 +33,13 @@ model Profile {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String   @unique
   username  String   @unique
-  lastSeen  DateTime
+  lastSeen  DateTime @default(now())
   location  String?
   email     String?
   bio       String?
   avatar    String?
   links     String[]
   mcUuid    String?
-  discordId String?  @unique
 }
 
 model MapArt {
