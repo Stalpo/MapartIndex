@@ -21,10 +21,15 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
+// loggedIn variable middleware
+app.use((req, res, next) => {
+  res.locals.loggedIn = req.cookies.token;
+  next();
+});
+
 // Index route
 app.get('/', (req, res) => {
-  const loggedIn = req.cookies.token;
-  res.render('index', { loggedIn });
+  res.render('index');
 });
 
 // Register route
