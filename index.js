@@ -3,6 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+const moment = require('moment');
 
 // Init express
 const app = express();
@@ -39,6 +40,24 @@ app.use((req, res, next) => {
 
   next();
 });
+
+// Custom middleware for console logging
+const logMiddleware = (req, res, next) => {
+  const timestamp = moment().format('MM-DD HH:mm:ss');
+  const method = req.method;
+  const url = req.url;
+
+  res.on('finish', () => {
+    const statusCode = res.statusCode;
+    const responseTime = new Date() - req.startTime;
+    console.log(`[${timestamp}] ${method} ${url} ${statusCode} - ${responseTime}ms`);
+  });
+
+  req.startTime = new Date();
+  next();
+};
+
+app.use(logMiddleware);
 
 // Index route
 app.get('/', (req, res) => {
