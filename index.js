@@ -14,6 +14,7 @@ const userController = require('./controllers/userController');
 
 // View engine
 app.set('view engine', 'pug');
+app.locals.pretty = true;
 app.set('views', path.join(__dirname, 'views'));
 
 // Middleware
