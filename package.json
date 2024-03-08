@@ -4,8 +4,7 @@
   "description": "A website to host the 2b2t mapart communities full collection and give unique info about maps.",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "test": "mocha test/*.test.js"
+    "start": "node index.js"
   },
   "dependencies": {
     "@prisma/client": "^5.10.2",
