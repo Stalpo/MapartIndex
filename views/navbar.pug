@@ -1,0 +1,16 @@
+nav.navbar.navbar-expand-lg.navbar-light.bg-light
+  a.navbar-brand(href="/") MapartIndex
+  button.navbar-toggler(type="button", data-toggle="collapse", data-target="#navbarNav", aria-controls="navbarNav", aria-expanded="false", aria-label="Toggle navigation")
+    span.navbar-toggler-icon
+  div#navbarNav.collapse.navbar-collapse
+    ul.navbar-nav.ml-auto
+      li.nav-item
+        a.nav-link(href="/") Home
+      li.nav-item
+        if !loggedIn
+          a.nav-link(href="/login") Login
+        else
+          a.nav-link(href="/logout") Logout
+      li.nav-item
+        if !loggedIn
+          a.nav-link(href="/register") Register

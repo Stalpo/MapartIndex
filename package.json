@@ -1,0 +1,22 @@
+{
+  "name": "MapartIndex",
+  "version": "1.0.0",
+  "description": "A website to host the 2b2t mapart communities full collection and give unique info about maps.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "mocha test/*.test.js"
+  },
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.6",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^4.1.0",
+    "pug": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
