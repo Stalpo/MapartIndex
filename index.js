@@ -42,7 +42,7 @@ app.use((req, res, next) => {
 });
 
 // Custom middleware for console logging
-const logMiddleware = (req, res, next) => {
+app.use((req, res, next) => {
   const timestamp = moment().format('MM-DD HH:mm:ss');
   const method = req.method;
   const url = req.url;
@@ -55,9 +55,7 @@ const logMiddleware = (req, res, next) => {
 
   req.startTime = new Date();
   next();
-};
-
-app.use(logMiddleware);
+});
 
 // Index route
 app.get('/', (req, res) => {
