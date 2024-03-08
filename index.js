@@ -30,7 +30,6 @@ app.use((req, res, next) => {
 
     if (verificationResult.valid) {
       // Token is valid, you can use the verified data
-      console.log(verificationResult.username);
       res.locals.username = verificationResult.username;
     } else {
       // Token is not valid, handle the error as needed
@@ -71,6 +70,16 @@ app.post('/login', async (req, res) => {
 // Logout route
 app.get('/logout', (req, res) => {
   res.render('logout');
+});
+
+// Profile route
+app.get('/profile', (req, res) => {
+  // About ready to start building controller and model.
+  res.render('profile');
+});
+
+app.post('/profile', async (req, res) => {
+  // This does nothing until I make the profile model and controller.
 });
 
 app.listen(PORT, () => {

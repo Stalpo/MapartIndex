@@ -1,0 +1,52 @@
+doctype html
+html
+  - const pageTitle = "Profile"
+  include includes/head.pug
+  body
+    include includes/navbar.pug
+
+    div.container
+      h1.text-center= pageTitle
+      hr
+      if !username
+        p You are not logged in!
+      else
+        div.row
+          div.col-md-4.text-center
+            img.img-fluid.rounded-circle(src="https://placekitten.com/200/200", alt="Profile Picture")
+            h2 #{ username }
+            p.text-center Last seen: #{ userLastLogin } <!-- Replace with actual user registration date -->
+            hr
+            h3 Your Details
+            p Email: #{ userEmail } <!-- Replace with actual user email -->
+            p Location: #{ userLocation } <!-- Replace with actual user location -->
+            p Joined: #{ userJoinDate } <!-- Replace with actual user join date -->
+          div.col-md-8
+            div.row
+              div.col-md-6
+                h3.text-center Recent Uploads
+                ul.list-group
+                  li.list-group-item
+                    a(href="#") Uploaded Image 1
+                  li.list-group-item
+                    a(href="#") Uploaded Image 2
+                  li.list-group-item
+                    a(href="#") Uploaded Image 3
+              div.col-md-6
+                h3.text-center Upload Count
+                p.text-center 10 <!-- Replace with actual upload count -->
+            div.row.mt-4
+              div.col-md-12
+                h3.text-center Your Achievements
+                ul.list-group
+                  li.list-group-item
+                    i.fa.fa-trophy.mr-2
+                    | Newfag
+                  li.list-group-item
+                    i.fa.fa-trophy.mr-2
+                    | Died in Spawn
+                  li.list-group-item
+                    i.fa.fa-trophy.mr-2
+                    | Museum Collector
+      include includes/footer.pug
+      include includes/scripts.pug
