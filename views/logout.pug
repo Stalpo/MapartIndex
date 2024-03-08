@@ -6,5 +6,9 @@ html
     include includes/navbar.pug
     div.container
       h1.text-center You have been logged out successfully.
-      script.
-        document.cookie = 'token=; path=/;';
+
+    script.
+      document.cookie = 'token=; path=/;';
+
+    include includes/footer.pug
+    include includes/scripts.pug
