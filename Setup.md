@@ -7,6 +7,8 @@
 ```
 DATABASE_URL="mongodb+srv://"
 SECRET_KEY="secretkey"
+DISCORD_CLIENT_ID="clientid"
+DISCORD_CLIENT_SECRET="clientsecret"
 ```
 
 ## Useful stuff
