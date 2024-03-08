@@ -1,12 +1,20 @@
 const userModel = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const validator = require('validator');
 
 // Function to check if a string is alphanumeric
 const isAlphanumeric = (str) => /^[a-zA-Z0-9]+$/.test(str);
 
+// Sanitize input
+const sanitizeInput = (input) => validator.escape(input);
+
 // Register user
 const registerUser = async (username, password) => {
+  // Sanitize inputs
+  username = sanitizeInput(username);
+  password = sanitizeInput(password);
+
   // Validate username
   if (username.length < 5 || !isAlphanumeric(username)) {
     return { error: 'Invalid username. It must be at least 5 characters and only alphanumeric.' };
@@ -36,6 +44,10 @@ const registerUser = async (username, password) => {
 
 // Login user
 const loginUser = async (username, password) => {
+  // Sanitize inputs
+  username = sanitizeInput(username);
+  password = sanitizeInput(password);
+
   const user = await userModel.getUserByUsername(username);
 
   if (!user) {

@@ -16,7 +16,8 @@
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^4.1.0",
     "prisma": "^5.10.2",
-    "pug": "^3.0.2"
+    "pug": "^3.0.2",
+    "validator": "^13.11.0"
   },
   "engines": {
     "node": ">=14.0.0"
