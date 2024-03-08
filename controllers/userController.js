@@ -51,7 +51,24 @@ const loginUser = async (username, password) => {
   return { token };
 };
 
+// Function to verify a JWT token
+const verifyToken = (username, token) => {
+  try {
+    const decoded = jwt.verify(token, 'secretkey');
+    
+    if (decoded.username === username) {
+      return true;
+    } else {
+      return 'Token does not match the provided username';
+    }
+  } catch (error) {
+    console.error('Error verifying token:', error);
+    return 'Invalid token';
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
+  verifyToken,
 };
