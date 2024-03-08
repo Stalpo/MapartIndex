@@ -1,10 +1,12 @@
-// Dependencies
+// External dependencies
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const path = require('path');
-const moment = require('moment');
-const discord = require('./routes/discord');
+
+// Internal dependencies
+const { loggedInMiddleware, loggingMiddleware } = require('./middleware');
+
 // Init express
 const app = express();
 const PORT = 3000;
@@ -23,40 +25,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
-// loggedIn variable middleware
-app.use((req, res, next) => {
-  const token = req.cookies.token;
+// Custom middleware
+app.use(loggedInMiddleware);
+app.use(loggingMiddleware);
 
-  if (token) {
-    const verificationResult = userController.verifyToken(token);
-
-    if (verificationResult.valid) {
-      // Token is valid, you can use the verified data
-      res.locals.username = verificationResult.username;
-    } else {
-      // Token is not valid, handle the error as needed
-      console.error(verificationResult.error);
-    }
-  }
-
-  next();
-});
-
-// Custom middleware for console logging
-app.use((req, res, next) => {
-  const timestamp = moment().format('MM-DD HH:mm:ss');
-  const method = req.method;
-  const url = req.url;
-
-  res.on('finish', () => {
-    const statusCode = res.statusCode;
-    const responseTime = new Date() - req.startTime;
-    console.log(`[${timestamp}] ${method} ${url} ${statusCode} - ${responseTime}ms`);
-  });
-
-  req.startTime = new Date();
-  next();
-});
+// Custom routes
+const discord = require('./routes/discord');
+app.use('/api/discord', discord);
 
 // Index route
 app.get('/', (req, res) => {
@@ -99,7 +74,6 @@ app.get('/profile', (req, res) => {
 app.post('/profile', async (req, res) => {
   // This does nothing until I make the profile model and controller.
 });
-app.use('/api/discord', discord);
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
