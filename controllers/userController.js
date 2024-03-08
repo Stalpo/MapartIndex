@@ -9,6 +9,13 @@ const isAlphanumeric = (str) => /^[a-zA-Z0-9]+$/.test(str);
 // Sanitize input
 const sanitizeInput = (input) => validator.escape(input);
 
+// Get userId from username
+// Current WIP
+const getIdFromUsername = async (username) => {
+  const user = await userModel.getUserByUsername(username);
+  return user ? user.id : null;
+};
+
 // Register user
 const registerUser = async (username, password) => {
   // Sanitize inputs
@@ -89,5 +96,6 @@ module.exports = {
   registerUser,
   loginUser,
   verifyToken,
-  loginDiscordUser
+  getIdFromUsername,
+  loginDiscordUser,
 };

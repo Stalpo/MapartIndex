@@ -2,7 +2,7 @@ const moment = require('moment');
 const userController = require('./controllers/userController');
 
 // loggedIn variable middleware
-const loggedInMiddleware = (req, res, next) => {
+const loggedInMiddleware = async (req, res, next) => {
   const token = req.cookies.token;
 
   if (token) {
@@ -11,6 +11,7 @@ const loggedInMiddleware = (req, res, next) => {
     if (verificationResult.valid) {
       // Token is valid, you can use the verified data
       res.locals.username = verificationResult.username;
+      // res.locals.userId = userController.getIdFromUsername(verificationResult.username);
     } else {
       // Token is not valid, handle the error as needed
       console.error(verificationResult.error);
