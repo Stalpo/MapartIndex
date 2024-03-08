@@ -1,7 +1,7 @@
 ### How to get it up and running:
 1. Run `npm install` to install the project dependencies
 2. Run `npx prisma generate` to generate the prisma client source
-3. Run `node app.js` to run the web application
+3. Run `node --env-file .env app.js` to run the web application
 
 ## Useful stuff
 - [Prisma](https://www.prisma.io/docs/)
