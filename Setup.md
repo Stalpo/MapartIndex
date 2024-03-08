@@ -3,6 +3,12 @@
 2. Run `npx prisma generate` to generate the prisma client source
 3. Run `node --env-file .env index.js` to run the web application
 
+### .env requirements:
+```
+DATABASE_URL="mongodb+srv://"
+SECRET_KEY="secretkey"
+```
+
 ## Useful stuff
 - [Prisma](https://www.prisma.io/docs/)
 - Push schema changes to the database: `npx prisma db push`
