@@ -9,9 +9,7 @@ const getUserById = async (id) => {
 };
 
 const createUser = async ({ username, hashedPw }) => {
-  const discordId = "";
-  const mcUuid = "";
-  await prisma.user.create({ data: { username, hashedPw, discordId, mcUuid }});
+  await prisma.user.create({ data: { username, hashedPw }});
 };
 
 module.exports = {
