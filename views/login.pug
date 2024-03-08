@@ -1,6 +1,6 @@
 doctype html
 html
-- const pageTitle = "Login"
+  - const pageTitle = "Login"
   include includes/head.pug
   body
     include includes/navbar.pug
@@ -10,12 +10,18 @@ html
           h1.text-center Login
           form(id="loginForm", action="/login", method="post")
             div.form-group
-              label(for="username") Username:
-              input(type="text", class="form-control", name="username", id="usernameInput", required)
+              div.input-group
+                div.input-group-prepend
+                  span.input-group-text
+                    i.fas.fa-user
+                input(type="text", class="form-control", name="username", id="usernameInput", placeholder="Username", required)
             div.form-group
-              label(for="password") Password:
-              input(type="password", class="form-control", name="password", id="passwordInput", required)
-            button(type="submit", class="btn btn-primary btn-block", id="loginButton") Login
+              div.input-group
+                div.input-group-prepend
+                  span.input-group-text
+                    i.fas.fa-lock
+                input(type="password", class="form-control", name="password", id="passwordInput", placeholder="Password", required)
+            button(type="submit", class="btn btn-primary btn-block mt-3", id="loginButton") Login
 
           script.
             // Prevent form submission on Enter key press

@@ -1,6 +1,6 @@
 doctype html
 html
-- const pageTitle = "Register"
+  - const pageTitle = "Register"
   include includes/head.pug
   body
     include includes/navbar.pug
@@ -10,11 +10,17 @@ html
           h1.text-center Register
           form(action="/register", method="post")
             div.form-group
-              label(for="username") Username:
-              input(type="text", class="form-control", name="username", required)
+              div.input-group
+                div.input-group-prepend
+                  span.input-group-text
+                    i.fas.fa-user
+                input(type="text", class="form-control", name="username", placeholder="Username", required)
             div.form-group
-              label(for="password") Password:
-              input(type="password", class="form-control", name="password", required)
+              div.input-group
+                div.input-group-prepend
+                  span.input-group-text
+                    i.fas.fa-lock
+                input(type="password", class="form-control", name="password", placeholder="Password", required)
             button(type="submit", class="btn btn-primary btn-block") Register
 
     script.
