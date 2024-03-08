@@ -3,9 +3,7 @@ const prisma = db.prisma;
 
 const getProfileById = async (userId) => {
   return prisma.profile.findUnique({
-    where: {
-      userId
-    }
+    where: { userId }
   });
 };
 
@@ -21,9 +19,7 @@ const updateProfile = async (userId, {
   avatar,
 }) => {
   await prisma.profile.update({
-    where: {
-      userId
-    },
+    where: { userId },
     data: {
       username,
       location,
@@ -38,87 +34,54 @@ const updateProfile = async (userId, {
 
 const updateUsername = async (userId, username) => {
     await prisma.profile.update({
-        where: {
-        userId
-        },
-        data: {
-        username
-        }
+        where: { userId },
+        data: { username }
     });
 
 }
 const updateLocation = async (userId, location) => {
     await prisma.profile.update({
-        where: {
-        userId
-        },
-        data: {
-        location
-        }
+        where: { userId },
+        data: { location }
     });
 
 }
 const updateEmail = async (userId, email) => {
     await prisma.profile.update({
-        where: {
-        userId
-        },
-        data: {
-        email
-        }
+        where: { userId },
+        data: { email }
     });
 }
 const updateMcUuid = async (userId, mcUuid) => {
     await prisma.profile.update({
-        where: {
-        userId
-        },
-        data: {
-        mcUuid
-        }
+        where: { userId },
+        data: { mcUuid }
     });
 }
 const updateLastSeen = async (userId, lastSeen) => {
     await prisma.profile.update({
-        where: {
-        userId
-        },
-        data: {
-        lastSeen
-        }
+        where: { userId },
+        data: { lastSeen }
     });
 }
 const updateBio = async (userId, bio) => {
     await prisma.profile.update({
-        where: {
-        userId
-        },
-        data: {
-        bio
-        }
+        where: { userId },
+        data: { bio }
     });
 }
 const updateAvatar = async (userId, avatar) => {
     await prisma.profile.update({
-        where: {
-        userId
-        },
-        data: {
-        avatar
-        }
+        where: { userId },
+        data: { avatar }
     });
 }
 const updateLinks = async (userId, links) => {
     await prisma.profile.update({
-        where: {
-        userId
-        },
-        data: {
-        links
-        }
+        where: { userId },
+        data: { links }
     });
 }
-
 
 module.exports = {
   getProfileById,
@@ -131,6 +94,5 @@ module.exports = {
   updateLastSeen,
   updateBio,
   updateAvatar,
-  updateLinks
-
+  updateLinks,
 };
