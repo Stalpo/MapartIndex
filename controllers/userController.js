@@ -47,14 +47,14 @@ const loginUser = async (username, password) => {
     return { error: 'Invalid username or password' };
   }
 
-  const token = jwt.sign({ username }, 'secretkey', { expiresIn: '1h' });
+  const token = jwt.sign({ username }, process.env.SECRET_KEY, { expiresIn: '1h' });
   return { token };
 };
 
 // Function to verify a JWT token
 const verifyToken = (username, token) => {
   try {
-    const decoded = jwt.verify(token, 'secretkey');
+    const decoded = jwt.verify(token, process.env.SECRET_KEY);
     
     if (decoded.username === username) {
       return true;
