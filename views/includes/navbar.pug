@@ -5,12 +5,24 @@ nav.navbar.navbar-expand-lg.navbar-light.bg-light
   div#navbarNav.collapse.navbar-collapse
     ul.navbar-nav.ml-auto
       li.nav-item
-        a.nav-link(href="/") Home
+        a.nav-link(href="/")
+          i.fa.fa-home.mr-1
+          | Home
       li.nav-item
         if !username
-          a.nav-link(href="/login") Login
+          a.nav-link(href="/login")
+            i.fa.fa-sign-in-alt.mr-1
+            | Login
         else
-          a.nav-link(href="/logout") Logout
+          a.nav-link(href="/logout")
+            i.fa.fa-sign-out-alt.mr-1
+            | Logout
       li.nav-item
         if !username
-          a.nav-link(href="/register") Register
+          a.nav-link(href="/register")
+            i.fa.fa-user-plus.mr-1
+            | Register
+        else
+          a.nav-link(href="/profile")
+            i.fa.fa-user.mr-1
+            | Profile
