@@ -23,7 +23,21 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // loggedIn variable middleware
 app.use((req, res, next) => {
-  res.locals.loggedIn = req.cookies.token;
+  const token = req.cookies.token;
+
+  if (token) {
+    const verificationResult = userController.verifyToken(token);
+
+    if (verificationResult.valid) {
+      // Token is valid, you can use the verified data
+      console.log(verificationResult.username);
+      res.locals.username = verificationResult.username;
+    } else {
+      // Token is not valid, handle the error as needed
+      console.error(verificationResult.error);
+    }
+  }
+
   next();
 });
 

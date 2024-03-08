@@ -7,10 +7,10 @@ nav.navbar.navbar-expand-lg.navbar-light.bg-light
       li.nav-item
         a.nav-link(href="/") Home
       li.nav-item
-        if !loggedIn
+        if !username
           a.nav-link(href="/login") Login
         else
           a.nav-link(href="/logout") Logout
       li.nav-item
-        if !loggedIn
+        if !username
           a.nav-link(href="/register") Register

@@ -6,7 +6,10 @@ html
     include includes/navbar.pug
 
     div.container
-      h1.text-center Welcome to Your Website
-      // Your content goes here
+      h1.text-center Home
+      if !username
+        p Registration is open!
+      else
+        p Welcome back, #{ username }!
     include includes/footer.pug
     include includes/scripts.pug

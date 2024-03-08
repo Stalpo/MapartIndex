@@ -52,16 +52,11 @@ const loginUser = async (username, password) => {
 };
 
 // Function to verify a JWT token
-const verifyToken = (username, token) => {
+const verifyToken = (token) => {
   try {
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
-    
-    if (decoded.username === username) {
-      // Success
-      return { username: decoded.username, token: token, valid: true };
-    } else {
-      return { error: 'Token does not match the provided username' };
-    }
+    // Success
+    return { username: decoded.username, token: token, valid: true };
   } catch (error) {
     console.error('Error verifying token:', error);
     return { error: 'Invalid token' };
