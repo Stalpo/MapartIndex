@@ -1,14 +1,31 @@
 doctype html
 html
-- const pageTitle = "Logout"
   include includes/head.pug
   body
     include includes/navbar.pug
     div.container
       h1.text-center You have been logged out successfully.
+      p.text-center
+        | Redirecting to home page in 
+        span#countdown 5
+        |  seconds...
 
     script.
-      document.cookie = 'token=; path=/;';
+      let countdown = 5;
+
+      const updateCountdown = () => {
+        document.getElementById('countdown').textContent = countdown;
+        countdown--;
+
+        if (countdown >= 0) {
+          setTimeout(updateCountdown, 1000);
+        } else {
+          document.cookie = 'token=; path=/;';
+          window.location.href = '/';
+        }
+      };
+
+      updateCountdown();
 
     include includes/footer.pug
     include includes/scripts.pug
