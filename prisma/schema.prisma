@@ -20,35 +20,37 @@ model User {
   updatedAt DateTime @updatedAt
   username  String   @unique
   hashedPw  String
-  mapIds    MapId[]
   mcUuid    String
   discordId String
-  maps      MapArt[]
-}
-
-model MapId {
-  id        String   @id @default(uuid()) @map("_id")
-  name      String
-  ownerId   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  owner     User     @relation(fields: [id], references: [id], onDelete: Cascade)
-  data      String   @unique
-  imgUrl    String
-  creator   String
-  Map       MapArt?  @relation(fields: [mapId], references: [id], onDelete: Cascade)
-  mapId     String?
+  mapIds    MapId[]
+  mapArts   MapArt[]
 }
 
 model MapArt {
   id          String   @id @default(uuid()) @map("_id")
-  creator     User     @relation(fields: [id], references: [id], onDelete: Cascade)
-  mapIds      MapId[]
-  rotations   Int[] // 0-3 rotation
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  creator     String // if not known is "N/A"
+  creatorUser User?    @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  creatorId   String?
+  imgUrl      String
   name        String
   description String
-  vSize       Int
+  mapIds      MapId[]
+  rotations   Int[] // 0-3 rotation
   hSize       Int
+  vSize       Int
+}
+
+model MapId {
+  id          String   @id @default(uuid()) @map("_id")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  creator     String // if not known is "N/A"
+  creatorUser User?    @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  creatorId   String?
+  Map         MapArt?  @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  mapId       String?
+  imgUrl      String
+  data        String   @unique
 }
