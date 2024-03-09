@@ -82,14 +82,13 @@ const verifyToken = (token) => {
   }
 };
 
-const loginDiscordUser = async (discordId,username,avatar,email) => {
-  let user = await userModel.getUserByDiscordId(discordId);
+const loginDiscordUser = async (discordId, username, avatar, email) => {
+  const user = await userModel.getUserByDiscordId(discordId);
   if(!user) {
-   await userModel.createUserDiscord({discordId, username, avatar, email})
+    await userModel.createUserDiscord({ discordId, username, avatar, email })
   }
   const token = jwt.sign({ username }, process.env.SECRET_KEY, { expiresIn: '1h' });
   return { token };
-
 }
 
 module.exports = {

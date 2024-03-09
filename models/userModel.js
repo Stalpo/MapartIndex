@@ -12,7 +12,8 @@ const getUserById = async (id) => {
 };
 
 const getUserByDiscordId = async (discordId) => {
-  await prisma.user.findUnique({ where: { discordId: discordId }});
+  const user = await prisma.user.findUnique({ where: { discordId: discordId }});
+  return user;
 };
 
 const createUser = async ({ username, hashedPw }) => {
