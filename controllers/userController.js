@@ -10,7 +10,6 @@ const isAlphanumeric = (str) => /^[a-zA-Z0-9]+$/.test(str);
 const sanitizeInput = (input) => validator.escape(input);
 
 // Get userId from username
-// Current WIP
 const getIdFromUsername = async (username) => {
   const user = await userModel.getUserByUsername(username);
   return user ? user.id : null;
