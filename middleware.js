@@ -11,7 +11,9 @@ const loggedInMiddleware = async (req, res, next) => {
     if (verificationResult.valid) {
       // Token is valid, you can use the verified data
       res.locals.username = verificationResult.username;
-      // res.locals.userId = userController.getIdFromUsername(verificationResult.username);
+      // Set userId in the locals for future use
+      const userId = await userController.getIdFromUsername(verificationResult.username);
+      res.locals.userId = userId;
     } else {
       // Token is not valid, handle the error as needed
       console.error(verificationResult.error);

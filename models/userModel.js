@@ -4,11 +4,13 @@ const prisma = db.prisma;
 // const profileModel = require('./profileModel');
 
 const getUserByUsername = async (username) => {
-  await prisma.user.findUnique({ where: { username: username }});
+  const user = await prisma.user.findUnique({ where: { username: username }});
+  return user;
 };
 
 const getUserById = async (id) => {
-  await prisma.user.findUnique({ where: { id : id }});
+  const user = await prisma.user.findUnique({ where: { id : id }});
+  return user;
 };
 
 const getUserByDiscordId = async (discordId) => {
@@ -17,12 +19,14 @@ const getUserByDiscordId = async (discordId) => {
 };
 
 const createUser = async ({ username, hashedPw }) => {
-  await prisma.user.create({ data: { username, hashedPw }});
+  const user = await prisma.user.create({ data: { username, hashedPw }});
+  return user;
 };
 
 const createUserDiscord = async ({ discordId, username, avatar, email }) => {
   const user = await prisma.user.create({ data: { discordId, username }});
   await prisma.profile.create({ data: { userId: user.id, avatar: avatar, email: email, username: username }});
+  return user;
 };
 
 module.exports = {
