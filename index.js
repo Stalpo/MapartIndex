@@ -127,13 +127,12 @@ app.post('/upload', upload.single('image'), async (req, res) => {
     }
 
     // Add metadata to the db
-    console.log(hash);
     const result = await mapIdController.createMapId({
       creatorId: res.locals.userId,
       mapId: 'someMapId',
       imgUrl: imgUrl,
       data: 'someData',
-      hash: hash.toString()
+      hash: hash
     });
     // Send a response with information about the uploaded file
     res.status(200).json({
