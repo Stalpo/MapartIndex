@@ -2,7 +2,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
+const crypto = require('crypto');
 
 // Internal dependencies
 const { loggedInMiddleware, loggingMiddleware } = require('./middleware');
@@ -14,6 +17,7 @@ const PORT = 3000;
 // Controllers
 const userController = require('./controllers/userController');
 const profileController = require('./controllers/profileController');
+const mapIdController = require('./controllers/mapIdController');
 
 // View engine
 app.set('view engine', 'pug');
@@ -29,6 +33,18 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 // Custom middleware
 app.use(loggedInMiddleware);
 app.use(loggingMiddleware);
+
+// Set up the storage for multer
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'public/images');
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({ storage: storage });
 
 // Custom routes
 const discord = require('./routes/discord');
@@ -70,12 +86,67 @@ app.get('/logout', (req, res) => {
 app.get('/profile', async (req, res) => {
   const userId = res.locals.userId;
   res.locals.profile = await profileController.getProfileById(userId);
-  console.log(res.locals.profile.lastSeen);
   res.render('profile');
 });
 
 app.post('/profile', async (req, res) => {
-  // This does nothing until I make the profile model and controller.
+  // At the moment there is no editing profiles.
+  // The controller has the functionality to but I need to make an edit profile view.
+});
+
+// Upload route
+app.get('/upload', async (req, res) => {
+  res.render('upload');
+});
+
+app.post('/upload', upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      // If no file is provided
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    // Metadata from req.file
+    const { filename, path, size, mimetype } = req.file;
+
+    // Build url
+    const imgUrl = "/public/images/" + filename;
+
+    // Read the image file and convert it to base64
+    const base64 = fs.readFileSync(path, { encoding: 'base64' });
+
+    // Calculate a hash of the base64 data
+    const hash = crypto.createHash('md5').update(base64).digest('hex');
+    // Check if a mapId with the same hash already exists
+    const existingMapId = await mapIdController.getMapIdByHash(hash);
+
+    if (existingMapId) {
+      // If duplicate, delete the file
+      fs.unlinkSync(path);
+      return res.status(409).json({ error: 'Duplicate image detected' });
+    }
+
+    // Add metadata to the db
+    console.log(hash);
+    const result = await mapIdController.createMapId({
+      creatorId: res.locals.userId,
+      mapId: 'someMapId',
+      imgUrl: imgUrl,
+      data: 'someData',
+      hash: hash.toString()
+    });
+    // Send a response with information about the uploaded file
+    res.status(200).json({
+      filename,
+      path,
+      size,
+      mimetype,
+      message: 'File uploaded successfully',
+    });
+  } catch (error) {
+    console.error('Error uploading file:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 app.listen(PORT, () => {

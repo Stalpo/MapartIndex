@@ -1,0 +1,24 @@
+doctype html
+html
+  - const pageTitle = "MapArt Upload"
+  include includes/head.pug
+  body
+    include includes/navbar.pug
+
+    div.container
+      div.row.justify-content-center.mt-5
+        div.col-md-6
+          h1.text-center= pageTitle
+          hr
+          if !username
+            p You are not logged in!
+          else
+            div.container.mt-5
+              form(action='/upload', method='post', enctype='multipart/form-data')
+                .form-group
+                  label(for='image') Choose a map:
+                  input(type='file', name='image', id='image', class='form-control-file')
+                button.btn.btn-primary(type='submit') Upload Image
+
+    include includes/footer.pug
+    include includes/scripts.pug

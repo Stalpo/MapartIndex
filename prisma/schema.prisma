@@ -68,5 +68,6 @@ model MapId {
   Map         MapArt?  @relation(fields: [mapId], references: [id], onDelete: Cascade)
   mapId       String?
   imgUrl      String
-  data        String   @unique
+  data        String?  @unique
+  hash        String   @unique
 }

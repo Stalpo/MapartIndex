@@ -8,6 +8,11 @@ nav.navbar.navbar-expand-lg.navbar-light.bg-light
         a.nav-link(href="/")
           i.fa.fa-home.mr-1
           | Home
+      if username
+        li.nav-item
+          a.nav-link(href="/upload")
+            i.fa.fa-upload.mr-1
+            | Upload
       li.nav-item
         if !username
           a.nav-link(href="/login")
