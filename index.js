@@ -13,6 +13,7 @@ const PORT = 3000;
 
 // Controllers
 const userController = require('./controllers/userController');
+const profileController = require('./controllers/profileController');
 
 // View engine
 app.set('view engine', 'pug');
@@ -66,8 +67,10 @@ app.get('/logout', (req, res) => {
 });
 
 // Profile route
-app.get('/profile', (req, res) => {
-  // About ready to start building controller and model.
+app.get('/profile', async (req, res) => {
+  const userId = res.locals.userId;
+  res.locals.profile = await profileController.getProfileById(userId);
+  console.log(res.locals.profile.lastSeen);
   res.render('profile');
 });
 

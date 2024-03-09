@@ -13,14 +13,14 @@ html
       else
         div.row
           div.col-md-4.text-center
-            img.img-fluid.rounded-circle(src="https://placekitten.com/200/200", alt="Profile Picture")
+            img.img-fluid.rounded-circle(src=profile.avatar, alt="Profile Avatar")
             h2 #{ username }
-            p.text-center Last seen: #{ userLastLogin } <!-- Replace with actual user registration date -->
+            p.text-center Last seen: #{ profile.lastSeen } <!-- Replace with actual user registration date -->
             hr
             h3 Your Details
-            p Email: #{ userEmail } <!-- Replace with actual user email -->
-            p Location: #{ userLocation } <!-- Replace with actual user location -->
-            p Joined: #{ userJoinDate } <!-- Replace with actual user join date -->
+            p Email: #{ profile.email } <!-- Replace with actual user email -->
+            p Location: #{ profile.location } <!-- Replace with actual user location -->
+            p Joined: #{ profile.createdAt } <!-- Replace with actual user join date -->
           div.col-md-8
             div.row
               div.col-md-6

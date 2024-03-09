@@ -58,8 +58,8 @@ const updateMcUid = async (userId, mcUid) => {
   return await profileModel.updateMcUid(userId, mcUid);
 };
 
-const updateLastSeenDate = async (userId, lastSeenDate) => {
-  return await profileModel.updateLastSeenDate(userId, lastSeenDate);
+const updateLastSeen = async (userId, lastSeenDate) => {
+  return await profileModel.updateLastSeen(userId, lastSeenDate);
 };
 
 const updateBio = async (userId, bio) => {
@@ -82,7 +82,7 @@ module.exports = {
   updateLocation,
   updateEmail,
   updateMcUid,
-  updateLastSeenDate,
+  updateLastSeen,
   updateBio,
   updateAvatar,
   updateLinks,
