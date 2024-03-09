@@ -14,11 +14,16 @@ html
             p You are not logged in!
           else
             div.container.mt-5
-              form(action='/upload', method='post', enctype='multipart/form-data')
+              form(id='uploadForm', action='/upload', method='post', enctype='multipart/form-data')
                 .form-group
                   label(for='image') Choose a map:
                   input(type='file', name='image', id='image', class='form-control-file')
                 button.btn.btn-primary(type='submit') Upload Image
+              .progress.mt-3(style='display: none;')
+                .progress-bar(role='progressbar', id='uploadProgressBar', style='width: 0%', aria-valuenow='0', aria-valuemin='0', aria-valuemax='100')
+              pre#successMessage(style='display: none;')
+              pre#errorMessage(style='text-align: center; display: none;')
 
+    script(src="./public/js/upload.js")
     include includes/footer.pug
     include includes/scripts.pug
