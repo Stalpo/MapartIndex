@@ -1,7 +1,7 @@
 const profileModel = require('../models/profileModel');
 
 const getProfileById = async (userId) => {
-  return profileModel.getProfileById(userId);
+  return await profileModel.getProfileById(userId);
 };
 
 const createProfile = async ({
@@ -13,7 +13,7 @@ const createProfile = async ({
   joinDate,
   lastSeenDate
 }) => {
-  await profileModel.createProfile({
+  return await profileModel.createProfile({
     userId,
     username,
     location,
@@ -32,7 +32,7 @@ const updateProfile = async (userId, {
   mcUid,
   lastSeenDate
 }) => {
-  await profileModel.updateProfile(userId, {
+  return await profileModel.updateProfile(userId, {
     username,
     location,
     email,
@@ -42,8 +42,48 @@ const updateProfile = async (userId, {
   });
 };
 
+const updateUsername = async (userId, username) => {
+  return await profileModel.updateUsername(userId, username);
+};
+
+const updateLocation = async (userId, location) => {
+  return await profileModel.updateLocation(userId, location);
+};
+
+const updateEmail = async (userId, email) => {
+  return await profileModel.updateEmail(userId, email);
+};
+
+const updateMcUid = async (userId, mcUid) => {
+  return await profileModel.updateMcUid(userId, mcUid);
+};
+
+const updateLastSeenDate = async (userId, lastSeenDate) => {
+  return await profileModel.updateLastSeenDate(userId, lastSeenDate);
+};
+
+const updateBio = async (userId, bio) => {
+  return await profileModel.updateBio(userId, bio);
+};
+
+const updateAvatar = async (userId, avatar) => {
+  return await profileModel.updateAvatar(userId, avatar);
+};
+
+const updateLinks = async (userId, links) => {
+  return await profileModel.updateLinks(userId, links);
+};
+
 module.exports = {
   getProfileById,
   createProfile,
   updateProfile,
+  updateUsername,
+  updateLocation,
+  updateEmail,
+  updateMcUid,
+  updateLastSeenDate,
+  updateBio,
+  updateAvatar,
+  updateLinks,
 };

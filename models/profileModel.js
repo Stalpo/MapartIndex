@@ -2,7 +2,7 @@ const db = require('../util/db');
 const prisma = db.prisma;
 
 const getProfileById = async (userId) => {
-  return prisma.profile.findUnique({
+  return await prisma.profile.findUnique({
     where: { userId }
   });
 };
@@ -18,7 +18,7 @@ const updateProfile = async (userId, {
   bio,
   avatar,
 }) => {
-  await prisma.profile.update({
+  return await prisma.profile.update({
     where: { userId },
     data: {
       username,
@@ -33,51 +33,51 @@ const updateProfile = async (userId, {
 };
 
 const updateUsername = async (userId, username) => {
-    await prisma.profile.update({
+    return await prisma.profile.update({
         where: { userId },
         data: { username }
     });
 
 }
 const updateLocation = async (userId, location) => {
-    await prisma.profile.update({
+    return await prisma.profile.update({
         where: { userId },
         data: { location }
     });
 
 }
 const updateEmail = async (userId, email) => {
-    await prisma.profile.update({
+    return await prisma.profile.update({
         where: { userId },
         data: { email }
     });
 }
 const updateMcUuid = async (userId, mcUuid) => {
-    await prisma.profile.update({
+    return await prisma.profile.update({
         where: { userId },
         data: { mcUuid }
     });
 }
 const updateLastSeen = async (userId, lastSeen) => {
-    await prisma.profile.update({
+    return await prisma.profile.update({
         where: { userId },
         data: { lastSeen }
     });
 }
 const updateBio = async (userId, bio) => {
-    await prisma.profile.update({
+    return await prisma.profile.update({
         where: { userId },
         data: { bio }
     });
 }
 const updateAvatar = async (userId, avatar) => {
-    await prisma.profile.update({
+    return await prisma.profile.update({
         where: { userId },
         data: { avatar }
     });
 }
 const updateLinks = async (userId, links) => {
-    await prisma.profile.update({
+    return await prisma.profile.update({
         where: { userId },
         data: { links }
     });
