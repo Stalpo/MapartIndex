@@ -46,8 +46,8 @@ model MapArt {
   id           String   @id @default(uuid()) @map("_id")
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-  uploaderUser User?    @relation(fields: [uploaderId], references: [id], onDelete: Cascade)
-  uploaderId   String?
+  user         User?    @relation(fields: [userId], references: [id])
+  userId       String?
   artist       String?  @default("N/A")
   imgUrl       String
   name         String
