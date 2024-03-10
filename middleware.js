@@ -15,13 +15,16 @@ const loggedInMiddleware = async (req, res, next) => {
 
       // Set userId in the locals for future use
       const userId = await userController.getIdFromUsername(verificationResult.username);
-      res.locals.userId = userId;
+
+      if (userId) {
+        res.locals.userId = userId;
+        // Update lastSeen
+        await profileController.updateLastSeen(userId, new Date());
+      }
       
-      // Update lastSeen
-      await profileController.updateLastSeen(userId, new Date());
     } else {
       // Token is not valid, handle the error as needed
-      console.error(`Error verifying token: ${verificationResult.error.message}`);
+      console.error(verificationResult.error);
     }
   }
 
