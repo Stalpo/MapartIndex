@@ -14,7 +14,7 @@ const getAllMaps = async () => {
           not: null,
         },
       },
-      take: 10,
+      take: 12,
       include: {
         Map: true,
       },

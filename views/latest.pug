@@ -8,11 +8,11 @@ html
       h1.text-center= pageTitle
       hr
       if allMaps.length > 0
-        ul
+        ul(style="list-style: none; padding: 0; display: flex; flex-wrap: wrap;")
           each map in allMaps
-            li
+            li(style="width: 25%; padding: 10px; box-sizing: border-box; text-align: center;")
               p Map ID: #{map.id}
-              img(src="/public/uploads/" + map.imgUrl, alt=map.id)
+              img(src="/public/uploads/" + map.imgUrl, alt=map.id, style="max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);")
               // map.creatorId, map.createdAt, etc. can be added
       else
         p No maps available
