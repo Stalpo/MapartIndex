@@ -178,13 +178,7 @@ app.post('/upload', upload.single('image'), async (req, res) => {
       hash: hash
     });
     // Send a response with information about the uploaded file
-    res.status(200).json({
-      filename,
-      path,
-      size,
-      mimetype,
-      message: 'File uploaded successfully',
-    });
+    res.status(200).json({ message: 'Upload successful', filename: filename });
   } catch (error) {
     console.error('Error uploading file:', error);
     res.status(500).json({ error: 'Internal server error' });
