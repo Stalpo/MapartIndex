@@ -1,7 +1,15 @@
 const db = require('../util/db');
 const prisma = db.prisma;
 
-// const profileModel = require('./profileModel');
+const isAdmin = async (userId) => {
+  try {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    return user.admin;
+  } catch (error) {
+    console.error('Error in isAdmin:', error);
+    return false;
+  }
+};
 
 const getUserByUsername = async (username) => {
   const user = await prisma.user.findUnique({ where: { username: username }});
@@ -39,6 +47,7 @@ const createUserDiscord = async ({ discordId, username, avatar, email }) => {
 };
 
 module.exports = {
+  isAdmin,
   getUserByUsername,
   createUser,
   getUserById,

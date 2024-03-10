@@ -10,7 +10,7 @@ const sanitize = require('sanitize-filename');
 const validator = require('validator');
 
 // Internal dependencies
-const { loggedInMiddleware, loggingMiddleware } = require('./middleware');
+const { loggedInMiddleware, loggingMiddleware, checkAdminStatus } = require('./middleware');
 
 // Init express
 const app = express();
@@ -35,6 +35,7 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 // Custom middleware
 app.use(loggedInMiddleware);
 app.use(loggingMiddleware);
+app.use(checkAdminStatus);
 
 // Set up the storage for multer
 const storage = multer.diskStorage({

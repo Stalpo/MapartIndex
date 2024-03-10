@@ -2,6 +2,26 @@ const moment = require('moment');
 const userController = require('./controllers/userController');
 const profileController = require('./controllers/profileController');
 
+// Check admin status middleware
+const checkAdminStatus = async (req, res, next) => {
+  try {
+    const userId = res.locals.userId;
+    const isAdminUser = await userController.isAdmin(userId);
+    
+    if (isAdminUser) {
+      res.locals.admin = true;
+    } else {
+      res.locals.admin = false;
+    }
+
+    next();
+  } catch (error) {
+    console.error('Error checking admin status:', error);
+    res.locals.admin = false;
+    next(error);
+  }
+};
+
 // loggedIn variable middleware
 const loggedInMiddleware = async (req, res, next) => {
   const token = req.cookies.token;
@@ -21,7 +41,7 @@ const loggedInMiddleware = async (req, res, next) => {
         // Update lastSeen
         await profileController.updateLastSeen(userId, new Date());
       }
-      
+
     } else {
       // Token is not valid, handle the error as needed
       console.error(verificationResult.error);
@@ -48,6 +68,7 @@ const loggingMiddleware = (req, res, next) => {
 };
 
 module.exports = {
+  checkAdminStatus,
   loggedInMiddleware,
   loggingMiddleware,
 };

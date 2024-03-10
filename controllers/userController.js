@@ -3,6 +3,16 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const validator = require('validator');
 
+const isAdmin = async (userId) => {
+  try {
+    const user = await userModel.isAdmin(userId);
+    return user;
+  } catch (error) {
+    console.error('Error in isAdmin:', error);
+    return false;
+  }
+};
+
 // Function to check if a string is alphanumeric
 const isAlphanumeric = (str) => /^[a-zA-Z0-9]+$/.test(str);
 
@@ -96,6 +106,7 @@ const loginDiscordUser = async (discordId, username, avatar, email) => {
 }
 
 module.exports = {
+  isAdmin,
   registerUser,
   loginUser,
   getUserById,

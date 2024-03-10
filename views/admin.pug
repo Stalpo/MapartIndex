@@ -6,36 +6,38 @@ html
     include includes/navbar.pug
     div.container
       h1.text-center= pageTitle
-
-      if allMaps.length > 0
-        table.table.table-striped
-          thead
-            tr
-              th Map ID
-              th Created At
-              th Updated At
-              th User ID
-              th Artist
-              th NSFW
-              th Actions
-
-          tbody
-            each map in allMaps
-              tr
-                td= map.id
-                td= map.createdAt.toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', hour12: true })
-                td= map.updatedAt.toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', hour12: true })
-                td= map.userId
-                td= map.artist
-                td= map.nsfw
-                td
-                  .btn-group(role='group', aria-label='Buttons')
-                    button.btn.btn-secondary(type='button', onclick=`location.href='/mapart/${map.id}'`)
-                      i.fa.fa-eye
-                    button.btn.btn-secondary(type='button', onclick=`location.href='/mapart-edit/${map.id}'`)
-                      i.fa.fa-pencil-alt
+      if !admin
+        p You are not an administrator
       else
-        p No maps available
+        if allMaps.length > 0
+          table.table.table-striped
+            thead
+              tr
+                th Map ID
+                th Created At
+                th Updated At
+                th User ID
+                th Artist
+                th NSFW
+                th Actions
+
+            tbody
+              each map in allMaps
+                tr
+                  td= map.id
+                  td= map.createdAt.toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', hour12: true })
+                  td= map.updatedAt.toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', hour12: true })
+                  td= map.userId
+                  td= map.artist
+                  td= map.nsfw
+                  td
+                    .btn-group(role='group', aria-label='Buttons')
+                      button.btn.btn-secondary(type='button', onclick=`location.href='/mapart/${map.id}'`)
+                        i.fa.fa-eye
+                      button.btn.btn-secondary(type='button', onclick=`location.href='/mapart-edit/${map.id}'`)
+                        i.fa.fa-pencil-alt
+        else
+          p No maps available
 
       nav
         ul.pagination.justify-content-center
