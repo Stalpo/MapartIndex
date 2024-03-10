@@ -14,7 +14,15 @@ const getUserById = async (id) => {
 };
 
 const getUserByDiscordId = async (discordId) => {
-  const user = await prisma.user.findUnique({ where: { discordId: discordId }});
+  const user = await prisma.user.findFirst({
+    where: {
+      discordId: {
+        equals: discordId,
+        not: null, // Exclude users with null Discord IDs
+      },
+    },
+  });
+
   return user;
 };
 
