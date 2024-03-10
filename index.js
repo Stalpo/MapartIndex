@@ -96,10 +96,6 @@ app.get('/profile', async (req, res) => {
     res.locals.profile = await profileController.getProfileById(userId);
     res.locals.userMaps = await profileController.getAllMapsForUserId(userId);
   }
-
-  // Debugging the profile joined date not being correct.
-  // console.log(res.locals.profile);
-
   res.render('profile');
 });
 
