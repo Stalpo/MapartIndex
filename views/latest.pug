@@ -1,5 +1,6 @@
 doctype html
 html
+  - const pageTitle = "Latest"
   include includes/head.pug
   body
     include includes/navbar.pug
@@ -11,11 +12,11 @@ html
         ul(style="list-style: none; padding: 0; display: flex; flex-wrap: wrap;")
           each map in allMaps
             li(style="width: 25%; padding: 10px; box-sizing: border-box; text-align: center;")
-              p Map ID: #{map.id}
-              img(src="/public/uploads/" + map.imgUrl, alt=map.id, style="max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);")
-              // map.creatorId, map.createdAt, etc. can be added
+              a(href=`/mapart/${map.id}`)
+                p Map ID: #{map.id}
+                img(src="/public/uploads/" + map.imgUrl, alt=map.id, style="max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);")
+                // map.creatorId, map.createdAt, etc. can be added
 
-        // Bootstrap Pagination
         nav
           ul.pagination.justify-content-center
             li.page-item(class=currentPage === 1 ? 'disabled' : '')

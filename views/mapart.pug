@@ -1,0 +1,20 @@
+doctype html
+html
+  - const pageTitle = "MapArt"
+  include includes/head.pug
+  body
+    include includes/navbar.pug
+
+    div.container
+      h1.text-center= pageTitle
+      hr
+      if map
+        div.text-center
+          p Map ID: #{map.id}
+          img(src=`/public/uploads/${map.imgUrl}`, alt=map.id, style="max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);")
+          // Additional map details can be added here
+      else
+        p Map not found
+
+script.
+  var map = !{JSON.stringify(map)};

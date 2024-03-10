@@ -217,6 +217,18 @@ app.get('/latest', async (req, res) => {
   }
 });
 
+app.get('/mapart/:id', async (req, res) => {
+  try {
+    const mapId = req.params.id;
+    const map = await mapIdController.getMapById(mapId);
+
+    res.render('mapart', { pageTitle: 'Individual MapArt', map });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

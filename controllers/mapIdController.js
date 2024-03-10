@@ -1,6 +1,6 @@
 const mapIdModel = require('../models/mapIdModel');
 
-const getMapIdById = async (mapId) => {
+const getMapById = async (mapId) => {
   return await mapIdModel.getMapIdById(mapId);
 };
 
@@ -34,7 +34,7 @@ const getMapIdByHash = async (hash) => {
 };
 
 module.exports = {
-  getMapIdById,
+  getMapById,
   getAllMaps,
   getPaginatedMaps,
   createMapId,

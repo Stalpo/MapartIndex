@@ -65,7 +65,7 @@ const loginUser = async (username, password) => {
     return { error: 'Invalid username or password' };
   }
 
-  const token = jwt.sign({ username }, process.env.SECRET_KEY, { expiresIn: '1h' });
+  const token = jwt.sign({ username }, process.env.SECRET_KEY, { expiresIn: '24h' });
   return { token };
 };
 
@@ -86,7 +86,7 @@ const loginDiscordUser = async (discordId, username, avatar, email) => {
   if(!user) {
     await userModel.createUserDiscord({ discordId, username, avatar, email })
   }
-  const token = jwt.sign({ username }, process.env.SECRET_KEY, { expiresIn: '1h' });
+  const token = jwt.sign({ username }, process.env.SECRET_KEY, { expiresIn: '24h' });
   return { token };
 }
 
