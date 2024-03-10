@@ -23,7 +23,7 @@ model User {
   mapIds    MapId[]
   mapArts   MapArt[]
   Profile   Profile?
-  discordId String?  @unique
+  discordId String?
 }
 
 model Profile {
