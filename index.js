@@ -124,7 +124,6 @@ app.get('/edit-profile', async (req, res) => {
   const userId = res.locals.userId;
   if (userId) {
     res.locals.profile = await profileController.getProfileById(userId);
-    res.locals.userMaps = await profileController.getAllMapsForUserId(userId);
   }
   res.render('edit-profile');
 });
@@ -135,12 +134,19 @@ app.post('/edit-profile', async (req, res) => {
 
     // Collect the updated profile data from the form and sanitize
     const { email, location, avatar } = req.body;
-    const sanitizedEmail = validator.escape(email);
-    const sanitizedLocation = validator.escape(location);
-    const sanitizedAvatar = validator.escape(avatar);
+    const sanitizedEmail = validator.trim(email);
+    const sanitizedLocation = validator.trim(location);
+
+    // Check if the avatar is a valid URL
+    const isAvatarURLValid = validator.isURL(avatar);
+    const sanitizedAvatar = isAvatarURLValid ? avatar : '';
 
     // Update the user's profile
-    await profileController.updateProfile(userId, { sanitizedEmail, sanitizedLocation, sanitizedAvatar });
+    await profileController.updateProfile(userId, {
+      email: sanitizedEmail,
+      location: sanitizedLocation,
+      avatar: sanitizedAvatar
+    });
     
     // Redirect to the profile page after editing
     res.redirect('/profile');
