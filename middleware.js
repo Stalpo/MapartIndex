@@ -6,13 +6,10 @@ const profileController = require('./controllers/profileController');
 const checkAdminStatus = async (req, res, next) => {
   try {
     const userId = res.locals.userId;
+    if(!userId) return next();
     const isAdminUser = await userController.isAdmin(userId);
     
-    if (isAdminUser) {
-      res.locals.admin = true;
-    } else {
-      res.locals.admin = false;
-    }
+    res.locals.admin = !!isAdminUser;
 
     next();
   } catch (error) {
