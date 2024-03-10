@@ -1,0 +1,18 @@
+doctype html
+html
+  include includes/head.pug
+  body
+    include includes/navbar.pug
+
+    div.container
+      h1.text-center= pageTitle
+      hr
+      if allMaps.length > 0
+        ul
+          each map in allMaps
+            li
+              p Map ID: #{map.id}
+              img(src="/public/uploads/" + map.imgUrl, alt=map.id)
+              // map.creatorId, map.createdAt, etc. can be added
+      else
+        p No maps available

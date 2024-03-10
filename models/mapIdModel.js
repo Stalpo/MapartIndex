@@ -1,10 +1,33 @@
-const db = require('../util/db');
-const prisma = db.prisma;
+const prisma = require('../util/db').prisma;
 
 const getMapIdById = async (mapId) => {
   return await prisma.mapId.findUnique({
     where: { id: mapId }
   });
+};
+
+const getAllMaps = async () => {
+  try {
+    const maps = await prisma.mapId.findMany({
+      where: {
+        userId: {
+          not: null,
+        },
+      },
+      take: 10,
+      include: {
+        Map: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return maps;
+  } catch (error) {
+    console.error('Error fetching maps with userId:', error);
+    throw error;
+  }
 };
 
 const createMapId = async ({ userId, mapId, imgUrl, hash }) => {
@@ -51,6 +74,7 @@ const getAllMapsForUserId = async (userId) => {
 
 module.exports = {
   getMapIdById,
+  getAllMaps,
   createMapId,
   updateMapId,
   getMapIdByHash,

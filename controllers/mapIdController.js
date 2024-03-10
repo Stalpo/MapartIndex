@@ -4,6 +4,10 @@ const getMapIdById = async (mapId) => {
   return await mapIdModel.getMapIdById(mapId);
 };
 
+const getAllMaps = async () => {
+  return await mapIdModel.getAllMaps();
+};
+
 const createMapId = async ({ userId, mapId, imgUrl, hash }) => {
   return await mapIdModel.createMapId({
     userId,
@@ -27,6 +31,7 @@ const getMapIdByHash = async (hash) => {
 
 module.exports = {
   getMapIdById,
+  getAllMaps,
   createMapId,
   updateMapId,
   getMapIdByHash,

@@ -199,6 +199,17 @@ app.post('/upload', upload.single('image'), async (req, res) => {
   }
 });
 
+// Latest uploads route
+app.get('/latest', async (req, res) => {
+  try {
+    const allMaps = await mapIdController.getAllMaps();
+    res.render('latest', { allMaps });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
