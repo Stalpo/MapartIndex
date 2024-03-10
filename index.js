@@ -85,9 +85,11 @@ app.get('/logout', (req, res) => {
 // Profile route
 app.get('/profile', async (req, res) => {
   const userId = res.locals.userId;
-  res.locals.profile = await profileController.getProfileById(userId);
-  res.locals.userMaps = await profileController.getAllMapsForUserId(userId);
-
+  if (userId) {
+    res.locals.profile = await profileController.getProfileById(userId);
+    res.locals.userMaps = await profileController.getAllMapsForUserId(userId);
+  }
+  
   // Debugging the profile joined date not being correct.
   // console.log(res.locals.profile);
 
