@@ -3,6 +3,46 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const validator = require('validator');
 
+const isAdmin = async (userId) => {
+  try {
+    const user = await userModel.isAdmin(userId);
+    return user;
+  } catch (error) {
+    console.error('Error in isAdmin:', error);
+    return false;
+  }
+};
+
+const getApiKeyById = async (userId) => {
+  try {
+    const apiKey = await userModel.getApiKeyById(userId);
+    return apiKey;
+  } catch (error) {
+    console.error('Error in getApiKeyById:', error);
+    return null;
+  }
+};
+
+const verifyApiKey = async (apiKey) => {
+  try {
+    const isValid = await userModel.verifyApiKey(apiKey);
+    return isValid;
+  } catch (error) {
+    console.error('Error in verifyApiKey:', error);
+    return false;
+  }
+};
+
+const newApiKey = async (userId) => {
+  try {
+    const newApiKey = await userModel.renewApiKey(userId);
+    return newApiKey;
+  } catch (error) {
+    console.error('Error in renewApiKey:', error);
+    return null;
+  }
+};
+
 // Function to check if a string is alphanumeric
 const isAlphanumeric = (str) => /^[a-zA-Z0-9]+$/.test(str);
 
@@ -13,6 +53,11 @@ const sanitizeInput = (input) => validator.escape(input);
 const getIdFromUsername = async (username) => {
   const user = await userModel.getUserByUsername(username);
   return user ? user.id : null;
+};
+
+const getUserById = async (userId) => {
+  const user = await userModel.getUserById(userId);
+  return user;
 };
 
 // Register user
@@ -65,7 +110,7 @@ const loginUser = async (username, password) => {
     return { error: 'Invalid username or password' };
   }
 
-  const token = jwt.sign({ username }, process.env.SECRET_KEY, { expiresIn: '1h' });
+  const token = jwt.sign({ username }, process.env.SECRET_KEY, { expiresIn: '24h' });
   return { token };
 };
 
@@ -86,13 +131,18 @@ const loginDiscordUser = async (discordId, username, avatar, email) => {
   if(!user) {
     await userModel.createUserDiscord({ discordId, username, avatar, email })
   }
-  const token = jwt.sign({ username }, process.env.SECRET_KEY, { expiresIn: '1h' });
+  const token = jwt.sign({ username }, process.env.SECRET_KEY, { expiresIn: '24h' });
   return { token };
 }
 
 module.exports = {
+  isAdmin,
+  getApiKeyById,
+  verifyApiKey,
+  newApiKey,
   registerUser,
   loginUser,
+  getUserById,
   verifyToken,
   getIdFromUsername,
   loginDiscordUser,

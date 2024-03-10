@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const progressBar = document.getElementById("uploadProgressBar");
   const successMessage = document.getElementById("successMessage");
   const errorMessage = document.getElementById("errorMessage");
+  const previewImg = document.getElementById("previewImg");
 
   form.addEventListener("submit", function (event) {
     event.preventDefault(); // Prevent the form from submitting normally
@@ -31,8 +32,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (xhr.status === 200) {
         // Handle a successful upload response
+        const response = JSON.parse(xhr.responseText);
         successMessage.style.display = "block";
-        successMessage.innerHTML = "Upload Successful: " + xhr.responseText;
+        successMessage.innerHTML =
+          "Upload Successful! Click <a href='./public/uploads/" +
+          response.filename +
+          "' target='_blank'>here</a> to view your file.";
+
+        // Display the uploaded image in the success alert
+        if (response.filename) {
+          previewImg.src = "./public/uploads/" + response.filename;
+          console.dir(previewImg);
+          previewImg.style.display = "block";
+        }
       } else {
         // Handle other server errors or HTTP status codes
         try {

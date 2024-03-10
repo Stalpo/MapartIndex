@@ -1,0 +1,35 @@
+doctype html
+html
+  include includes/head.pug
+  body
+    include includes/navbar.pug
+
+    div.container
+      h1.text-center= pageTitle
+      if !admin
+        p You are not an administrator
+      else
+        hr
+        p Editing: #{ map.id }
+        // Form for editing map details
+        form(method='post' action=`/mapart-edit/${map.id}`)
+          // Artist
+          .mb-3
+            label(for='artist', class='form-label') Artist:
+            input.form-control(type='text', id='artist', name='artist', value=map.artist)
+
+          // NSFW
+          .mb-3
+            div.form-check
+              input.form-check-input(type='checkbox', id='nsfw', name='nsfw', checked=map.nsfw)
+              label.form-check-label(for='nsfw') NSFW
+
+          // Uploaded By
+          .mb-3
+            label(for='user', class='form-label') Uploaded By:
+            input.form-control(type='text', id='user', name='user', value=user.username, readonly)
+
+          // Submit button
+          button.btn.btn-primary(type='submit') Save Changes
+
+    include includes/scripts.pug

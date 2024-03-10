@@ -133,4 +133,5 @@ package-lock.json
 
 .idea/
 /prisma/src/
-/public/images/*
+/public/uploads/*.png
+/public/uploads/*.jpg

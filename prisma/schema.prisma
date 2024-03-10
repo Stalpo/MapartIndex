@@ -20,10 +20,12 @@ model User {
   updatedAt DateTime @updatedAt
   username  String   @unique
   hashedPw  String?
-  mapIds    MapId[]
+  mapIds    MapId[]  // Removed the @relation attribute
   mapArts   MapArt[]
   Profile   Profile?
-  discordId String?  @unique
+  discordId String?
+  admin     Boolean  @default(false)
+  apiKey    String?
 }
 
 model Profile {
@@ -43,31 +45,32 @@ model Profile {
 }
 
 model MapArt {
-  id          String   @id @default(uuid()) @map("_id")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  creator     String   @default("N/A")
-  creatorUser User?    @relation(fields: [creatorId], references: [id], onDelete: Cascade)
-  creatorId   String?
-  imgUrl      String
-  name        String
-  description String
-  mapIds      MapId[]
-  rotations   Int[] // 0-3 rotation
-  hSize       Int
-  vSize       Int
+  id           String   @id @default(uuid()) @map("_id")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User?    @relation(fields: [userId], references: [id])
+  userId       String?
+  artist       String?  @default("N/A")
+  imgUrl       String
+  name         String
+  description  String
+  mapIds       MapId[]
+  rotations    Int[] // 0-3 rotation
+  hSize        Int
+  vSize        Int
+  nsfw         Boolean  @default(false)
 }
 
 model MapId {
-  id          String   @id @default(uuid()) @map("_id")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  creator     String   @default("N/A")
-  creatorUser User?    @relation(fields: [creatorId], references: [id], onDelete: Cascade)
-  creatorId   String?
-  Map         MapArt?  @relation(fields: [mapId], references: [id], onDelete: Cascade)
-  mapId       String?
-  imgUrl      String
-  data        String?  @unique
-  hash        String   @unique
+  id           String   @id @default(uuid()) @map("_id")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User?    @relation(fields: [userId], references: [id])
+  userId       String?
+  artist       String?  @default("N/A")
+  Map          MapArt?  @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  mapId        String?
+  imgUrl       String
+  hash         String
+  nsfw         Boolean  @default(false)
 }

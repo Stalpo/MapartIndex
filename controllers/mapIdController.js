@@ -1,25 +1,39 @@
 const mapIdModel = require('../models/mapIdModel');
 
-const getMapIdById = async (mapId) => {
+const getMapById = async (mapId) => {
   return await mapIdModel.getMapIdById(mapId);
 };
 
-const createMapId = async ({ creatorId, mapId, imgUrl, data, hash }) => {
+const getAllMaps = async () => {
+  return await mapIdModel.getAllMaps();
+};
+
+const getPaginatedMaps = async (currentPage, perPage) => {
+  return await mapIdModel.getPaginatedMaps(currentPage, perPage);
+};
+
+const createMapId = async ({ userId, mapId, imgUrl, hash }) => {
   return await mapIdModel.createMapId({
-    creatorId,
+    userId,
     mapId,
     imgUrl,
-    data,
     hash
   });
 };
 
-const updateMapId = async (mapId, { creatorId, imgUrl, data }) => {
-  return await mapIdModel.updateMapId(mapId, {
-    creatorId,
-    imgUrl,
-    data
-  });
+const updateMapById = async (mapId, { artist, nsfw, mapArtData }) => {
+  try {
+    const result = await mapIdModel.updateMapById(mapId, {
+      artist,
+      nsfw,
+      mapArtData,
+    });
+
+    return result;
+  } catch (error) {
+    console.error('Error updating map:', error);
+    throw error;
+  }
 };
 
 const getMapIdByHash = async (hash) => {
@@ -35,9 +49,11 @@ const getMapsByOwnerId = async (ownerId) => {
 };
 
 module.exports = {
-  getMapIdById,
+  getMapById,
+  getAllMaps,
+  getPaginatedMaps,
   createMapId,
-  updateMapId,
+  updateMapById,
   getMapIdByHash,
   getAllMapIds,
   getMapsByOwnerId,

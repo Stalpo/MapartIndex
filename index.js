@@ -6,9 +6,11 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
+const sanitize = require('sanitize-filename');
+const validator = require('validator');
 
 // Internal dependencies
-const { loggedInMiddleware, loggingMiddleware } = require('./middleware');
+const { loggedInMiddleware, loggingMiddleware, checkAdminStatus } = require('./middleware');
 
 // Init express
 const app = express();
@@ -33,18 +35,44 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 // Custom middleware
 app.use(loggedInMiddleware);
 app.use(loggingMiddleware);
+app.use(checkAdminStatus);
 
 // Set up the storage for multer
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'public/images');
+    cb(null, 'public/uploads');
   },
   filename: function (req, file, cb) {
-    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+    crypto.randomBytes(16, (err, buffer) => {
+      if (err) return cb(err);
+
+      const hash = buffer.toString('hex');
+      const sanitizedFilename = sanitize(file.originalname);
+      const filename = `${hash}${path.extname(sanitizedFilename)}`;
+      
+      cb(null, filename);
+    });
   },
 });
 
-const upload = multer({ storage: storage });
+// File filter for multer
+const fileFilter = (req, file, cb) => {
+  // Check if the file is an image
+  if (file.mimetype.startsWith('image/')) {
+    cb(null, true);
+  } else {
+    cb(new Error('Only images are allowed!'), false);
+  }
+};
+
+// Init multer storage, file filter, and limits
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: {
+    fileSize: 1024 * 1024 * 2, // 2 MB limit
+  },
+});
 
 // Custom routes
 const discord = require('./routes/discord');
@@ -87,13 +115,57 @@ app.get('/logout', (req, res) => {
 // Profile route
 app.get('/profile', async (req, res) => {
   const userId = res.locals.userId;
-  res.locals.profile = await profileController.getProfileById(userId);
+  if (userId) {
+    res.locals.profile = await profileController.getProfileById(userId);
+    res.locals.userMaps = await profileController.getAllMapsForUserId(userId);
+    res.locals.apiKey = await userController.getApiKeyById(userId);
+  }
   res.render('profile');
 });
 
-app.post('/profile', async (req, res) => {
-  // At the moment there is no editing profiles.
-  // The controller has the functionality to but I need to make an edit profile view.
+// Profile editing route
+app.get('/edit-profile', async (req, res) => {
+  const userId = res.locals.userId;
+  if (userId) {
+    res.locals.profile = await profileController.getProfileById(userId);
+  }
+  res.render('edit-profile');
+});
+
+app.post('/edit-profile', async (req, res) => {
+  try {
+    const userId = res.locals.userId;
+
+    // Collect the updated profile data from the form and sanitize
+    const { bio, email, location, avatar, mcUuid } = req.body;
+
+    const sanitizedBio = validator.trim(bio);
+    const sanitizedEmail = validator.trim(email);
+    const sanitizedLocation = validator.trim(location);
+
+    // Check if the avatar is a valid URL
+    const isAvatarURLValid = validator.isURL(avatar);
+    const sanitizedAvatar = isAvatarURLValid ? avatar : '';
+
+    const isValidUuid = validator.isUUID(mcUuid);
+    const sanitizedUuid = isValidUuid ? mcUuid : '';
+
+
+    // Update the user's profile
+    await profileController.updateProfile(userId, {
+      bio: sanitizedBio,
+      email: sanitizedEmail,
+      location: sanitizedLocation,
+      avatar: sanitizedAvatar,
+      mcUuid: sanitizedUuid
+    });
+
+    // Redirect to the profile page after editing
+    res.redirect('/profile');
+  } catch (error) {
+    console.error('Error editing profile:', error);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
 // Upload route
@@ -111,42 +183,106 @@ app.post('/upload', upload.single('image'), async (req, res) => {
     // Metadata from req.file
     const { filename, path, size, mimetype } = req.file;
 
-    // Build url
-    const imgUrl = "/public/images/" + filename;
-
     // Read the image file and convert it to base64
     const base64 = fs.readFileSync(path, { encoding: 'base64' });
 
     // Calculate a hash of the base64 data
     const hash = crypto.createHash('md5').update(base64).digest('hex');
-    // Check if a mapId with the same hash already exists
-    const existingMapId = await mapIdController.getMapIdByHash(hash);
-
-    if (existingMapId) {
-      // If duplicate, delete the file
-      fs.unlinkSync(path);
-      return res.status(409).json({ error: 'Duplicate image detected' });
-    }
 
     // Add metadata to the db
-    const result = await mapIdController.createMapId({
-      creatorId: res.locals.userId,
-      mapId: 'someMapId',
-      imgUrl: imgUrl,
-      data: 'someData',
+    await mapIdController.createMapId({
+      userId: res.locals.userId,
+      imgUrl: filename,
       hash: hash
     });
     // Send a response with information about the uploaded file
-    res.status(200).json({
-      filename,
-      path,
-      size,
-      mimetype,
-      message: 'File uploaded successfully',
-    });
+    res.status(200).json({ message: 'Upload successful', filename: filename });
   } catch (error) {
     console.error('Error uploading file:', error);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.get('/latest', async (req, res) => {
+  try {
+    const perPage = 12;
+    const currentPage = parseInt(req.query.page) || 1;
+
+    const allMaps = await mapIdController.getAllMaps();
+    const totalMaps = allMaps.length;
+    const totalPages = Math.ceil(totalMaps / perPage);
+
+    const paginatedMaps = await mapIdController.getPaginatedMaps(currentPage, perPage);
+
+    res.render('latest', { allMaps: paginatedMaps, currentPage, totalPages });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+app.get('/mapart/:id', async (req, res) => {
+  try {
+    const mapId = req.params.id;
+    const map = await mapIdController.getMapById(mapId);
+
+    res.render('mapart', { pageTitle: 'Individual MapArt', map });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+app.get('/admin', async (req, res) => {
+  try {
+    const perPage = 10;
+    const currentPage = parseInt(req.query.page) || 1;
+
+    const allMaps = await mapIdController.getAllMaps();
+    const totalMaps = allMaps.length;
+    const totalPages = Math.ceil(totalMaps / perPage);
+
+    const paginatedMaps = await mapIdController.getPaginatedMaps(currentPage, perPage);
+
+    res.render('admin', { allMaps: paginatedMaps, currentPage, totalPages });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+app.get('/mapart-edit/:id', async (req, res) => {
+  try {
+    const mapId = req.params.id;
+    const map = await mapIdController.getMapById(mapId);
+
+    const user = await userController.getUserById(map.userId);
+
+    res.render('mapart-edit', { pageTitle: 'Edit MapArt', map, user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+app.post('/mapart-edit/:id', async (req, res) => {
+  try {
+    const mapId = req.params.id;
+    const { artist, nsfw, /* Add other fields as needed */ } = req.body;
+
+    // Update map details, including MapArt data
+    await mapIdController.updateMapById(mapId, {
+      artist,
+      nsfw: nsfw === 'on',
+      mapArtData: {
+        // Add other MapArt data fields here
+      },
+    });
+
+    res.redirect(`/admin`);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
   }
 });
 
