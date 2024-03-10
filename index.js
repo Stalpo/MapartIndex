@@ -40,7 +40,14 @@ const storage = multer.diskStorage({
     cb(null, 'public/uploads');
   },
   filename: function (req, file, cb) {
-    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+    crypto.randomBytes(16, (err, buffer) => {
+      if (err) return cb(err);
+
+      const hash = buffer.toString('hex');
+      const filename = `${hash}${path.extname(file.originalname)}`;
+      
+      cb(null, filename);
+    });
   },
 });
 
@@ -89,7 +96,7 @@ app.get('/profile', async (req, res) => {
     res.locals.profile = await profileController.getProfileById(userId);
     res.locals.userMaps = await profileController.getAllMapsForUserId(userId);
   }
-  
+
   // Debugging the profile joined date not being correct.
   // console.log(res.locals.profile);
 
