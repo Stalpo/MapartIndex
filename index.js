@@ -6,6 +6,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
+const sanitize = require('sanitize-filename');
 
 // Internal dependencies
 const { loggedInMiddleware, loggingMiddleware } = require('./middleware');
@@ -44,14 +45,32 @@ const storage = multer.diskStorage({
       if (err) return cb(err);
 
       const hash = buffer.toString('hex');
-      const filename = `${hash}${path.extname(file.originalname)}`;
+      const sanitizedFilename = sanitize(file.originalname);
+      const filename = `${hash}${path.extname(sanitizedFilename)}`;
       
       cb(null, filename);
     });
   },
 });
 
-const upload = multer({ storage: storage });
+// File filter for multer
+const fileFilter = (req, file, cb) => {
+  // Check if the file is an image
+  if (file.mimetype.startsWith('image/')) {
+    cb(null, true);
+  } else {
+    cb(new Error('Only images are allowed!'), false);
+  }
+};
+
+// Init multer storage, file filter, and limits
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: {
+    fileSize: 1024 * 1024 * 2, // 2 MB limit
+  },
+});
 
 // Custom routes
 const discord = require('./routes/discord');
