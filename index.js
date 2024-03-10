@@ -147,7 +147,7 @@ app.post('/edit-profile', async (req, res) => {
       location: sanitizedLocation,
       avatar: sanitizedAvatar
     });
-    
+
     // Redirect to the profile page after editing
     res.redirect('/profile');
   } catch (error) {
