@@ -31,6 +31,10 @@ html
                 label(for="avatarInput") Avatar URL:
                 input#avatarInput.form-control(type="text" name="avatar" value=profile.avatar placeholder="Enter the URL of your avatar")
 
+              div.form-group
+                label(for="mcUuidInput") Minecraft UUID:
+                input#mcUuidInput.form-control(type="text" name="mcUuid" value=profile.mcUuid placeholder="Enter your Minecraft UUID")
+
               // Submit button
               button.btn.btn-primary(type="submit") Save Changes
 

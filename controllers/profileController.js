@@ -35,7 +35,7 @@ const updateProfile = async (userId, {
   location,
   email,
   discordId,
-  mcUid,
+  mcUuid,
   lastSeenDate,
   bio
 }) => {
@@ -44,7 +44,7 @@ const updateProfile = async (userId, {
     location,
     email,
     discordId,
-    mcUid,
+    mcUuid,
     lastSeenDate,
     bio
   });

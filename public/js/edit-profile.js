@@ -14,15 +14,17 @@ document.addEventListener("DOMContentLoaded", function() {
     var bioInput = document.getElementById("bioInput");
     var emailInput = document.getElementById("emailInput");
     var locationInput = document.getElementById("locationInput");
-    var avatarInput = document.getElementById("avatarInput");    
+    var avatarInput = document.getElementById("avatarInput");
+    var mcUuidInput = document.getElementById("mcUuidInput");    
 
     // Check if elements are input elements
-    if (bioInput && emailInput && locationInput && avatarInput) {
+    if (bioInput && emailInput && locationInput && avatarInput && mcUuidInput) {
 
       var bio = bioInput.value;
       var email = emailInput.value;
       var location = locationInput.value;
       var avatar = avatarInput.value;
+      var mcUuid = mcUuidInput.value;
 
       // You may need to collect other form data as needed
 
@@ -50,11 +52,12 @@ document.addEventListener("DOMContentLoaded", function() {
         bio: bio,
         email: email,
         location: location,
-        avatar: avatar
+        avatar: avatar,
+        mcUuid: mcUuid,
         // Add other fields as needed
       });
 
-      // console.log(jsonData);
+      console.log(jsonData);
 
       // Send the request
       xhr.send(jsonData);
