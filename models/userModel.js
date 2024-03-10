@@ -17,6 +17,36 @@ const getApiKeyById = async (userId) => {
   }
 };
 
+const verifyApiKey = async (apiKey) => {
+  try {
+    const user = await prisma.user.findFirst({
+      where: {
+        apiKey: {
+          equals: apiKey,
+        },
+      },
+    });
+    return !!user;
+  } catch (error) {
+    console.error('Error in verifyApiKey:', error);
+    return false;
+  }
+};
+
+const newApiKey = async (userId) => {
+  try {
+    const newApiKey = generateApiKey();
+    await prisma.user.update({
+      where: { id: userId },
+      data: { apiKey: newApiKey },
+    });
+    return newApiKey;
+  } catch (error) {
+    console.error('Error in renewApiKey:', error);
+    return null;
+  }
+};
+
 const isAdmin = async (userId) => {
   try {
     const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -67,6 +97,8 @@ const createUserDiscord = async ({ discordId, username, avatar, email }) => {
 module.exports = {
   isAdmin,
   getApiKeyById,
+  verifyApiKey,
+  newApiKey,
   getUserByUsername,
   createUser,
   getUserById,

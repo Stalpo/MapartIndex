@@ -23,6 +23,26 @@ const getApiKeyById = async (userId) => {
   }
 };
 
+const verifyApiKey = async (apiKey) => {
+  try {
+    const isValid = await userModel.verifyApiKey(apiKey);
+    return isValid;
+  } catch (error) {
+    console.error('Error in verifyApiKey:', error);
+    return false;
+  }
+};
+
+const newApiKey = async (userId) => {
+  try {
+    const newApiKey = await userModel.renewApiKey(userId);
+    return newApiKey;
+  } catch (error) {
+    console.error('Error in renewApiKey:', error);
+    return null;
+  }
+};
+
 // Function to check if a string is alphanumeric
 const isAlphanumeric = (str) => /^[a-zA-Z0-9]+$/.test(str);
 
@@ -118,6 +138,8 @@ const loginDiscordUser = async (discordId, username, avatar, email) => {
 module.exports = {
   isAdmin,
   getApiKeyById,
+  verifyApiKey,
+  newApiKey,
   registerUser,
   loginUser,
   getUserById,
