@@ -70,13 +70,16 @@ const createMapId = async ({ userId, mapId, imgUrl, hash }) => {
   });
 };
 
-const updateMapId = async (mapId, { uploaderId, imgUrl, data }) => {
+const updateMapById = async (mapId, { artist, nsfw, mapArtData }) => {
   return await prisma.mapId.update({
     where: { id: mapId },
     data: {
-      uploaderId,
-      imgUrl
-    }
+      artist,
+      nsfw,
+      Map: {
+        update: mapArtData,
+      },
+    },
   });
 };
 
@@ -92,7 +95,7 @@ const getAllMapsForUserId = async (userId) => {
       userId: userId,
     },
     include: {
-      Map: true, // Include the associated MapArt details
+      Map: true,
     },
   });
 };
@@ -102,7 +105,7 @@ module.exports = {
   getAllMaps,
   getPaginatedMaps,
   createMapId,
-  updateMapId,
+  updateMapById,
   getMapIdByHash,
   getAllMapsForUserId,
 };

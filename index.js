@@ -233,7 +233,7 @@ app.get('/admin', async (req, res) => {
   try {
     const perPage = 10;
     const currentPage = parseInt(req.query.page) || 1;
-    
+
     const allMaps = await mapIdController.getAllMaps();
     const totalMaps = allMaps.length;
     const totalPages = Math.ceil(totalMaps / perPage);
@@ -241,6 +241,41 @@ app.get('/admin', async (req, res) => {
     const paginatedMaps = await mapIdController.getPaginatedMaps(currentPage, perPage);
 
     res.render('admin', { allMaps: paginatedMaps, currentPage, totalPages });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+app.get('/mapart-edit/:id', async (req, res) => {
+  try {
+    const mapId = req.params.id;
+    const map = await mapIdController.getMapById(mapId);
+
+    const user = await userController.getUserById(map.userId);
+
+    res.render('mapart-edit', { pageTitle: 'Edit MapArt', map, user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+app.post('/mapart-edit/:id', async (req, res) => {
+  try {
+    const mapId = req.params.id;
+    const { artist, nsfw, /* Add other fields as needed */ } = req.body;
+
+    // Update map details, including MapArt data
+    await mapIdController.updateMapById(mapId, {
+      artist,
+      nsfw: nsfw === 'on',
+      mapArtData: {
+        // Add other MapArt data fields here
+      },
+    });
+
+    res.redirect(`/admin`);
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');

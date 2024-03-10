@@ -29,21 +29,26 @@ html
                 td= map.artist
                 td= map.nsfw
                 td
-                  a(href=`/mapart/${map.id}`) View Details
-
-        nav
-          ul.pagination.justify-content-center
-            li.page-item(class=currentPage === 1 ? 'disabled' : '')
-              a.page-link(href=`/admin?page=${currentPage - 1}`) Previous
-
-            for page in Array(totalPages).fill().map((_, i) => i + 1)
-              li.page-item(class=currentPage === page ? 'active' : '')
-                a.page-link(href=`/admin?page=${page}`)= page
-
-            li.page-item(class=currentPage === totalPages ? 'disabled' : '')
-              a.page-link(href=`/admin?page=${currentPage + 1}`) Next
-
+                  .btn-group(role='group', aria-label='Buttons')
+                    button.btn.btn-secondary(type='button', onclick=`location.href='/mapart/${map.id}'`)
+                      i.fa.fa-eye
+                    button.btn.btn-secondary(type='button', onclick=`location.href='/mapart-edit/${map.id}'`)
+                      i.fa.fa-pencil-alt
       else
         p No maps available
+
+      nav
+        ul.pagination.justify-content-center
+          if currentPage > 1
+            li.page-item
+              a.page-link(href=`/admin?page=${currentPage - 1}`) Previous
+
+          - for (let page = 1; page <= totalPages; page++)
+            li.page-item(class=currentPage === page ? 'active' : '')
+              a.page-link(href=`/admin?page=${page}`)= page
+
+          if currentPage < totalPages
+            li.page-item
+              a.page-link(href=`/admin?page=${currentPage + 1}`) Next
 
       include includes/scripts.pug

@@ -15,6 +15,11 @@ const getIdFromUsername = async (username) => {
   return user ? user.id : null;
 };
 
+const getUserById = async (userId) => {
+  const user = await userModel.getUserById(userId);
+  return user;
+};
+
 // Register user
 const registerUser = async (username, password) => {
   // Sanitize inputs
@@ -93,6 +98,7 @@ const loginDiscordUser = async (discordId, username, avatar, email) => {
 module.exports = {
   registerUser,
   loginUser,
+  getUserById,
   verifyToken,
   getIdFromUsername,
   loginDiscordUser,

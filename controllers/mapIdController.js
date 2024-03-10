@@ -21,12 +21,19 @@ const createMapId = async ({ userId, mapId, imgUrl, hash }) => {
   });
 };
 
-const updateMapId = async (mapId, { creatorId, imgUrl, data }) => {
-  return await mapIdModel.updateMapId(mapId, {
-    creatorId,
-    imgUrl,
-    data
-  });
+const updateMapById = async (mapId, { artist, nsfw, mapArtData }) => {
+  try {
+    const result = await mapIdModel.updateMapById(mapId, {
+      artist,
+      nsfw,
+      mapArtData,
+    });
+
+    return result;
+  } catch (error) {
+    console.error('Error updating map:', error);
+    throw error;
+  }
 };
 
 const getMapIdByHash = async (hash) => {
@@ -38,6 +45,6 @@ module.exports = {
   getAllMaps,
   getPaginatedMaps,
   createMapId,
-  updateMapId,
+  updateMapById,
   getMapIdByHash,
 };
