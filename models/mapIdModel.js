@@ -7,25 +7,27 @@ const getMapIdById = async (mapId) => {
   });
 };
 
-const createMapId = async ({ creatorId, mapId, imgUrl, data, hash }) => {
+const createMapId = async ({ userId, mapId, imgUrl, hash }) => {
   return await prisma.mapId.create({
     data: {
-      creatorId,
-      mapId,
-      imgUrl,
-      data,
-      hash
+      user: {
+        connect: {
+          id: userId
+        }
+      },
+      mapId: mapId,
+      imgUrl: imgUrl,
+      hash: hash,
     }
   });
 };
 
-const updateMapId = async (mapId, { creatorId, imgUrl, data }) => {
+const updateMapId = async (mapId, { uploaderId, imgUrl, data }) => {
   return await prisma.mapId.update({
     where: { id: mapId },
     data: {
-      creatorId,
-      imgUrl,
-      data
+      uploaderId,
+      imgUrl
     }
   });
 };

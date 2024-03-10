@@ -37,7 +37,7 @@ app.use(loggingMiddleware);
 // Set up the storage for multer
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'public/images');
+    cb(null, 'public/uploads');
   },
   filename: function (req, file, cb) {
     cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
@@ -109,29 +109,16 @@ app.post('/upload', upload.single('image'), async (req, res) => {
     // Metadata from req.file
     const { filename, path, size, mimetype } = req.file;
 
-    // Build url
-    const imgUrl = "/public/images/" + filename;
-
     // Read the image file and convert it to base64
     const base64 = fs.readFileSync(path, { encoding: 'base64' });
 
     // Calculate a hash of the base64 data
     const hash = crypto.createHash('md5').update(base64).digest('hex');
-    // Check if a mapId with the same hash already exists
-    const existingMapId = await mapIdController.getMapIdByHash(hash);
-
-    if (existingMapId) {
-      // If duplicate, delete the file
-      fs.unlinkSync(path);
-      return res.status(409).json({ error: 'Duplicate image detected' });
-    }
 
     // Add metadata to the db
-    const result = await mapIdController.createMapId({
-      creatorId: res.locals.userId,
-      mapId: 'someMapId',
-      imgUrl: imgUrl,
-      data: 'someData',
+    await mapIdController.createMapId({
+      userId: res.locals.userId,
+      imgUrl: filename,
       hash: hash
     });
     // Send a response with information about the uploaded file

@@ -4,12 +4,11 @@ const getMapIdById = async (mapId) => {
   return await mapIdModel.getMapIdById(mapId);
 };
 
-const createMapId = async ({ creatorId, mapId, imgUrl, data, hash }) => {
+const createMapId = async ({ userId, mapId, imgUrl, hash }) => {
   return await mapIdModel.createMapId({
-    creatorId,
+    userId,
     mapId,
     imgUrl,
-    data,
     hash
   });
 };
