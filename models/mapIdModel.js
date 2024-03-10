@@ -38,9 +38,21 @@ const getMapIdByHash = async (hash) => {
   });
 };
 
+const getAllMapsForUserId = async (userId) => {
+  return await prisma.mapId.findMany({
+    where: {
+      userId: userId,
+    },
+    include: {
+      Map: true, // Include the associated MapArt details
+    },
+  });
+};
+
 module.exports = {
   getMapIdById,
   createMapId,
   updateMapId,
   getMapIdByHash,
+  getAllMapsForUserId,
 };

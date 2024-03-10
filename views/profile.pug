@@ -15,26 +15,23 @@ html
           div.col-md-4.text-center
             img.img-fluid.rounded-circle(src=profile.avatar, alt="Profile Avatar")
             h2 #{ username }
-            p.text-center Last seen: #{ profile.lastSeen } <!-- Replace with actual user registration date -->
+            p.text-center Last seen: #{ profile.lastSeen ? profile.lastSeen.toLocaleString('en-US', {month:'2-digit',day:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit',hour12:true}) : 'Unknown' }
             hr
             h3 Your Details
-            p Email: #{ profile.email } <!-- Replace with actual user email -->
-            p Location: #{ profile.location } <!-- Replace with actual user location -->
-            p Joined: #{ profile.createdAt } <!-- Replace with actual user join date -->
+            p Email: #{ profile.email || 'Unknown' }
+            p Location: #{ profile.location || 'Unknown' }
+            p Joined: #{ profile.createdAt ? profile.createdAt.toLocaleString('en-US', {month:'2-digit',day:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit',hour12:true}) : 'Unknown' }
           div.col-md-8
             div.row
               div.col-md-6
                 h3.text-center Recent Uploads
                 ul.list-group
-                  li.list-group-item
-                    a(href="#") Uploaded Image 1
-                  li.list-group-item
-                    a(href="#") Uploaded Image 2
-                  li.list-group-item
-                    a(href="#") Uploaded Image 3
+                each map in userMaps.slice(0, 5)
+                  li.list-group-item.text-center
+                    a(href="/public/uploads/" + map.imgUrl title=map.imgUrl) #{ map.imgUrl }
               div.col-md-6
                 h3.text-center Upload Count
-                p.text-center 10 <!-- Replace with actual upload count -->
+                p.text-center #{ userMaps.length }
             div.row.mt-4
               div.col-md-12
                 h3.text-center Your Achievements

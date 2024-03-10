@@ -1,8 +1,14 @@
 const profileModel = require('../models/profileModel');
+const mapIdModel = require('../models/mapIdModel');
 
 const getProfileById = async (userId) => {
   return await profileModel.getProfileById(userId);
 };
+
+const getAllMapsForUserId = async (userId) => {
+  return await mapIdModel.getAllMapsForUserId(userId);
+};
+
 
 const createProfile = async ({
   userId,
@@ -76,6 +82,7 @@ const updateLinks = async (userId, links) => {
 
 module.exports = {
   getProfileById,
+  getAllMapsForUserId,
   createProfile,
   updateProfile,
   updateUsername,
