@@ -229,6 +229,24 @@ app.get('/mapart/:id', async (req, res) => {
   }
 });
 
+app.get('/admin', async (req, res) => {
+  try {
+    const perPage = 10;
+    const currentPage = parseInt(req.query.page) || 1;
+    
+    const allMaps = await mapIdController.getAllMaps();
+    const totalMaps = allMaps.length;
+    const totalPages = Math.ceil(totalMaps / perPage);
+
+    const paginatedMaps = await mapIdController.getPaginatedMaps(currentPage, perPage);
+
+    res.render('admin', { allMaps: paginatedMaps, currentPage, totalPages });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

@@ -1,0 +1,49 @@
+doctype html
+html
+  - const pageTitle = "Administration"
+  include includes/head.pug
+  body
+    include includes/navbar.pug
+    div.container
+      h1.text-center= pageTitle
+
+      if allMaps.length > 0
+        table.table.table-striped
+          thead
+            tr
+              th Map ID
+              th Created At
+              th Updated At
+              th User ID
+              th Artist
+              th NSFW
+              th Actions
+
+          tbody
+            each map in allMaps
+              tr
+                td= map.id
+                td= map.createdAt.toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', hour12: true })
+                td= map.updatedAt.toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', hour12: true })
+                td= map.userId
+                td= map.artist
+                td= map.nsfw
+                td
+                  a(href=`/mapart/${map.id}`) View Details
+
+        nav
+          ul.pagination.justify-content-center
+            li.page-item(class=currentPage === 1 ? 'disabled' : '')
+              a.page-link(href=`/admin?page=${currentPage - 1}`) Previous
+
+            for page in Array(totalPages).fill().map((_, i) => i + 1)
+              li.page-item(class=currentPage === page ? 'active' : '')
+                a.page-link(href=`/admin?page=${page}`)= page
+
+            li.page-item(class=currentPage === totalPages ? 'disabled' : '')
+              a.page-link(href=`/admin?page=${currentPage + 1}`) Next
+
+      else
+        p No maps available
+
+      include includes/scripts.pug
