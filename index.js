@@ -7,6 +7,7 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const sanitize = require('sanitize-filename');
+const validator = require('validator');
 
 // Internal dependencies
 const { loggedInMiddleware, loggingMiddleware } = require('./middleware');
@@ -118,9 +119,35 @@ app.get('/profile', async (req, res) => {
   res.render('profile');
 });
 
-app.post('/profile', async (req, res) => {
-  // At the moment there is no editing profiles.
-  // The controller has the functionality to but I need to make an edit profile view.
+// Profile editing route
+app.get('/edit-profile', async (req, res) => {
+  const userId = res.locals.userId;
+  if (userId) {
+    res.locals.profile = await profileController.getProfileById(userId);
+    res.locals.userMaps = await profileController.getAllMapsForUserId(userId);
+  }
+  res.render('edit-profile');
+});
+
+app.post('/edit-profile', async (req, res) => {
+  try {
+    const userId = res.locals.userId;
+
+    // Collect the updated profile data from the form and sanitize
+    const { email, location, avatar } = req.body;
+    const sanitizedEmail = validator.escape(email);
+    const sanitizedLocation = validator.escape(location);
+    const sanitizedAvatar = validator.escape(avatar);
+
+    // Update the user's profile
+    await profileController.updateProfile(userId, { sanitizedEmail, sanitizedLocation, sanitizedAvatar });
+    
+    // Redirect to the profile page after editing
+    res.redirect('/profile');
+  } catch (error) {
+    console.error('Error editing profile:', error);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
 // Upload route

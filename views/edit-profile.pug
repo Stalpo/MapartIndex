@@ -1,0 +1,34 @@
+doctype html
+html
+  - const pageTitle = "Edit Profile"
+  include includes/head.pug
+  body
+    include includes/navbar.pug
+
+    div.container
+      h1.text-center= pageTitle
+      hr
+      if !username
+        p You are not logged in!
+      else
+        div.row
+          div.col-md-8.offset-md-2
+            form(action="/edit-profile" method="POST")
+              div.form-group
+                label(for="emailInput") Email:
+                input#emailInput.form-control(type="email" name="email" value=profile.email placeholder="Enter your email")
+
+              div.form-group
+                label(for="locationInput") Location:
+                input#locationInput.form-control(type="text" name="location" value=profile.location placeholder="Enter your location")
+
+              div.form-group
+                label(for="avatarInput") Avatar URL:
+                input#avatarInput.form-control(type="text" name="avatar" value=profile.avatar placeholder="Enter the URL of your avatar")
+
+              // Submit button
+              button.btn.btn-primary(type="submit") Save Changes
+
+      script(src="/public/js/edit-profile.js")
+      include includes/footer.pug
+      include includes/scripts.pug
