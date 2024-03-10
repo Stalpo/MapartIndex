@@ -14,7 +14,6 @@ const getAllMaps = async () => {
           not: null,
         },
       },
-      take: 12,
       include: {
         Map: true,
       },
@@ -25,7 +24,33 @@ const getAllMaps = async () => {
 
     return maps;
   } catch (error) {
-    console.error('Error fetching maps with userId:', error);
+    console.error('Error fetching all maps:', error);
+    throw error;
+  }
+};
+
+const getPaginatedMaps = async (currentPage, perPage) => {
+  try {
+    const offset = (currentPage - 1) * perPage;
+    const maps = await prisma.mapId.findMany({
+      where: {
+        userId: {
+          not: null,
+        },
+      },
+      skip: offset,
+      take: perPage,
+      include: {
+        Map: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return maps;
+  } catch (error) {
+    console.error('Error fetching paginated maps:', error);
     throw error;
   }
 };
@@ -75,6 +100,7 @@ const getAllMapsForUserId = async (userId) => {
 module.exports = {
   getMapIdById,
   getAllMaps,
+  getPaginatedMaps,
   createMapId,
   updateMapId,
   getMapIdByHash,

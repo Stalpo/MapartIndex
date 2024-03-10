@@ -8,6 +8,10 @@ const getAllMaps = async () => {
   return await mapIdModel.getAllMaps();
 };
 
+const getPaginatedMaps = async (currentPage, perPage) => {
+  return await mapIdModel.getPaginatedMaps(currentPage, perPage);
+};
+
 const createMapId = async ({ userId, mapId, imgUrl, hash }) => {
   return await mapIdModel.createMapId({
     userId,
@@ -32,6 +36,7 @@ const getMapIdByHash = async (hash) => {
 module.exports = {
   getMapIdById,
   getAllMaps,
+  getPaginatedMaps,
   createMapId,
   updateMapId,
   getMapIdByHash,

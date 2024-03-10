@@ -199,11 +199,18 @@ app.post('/upload', upload.single('image'), async (req, res) => {
   }
 });
 
-// Latest uploads route
 app.get('/latest', async (req, res) => {
   try {
+    const perPage = 12;
+    const currentPage = parseInt(req.query.page) || 1;
+
     const allMaps = await mapIdController.getAllMaps();
-    res.render('latest', { allMaps });
+    const totalMaps = allMaps.length;
+    const totalPages = Math.ceil(totalMaps / perPage);
+
+    const paginatedMaps = await mapIdController.getPaginatedMaps(currentPage, perPage);
+
+    res.render('latest', { allMaps: paginatedMaps, currentPage, totalPages });
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
