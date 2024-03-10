@@ -5,6 +5,7 @@ const swaggerJsdoc = require('swagger-jsdoc');
 
 const options = {
     failOnErrors: true,
+    verbose: false,
     definition: {
         openapi: '3.0.0',
         info: {
@@ -15,6 +16,9 @@ const options = {
     apis: ['./routes/api/*.js'],
 };
 const openapiSpecification = swaggerJsdoc(options);
+
 router.use('/docs', swaggerUi.serve, swaggerUi.setup(openapiSpecification));
+
 router.use('/mapId', require('./api/mapid'));
+router.use('/user', require('./api/user'));
 module.exports = router;

@@ -51,6 +51,8 @@ const upload = multer({
  *     responses:
  *       200:
  *         description: Returns a list of map ids.
+ *     tags:
+ *     - Map ID
  */
 router.get('/maps', async (req, res) => {
     const result = await mapIdController.getAllMapIds();
@@ -71,6 +73,8 @@ router.get('/maps', async (req, res) => {
  *     parameters:
  *     - in: string
  *     name: id
+ *     tags:
+ *     - Map ID
  */
 router.get('/id', async (req, res) => {
     const id = req.query.id;
@@ -91,6 +95,8 @@ router.get('/id', async (req, res) => {
  *     parameters:
  *     - in: string
  *     name: id
+ *     tags:
+ *     - Map ID
  */
 router.get('/owner', async (req, res) => {
     const id = req.query.id;
@@ -112,6 +118,8 @@ router.get('/owner', async (req, res) => {
  *     parameters:
  *     - in: string
  *     name: hash
+ *     tags:
+ *     - Map ID
  */
 router.get('/hash', async (req, res) => {
     const hash = req.query.hash;
@@ -147,6 +155,8 @@ router.get('/hash', async (req, res) => {
  *              description: Unauthorized.
  *          500:
  *              description: Internal server error.
+ *       tags:
+ *       - Map ID
  */
 router.post('/create', upload.single('image'), async (req, res) => {
     const apiKey = req.get("X-API-Key")
