@@ -116,6 +116,7 @@ app.get('/profile', async (req, res) => {
   if (userId) {
     res.locals.profile = await profileController.getProfileById(userId);
     res.locals.userMaps = await profileController.getAllMapsForUserId(userId);
+    res.locals.apiKey = await userController.getApiKeyById(userId);
   }
   res.render('profile');
 });

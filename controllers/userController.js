@@ -13,6 +13,16 @@ const isAdmin = async (userId) => {
   }
 };
 
+const getApiKeyById = async (userId) => {
+  try {
+    const apiKey = await userModel.getApiKeyById(userId);
+    return apiKey;
+  } catch (error) {
+    console.error('Error in getApiKeyById:', error);
+    return null;
+  }
+};
+
 // Function to check if a string is alphanumeric
 const isAlphanumeric = (str) => /^[a-zA-Z0-9]+$/.test(str);
 
@@ -107,6 +117,7 @@ const loginDiscordUser = async (discordId, username, avatar, email) => {
 
 module.exports = {
   isAdmin,
+  getApiKeyById,
   registerUser,
   loginUser,
   getUserById,

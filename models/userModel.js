@@ -1,6 +1,22 @@
 const db = require('../util/db');
 const prisma = db.prisma;
 
+const { v4: uuidv4 } = require('uuid');
+
+const generateApiKey = () => {
+  return uuidv4();
+};
+
+const getApiKeyById = async (userId) => {
+  try {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    return user.apiKey;
+  } catch (error) {
+    console.error('Error in getApiKeyById:', error);
+    return null;
+  }
+};
+
 const isAdmin = async (userId) => {
   try {
     const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -26,7 +42,7 @@ const getUserByDiscordId = async (discordId) => {
     where: {
       discordId: {
         equals: discordId,
-        not: null, // Exclude users with null Discord IDs
+        not: null,
       },
     },
   });
@@ -35,19 +51,22 @@ const getUserByDiscordId = async (discordId) => {
 };
 
 const createUser = async ({ username, hashedPw }) => {
-  const user = await prisma.user.create({ data: { username, hashedPw }});
-  await prisma.profile.create({ data: { userId: user.id,  username: username }});
+  const apiKey = generateApiKey();
+  const user = await prisma.user.create({ data: { username, hashedPw, apiKey }});
+  await prisma.profile.create({ data: { userId: user.id, username: username }});
   return user;
 };
 
 const createUserDiscord = async ({ discordId, username, avatar, email }) => {
-  const user = await prisma.user.create({ data: { discordId, username }});
+  const apiKey = generateApiKey();
+  const user = await prisma.user.create({ data: { discordId, username, apiKey }});
   await prisma.profile.create({ data: { userId: user.id, avatar: avatar, email: email, username: username }});
   return user;
 };
 
 module.exports = {
   isAdmin,
+  getApiKeyById,
   getUserByUsername,
   createUser,
   getUserById,

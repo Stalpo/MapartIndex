@@ -25,6 +25,7 @@ model User {
   Profile   Profile?
   discordId String?
   admin     Boolean  @default(false)
+  apiKey    String?
 }
 
 model Profile {
