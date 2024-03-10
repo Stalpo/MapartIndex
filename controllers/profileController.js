@@ -36,7 +36,8 @@ const updateProfile = async (userId, {
   email,
   discordId,
   mcUid,
-  lastSeenDate
+  lastSeenDate,
+  bio
 }) => {
   return await profileModel.updateProfile(userId, {
     username,
@@ -44,7 +45,8 @@ const updateProfile = async (userId, {
     email,
     discordId,
     mcUid,
-    lastSeenDate
+    lastSeenDate,
+    bio
   });
 };
 

@@ -14,6 +14,11 @@ html
         div.row
           div.col-md-8.offset-md-2
             form(action="/edit-profile" method="POST")
+
+              div.form-group
+                label(for="bioInput") Bio:
+                input#bioInput.form-control(type="text" name="bio" value=profile.bio placeholder="Enter your bio")
+
               div.form-group
                 label(for="emailInput") Email:
                 input#emailInput.form-control(type="email" name="email" value=profile.email placeholder="Enter your email")

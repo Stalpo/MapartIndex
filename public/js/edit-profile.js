@@ -11,12 +11,15 @@ document.addEventListener("DOMContentLoaded", function() {
     event.preventDefault(); // Prevent the form from submitting normally
 
     // Collect form data
+    var bioInput = document.getElementById("bioInput");
     var emailInput = document.getElementById("emailInput");
     var locationInput = document.getElementById("locationInput");
     var avatarInput = document.getElementById("avatarInput");    
 
     // Check if elements are input elements
-    if (emailInput && locationInput && avatarInput) {
+    if (bioInput && emailInput && locationInput && avatarInput) {
+
+      var bio = bioInput.value;
       var email = emailInput.value;
       var location = locationInput.value;
       var avatar = avatarInput.value;
@@ -44,11 +47,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
       // Convert the data to JSON format
       var jsonData = JSON.stringify({
+        bio: bio,
         email: email,
         location: location,
         avatar: avatar
         // Add other fields as needed
       });
+
+      // console.log(jsonData);
 
       // Send the request
       xhr.send(jsonData);

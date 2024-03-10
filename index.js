@@ -133,7 +133,9 @@ app.post('/edit-profile', async (req, res) => {
     const userId = res.locals.userId;
 
     // Collect the updated profile data from the form and sanitize
-    const { email, location, avatar } = req.body;
+    const { bio, email, location, avatar } = req.body;
+
+    const sanitizedBio = validator.trim(bio);
     const sanitizedEmail = validator.trim(email);
     const sanitizedLocation = validator.trim(location);
 
@@ -143,6 +145,7 @@ app.post('/edit-profile', async (req, res) => {
 
     // Update the user's profile
     await profileController.updateProfile(userId, {
+      bio: sanitizedBio,
       email: sanitizedEmail,
       location: sanitizedLocation,
       avatar: sanitizedAvatar
