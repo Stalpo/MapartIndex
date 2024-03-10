@@ -20,6 +20,7 @@ const getUserByDiscordId = async (discordId) => {
 
 const createUser = async ({ username, hashedPw }) => {
   const user = await prisma.user.create({ data: { username, hashedPw }});
+  await prisma.profile.create({ data: { userId: user.id,  username: username }});
   return user;
 };
 
