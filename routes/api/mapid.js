@@ -243,6 +243,8 @@ router.post('/create', upload.single('image'), async (req, res) => {
  *     responses:
  *       200:
  *         description: Map and entry deleted successfully.
+ *       401:
+ *         description: Unauthorized.
  *       404:
  *         description: Map id not found.
  *       500:
@@ -252,16 +254,34 @@ router.post('/create', upload.single('image'), async (req, res) => {
  */
 router.delete('/:id', async (req, res) => {
     try {
+        // API Key from header
+        const apiKey = req.get("X-API-Key");
+
+        if (!apiKey) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        // Does users API Key exist
+        const user = await userController.getUserByApiKey(apiKey);
+
+        if (!user) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        // Which mapId are we deleting
         const mapId = req.params.id;
 
-        const user = userController.getUserByApiKey(req.get("X-API-Key"));
-        
         // Retrieve map information from the database
         const map = await mapIdController.getMapById(mapId);
+
         if (!map) {
             return res.status(404).json({ error: 'Map id not found' });
         }
-        if(map.user().id !== user.id) return res.status(401).json({error: 'Unauthorized'});
+
+        // Check if the user is authorized to delete the map
+        if (map.user.id !== user.id) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
 
         // Delete the file from the 'public/uploads' directory
         const filePath = `public/uploads/${map.imgUrl}`;
