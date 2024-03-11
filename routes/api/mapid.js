@@ -3,6 +3,8 @@ const router = express.Router();
 const mapIdController = require('../../controllers/mapIdController');
 const userController = require('../../controllers/userController');
 const fs = require("fs");
+const sanitize = require('sanitize-filename');
+const path = require('path');
 const crypto = require("crypto");
 const multer = require('multer');
 
@@ -152,10 +154,9 @@ router.get('/hash', async (req, res) => {
  *         required: true
  *     requestBody:
  *       content:
- *         img/png:
+ *         multipart/form-data:
  *           schema:
- *             type: string
- *             format: binary
+ *             type: object
  *             properties:
  *               image:
  *                 type: string
