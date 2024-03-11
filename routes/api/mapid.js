@@ -198,13 +198,13 @@ router.post('/create', upload.single('image'), async (req, res) => {
         const hash = crypto.createHash('md5').update(base64).digest('hex');
 
         // Add metadata to the db
-        await mapIdController.createMapId({
+        const map = await mapIdController.createMapId({
             userId: user.id,
             imgUrl: filename,
             hash: hash
         });
         // Send a response with information about the uploaded file
-        res.status(200).json({ message: 'Upload successful', filename: filename });
+        res.status(200).json({ message: 'Upload successful', permalink: "http://localhost:3000/mapart/" + map.id });
     } catch (error) {
         console.error('Error uploading file:', error);
         res.status(500).json({ error: 'Internal server error' });
