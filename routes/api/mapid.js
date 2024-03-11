@@ -71,8 +71,11 @@ router.get('/maps', async (req, res) => {
  *       404:
  *          description: Map id not found.
  *     parameters:
- *     - in: string
- *     name: id
+ *         - in: query
+ *           name: id
+ *           schema:
+ *             type: string
+ *           description: The user id to search for
  *     tags:
  *     - Map ID
  */
@@ -82,19 +85,23 @@ router.get('/id', async (req, res) => {
     if(result) return res.status(result.error ? 400 : 200).json(result);
     res.status(404).json({error: 'Map id not found'});
 });
+
 /**
  * @swagger
  * /api/mapId/owner:
  *   get:
- *     description: Returns the maps owned by the id provided.
+ *     description: Returns a list of maps owned by the user id provided.
  *     responses:
  *       200:
- *         description: Returns the maps owned by the id provided.
+ *         description: Returns a list of maps owned by the user id provided.
  *       404:
- *          description: Owner id not found.
+ *         description: Owner id not found.
  *     parameters:
- *     - in: string
- *     name: id
+ *       - in: query
+ *         name: id
+ *         schema:
+ *           type: string
+ *         description: The owner id to search for
  *     tags:
  *     - Map ID
  */
@@ -114,10 +121,13 @@ router.get('/owner', async (req, res) => {
  *       200:
  *         description: Returns a map defined by the hash provided.
  *       404:
- *          description: Map id not found.
+ *         description: Map id not found.
  *     parameters:
- *     - in: string
- *     name: hash
+ *       - in: query
+ *         name: hash
+ *         schema:
+ *           type: string
+ *         description: The hash to search for
  *     tags:
  *     - Map ID
  */
@@ -131,36 +141,41 @@ router.get('/hash', async (req, res) => {
 /**
  * @swagger
  * /api/mapId/create:
- *    post:
- *       description: Upload a map id
- *       parameters:
- *         - in: header
- *           name: X-API-Key
+ *   post:
+ *     description: Uploads an image and creates a map id.
+ *     parameters:
+ *       - in: header
+ *         name: X-API-Key
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         required: true
+ *     requestBody:
+ *       content:
+ *         img/png:
  *           schema:
  *             type: string
- *             format: uuid
- *           required: true
- *       requestBody:
- *         content:
- *           image/png:
- *             schema:
- *               type: string
- *               format: binary
- *       responses:
- *          200:
- *              description: Returns the permalink for the created map id.
- *          400:
- *              description: No file uploaded.
- *          401:
- *              description: Unauthorized.
- *          500:
- *              description: Internal server error.
- *       tags:
- *       - Map ID
+ *             format: binary
+ *             properties:
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Upload successful.
+ *       400:
+ *         description: No file uploaded.
+ *       401:
+ *         description: Unauthorized.
+ *       500:
+ *         description: Internal server error.
+ *     tags:
+ *     - Map ID
  */
 router.post('/create', upload.single('image'), async (req, res) => {
     const apiKey = req.get("X-API-Key")
-    //TODO: figure out why req.image is undefined
+    console.log(req.file)
+    //TODO: figure out why req.file is undefined
     try {
         if(!apiKey) return res.status(401).json({error: 'Unauthorized'});
         const user = await userController.getUserByApiKey(apiKey);
