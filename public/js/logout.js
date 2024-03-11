@@ -1,7 +1,6 @@
-let countdown = 5;
+let countdown = 3;
 
 const updateCountdown = () => {
-  document.cookie = 'token=; path=/;';
   document.getElementById('countdown').textContent = countdown;
   countdown--;
 
