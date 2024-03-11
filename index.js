@@ -76,7 +76,9 @@ const upload = multer({
 
 // Custom routes
 const discord = require('./routes/discord');
-app.use('/api/discord', discord);
+app.use('/discord', discord);
+const api = require('./routes/api');
+app.use('/api', api);
 
 // Index route
 app.get('/', (req, res) => {

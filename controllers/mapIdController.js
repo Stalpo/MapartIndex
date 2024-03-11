@@ -40,6 +40,14 @@ const getMapIdByHash = async (hash) => {
   return await mapIdModel.getMapIdByHash(hash);
 };
 
+const getAllMapIds = async () => {
+  return mapIdModel.getAllMapIds();
+};
+
+const getMapsByOwnerId = async (ownerId) => {
+  return mapIdModel.getMapsByOwnerId(ownerId);
+};
+
 module.exports = {
   getMapById,
   getAllMaps,
@@ -47,4 +55,6 @@ module.exports = {
   createMapId,
   updateMapById,
   getMapIdByHash,
+  getAllMapIds,
+  getMapsByOwnerId,
 };
