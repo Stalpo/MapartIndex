@@ -191,7 +191,8 @@ app.post('/upload', upload.single('image'), async (req, res) => {
     await mapIdController.createMapId({
       userId: res.locals.userId,
       imgUrl: filename,
-      hash: hash
+      hash: hash,
+      
     });
     // Send a response with information about the uploaded file
     res.status(200).json({ message: 'Upload successful', filename: filename });
