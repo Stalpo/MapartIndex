@@ -21,7 +21,8 @@ document.addEventListener("DOMContentLoaded", function() {
       if (xhr.readyState == 4) {
         if (xhr.status == 201) {
           // Registration successful
-          window.location.href = "/login"; // Redirect to login page
+
+          sendLogin(username, password);
         } else {
           var data = JSON.parse(xhr.responseText);
 
