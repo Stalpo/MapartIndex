@@ -139,6 +139,16 @@ const getUserByApiKey = async (apiKey) => {
   return await userModel.getUserByApiKey(apiKey);
 };
 
+const deleteUserById = async (userId) => {
+  try {
+    const result = await userModel.deleteUserById(userId);
+    return result;
+  } catch (error) {
+    console.error('Error in deleteUserById:', error);
+    return { error: 'Error deleting user' };
+  }
+};
+
 module.exports = {
   isAdmin,
   getApiKeyById,
@@ -151,4 +161,5 @@ module.exports = {
   getIdFromUsername,
   loginDiscordUser,
   getUserByApiKey,
+  deleteUserById,
 };

@@ -109,6 +109,19 @@ const createUserDiscord = async ({ discordId, username, avatar, email }) => {
   return user;
 };
 
+const deleteUserById = async (userId) => {
+  try {
+    await prisma.user.delete({
+      where: { id: userId },
+    });
+    // Delete profiles too?
+    return { message: 'User deleted successfully' };
+  } catch (error) {
+    console.error('Error in deleteUserById:', error);
+    return { error: 'Error deleting user' };
+  }
+};
+
 module.exports = {
   isAdmin,
   getApiKeyById,
@@ -120,4 +133,5 @@ module.exports = {
   getUserByDiscordId,
   createUserDiscord,
   getUserByApiKey,
+  deleteUserById,
 };
