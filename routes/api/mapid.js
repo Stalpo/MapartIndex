@@ -64,7 +64,7 @@ router.get('/maps', async (req, res) => {
 
 /**
  * @swagger
- * /api/mapId/id:
+ * /api/mapId/{id}:
  *   get:
  *     description: Returns a map defined by the id provided.
  *     responses:
@@ -73,7 +73,7 @@ router.get('/maps', async (req, res) => {
  *       404:
  *          description: Map id not found.
  *     parameters:
- *         - in: query
+ *         - in: path
  *           name: id
  *           schema:
  *             type: string
@@ -81,9 +81,9 @@ router.get('/maps', async (req, res) => {
  *     tags:
  *     - Map ID
  */
-router.get('/id', async (req, res) => {
-    const id = req.query.id;
-    const result = await mapIdController.getMapIdById(id);
+router.get('/:id', async (req, res) => {
+    const id = req.params.id;
+    const result = await mapIdController.getMapById(id)
     if(result) return res.status(result.error ? 400 : 200).json(result);
     res.status(404).json({error: 'Map id not found'});
 });
@@ -222,6 +222,13 @@ router.post('/create', upload.single('image'), async (req, res) => {
  *         schema:
  *           type: string
  *         description: The id of the map to delete.
+ *       - in: header
+ *         name: X-API-Key
+ *         description: The user's API key.
+ *         schema:
+ *          type: string
+ *          format: uuid
+ *          required: true
  *     responses:
  *       200:
  *         description: Map and entry deleted successfully.
@@ -236,13 +243,14 @@ router.delete('/:id', async (req, res) => {
     try {
         const mapId = req.params.id;
 
-        // gotta add api key check
+        const user = userController.getUserByApiKey(req.get("X-API-Key"));
         
         // Retrieve map information from the database
-        const map = await mapIdController.getMapIdById(mapId);
+        const map = await mapIdController.getMapById(mapId);
         if (!map) {
             return res.status(404).json({ error: 'Map id not found' });
         }
+        if(map.user().id !== user.id) return res.status(401).json({error: 'Unauthorized'});
 
         // Delete the file from the 'public/uploads' directory
         const filePath = `public/uploads/${map.imgUrl}`;
