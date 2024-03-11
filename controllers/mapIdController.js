@@ -41,7 +41,7 @@ const getMapIdByHash = async (hash) => {
 };
 
 const getAllMapIds = async () => {
-  return mapIdModel.getAllMapIds();
+  return mapIdModel.getAllMaps()
 };
 
 const getMapsByOwnerId = async (ownerId) => {
