@@ -168,6 +168,8 @@ router.get('/hash', async (req, res) => {
  *         description: No file uploaded.
  *       401:
  *         description: Unauthorized.
+ *       402:
+ *         description: Duplicate encountered.
  *       500:
  *         description: Internal server error.
  *     tags:
@@ -196,6 +198,15 @@ router.post('/create', upload.single('image'), async (req, res) => {
 
         // Calculate a hash of the base64 data
         const hash = crypto.createHash('md5').update(base64).digest('hex');
+
+        const duplicate = await mapIdController.getMapIdByHash(hash);
+
+        if(duplicate){
+            // Delete the file from the 'public/uploads' directory
+            const filePath = `public/uploads/${filename}`;
+            fs.unlinkSync(filePath);
+            return res.status(402).json({error: 'Duplicate encountered try uploading manually'});
+        }
 
         // Add metadata to the db
         const map = await mapIdController.createMapId({
