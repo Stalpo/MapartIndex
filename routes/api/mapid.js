@@ -235,6 +235,8 @@ router.delete('/:id', async (req, res) => {
     try {
         const mapId = req.params.id;
 
+        // gotta add api key check
+        
         // Retrieve map information from the database
         const map = await mapIdController.getMapIdById(mapId);
         if (!map) {
