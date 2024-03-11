@@ -287,6 +287,26 @@ app.post('/mapart-edit/:id', async (req, res) => {
   }
 });
 
+// Delete user route
+app.get('/deleteUser', (req, res) => {
+  res.render('deleteUser');
+});
+
+app.post('/deleteUser', async (req, res) => {
+  try {
+    const userId = res.locals.userId;
+
+    // Delete the user
+    const result = await userController.deleteUserById(userId);
+    res.clearCookie('token');
+    res.redirect('/');
+
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

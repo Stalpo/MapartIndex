@@ -52,6 +52,8 @@ html
             div.col.text-center
               button.btn.btn-primary(type="button", id="toggleApiKey", onclick="toggleApiKeyVisibility()") Show API Key
               p#apiKey(style="display: none;") API Key: #{ apiKey }
+
+              a.btn.btn-danger(href="/deleteUser") Delete My Account
               
 
       // include includes/footer.pug
