@@ -246,7 +246,7 @@ router.delete('/:id', async (req, res) => {
         fs.unlinkSync(filePath);
 
         // Delete the entry from the database
-        await mapIdController.deleteMapId(mapId);
+        await mapIdController.deleteMapById(mapId);
 
         res.status(200).json({ message: 'Map and entry deleted successfully' });
     } catch (error) {
