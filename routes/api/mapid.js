@@ -55,7 +55,7 @@ const upload = multer({
  *     - Map ID
  */
 router.get('/maps', async (req, res) => {
-    const result = await mapIdController.getAllMapIds();
+    const result = await mapIdController.getAllMaps();
     if (result) return res.status(200).json(result);
     res.status(404).json({ error: 'Map ids not found' });
 });
