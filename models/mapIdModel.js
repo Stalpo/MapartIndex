@@ -83,6 +83,15 @@ const updateMapById = async (mapId, { artist, nsfw, mapArtData }) => {
   });
 };
 
+const deleteMapById = async (mapId) => {
+  try {
+    return await prisma.mapId.delete({ where: { id: mapId } });
+  } catch (error) {
+    console.error('Error in deleteMapId:', error);
+    throw error;
+  }
+};
+
 const getMapIdByHash = async (hash) => {
   return await prisma.mapId.findFirst({
     where: { hash }
@@ -106,6 +115,7 @@ module.exports = {
   getPaginatedMaps,
   createMapId,
   updateMapById,
+  deleteMapById,
   getMapIdByHash,
   getAllMapsForUserId,
 };

@@ -209,4 +209,50 @@ router.post('/create', upload.single('image'), async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
+/**
+ * @swagger
+ * /api/mapId/{id}:
+ *   delete:
+ *     description: Deletes a map and its corresponding entry in the database.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         description: The id of the map to delete.
+ *     responses:
+ *       200:
+ *         description: Map and entry deleted successfully.
+ *       404:
+ *         description: Map id not found.
+ *       500:
+ *         description: Internal server error.
+ *     tags:
+ *     - Map ID
+ */
+router.delete('/:id', async (req, res) => {
+    try {
+        const mapId = req.params.id;
+
+        // Retrieve map information from the database
+        const map = await mapIdController.getMapIdById(mapId);
+        if (!map) {
+            return res.status(404).json({ error: 'Map id not found' });
+        }
+
+        // Delete the file from the 'public/uploads' directory
+        const filePath = `public/uploads/${map.imgUrl}`;
+        fs.unlinkSync(filePath);
+
+        // Delete the entry from the database
+        await mapIdController.deleteMapId(mapId);
+
+        res.status(200).json({ message: 'Map and entry deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting map and entry:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 module.exports = router;
