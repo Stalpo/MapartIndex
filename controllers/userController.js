@@ -135,6 +135,10 @@ const loginDiscordUser = async (discordId, username, avatar, email) => {
   return { token };
 }
 
+const getUserByApiKey = async (apiKey) => {
+  return await userModel.getUserByApiKey(apiKey);
+};
+
 module.exports = {
   isAdmin,
   getApiKeyById,
@@ -146,4 +150,5 @@ module.exports = {
   verifyToken,
   getIdFromUsername,
   loginDiscordUser,
+  getUserByApiKey,
 };

@@ -33,6 +33,21 @@ const verifyApiKey = async (apiKey) => {
   }
 };
 
+const getUserByApiKey = async (apiKey) => {
+  try {
+    return await prisma.user.findFirst({
+      where: {
+        apiKey: {
+          equals: apiKey,
+        },
+      },
+    });
+  } catch (error) {
+    console.error('Error in getUserByApiKey:', error);
+    return false;
+  }
+};
+
 const newApiKey = async (userId) => {
   try {
     const newApiKey = generateApiKey();
@@ -104,4 +119,5 @@ module.exports = {
   getUserById,
   getUserByDiscordId,
   createUserDiscord,
+  getUserByApiKey,
 };
