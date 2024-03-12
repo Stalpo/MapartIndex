@@ -19,6 +19,7 @@ html
                 buildTable(data);
                 buildUserSelector(data);
                 buildArtistSelector(data);
+                buildSortSelector(data);
               })
               .catch(error => console.error('Error fetching data:', error));
 
@@ -50,7 +51,6 @@ html
               });
             }
 
-
             function buildUserSelector(maps) {
               const userSelector = document.getElementById('userSelector');
               const uniqueUsers = [...new Set(maps.map(map => map.username || map.userId))];
@@ -71,11 +71,13 @@ html
               userSelector.addEventListener('change', function() {
                 const selectedUser = this.value;
                 const selectedArtist = document.getElementById('artistSelector').value;
+                const selectedSort = document.getElementById('sortSelector').value;
                 const filteredMaps = maps.filter(map => 
                   (selectedUser === '' || map.username === selectedUser || map.userId === selectedUser) &&
                   (selectedArtist === '' || map.artist === selectedArtist)
                 );
-                buildTable(filteredMaps);
+
+                applySortAndBuildTable(filteredMaps, selectedSort);
               });
             }
 
@@ -99,12 +101,68 @@ html
               artistSelector.addEventListener('change', function() {
                 const selectedArtist = this.value;
                 const selectedUser = document.getElementById('userSelector').value;
+                const selectedSort = document.getElementById('sortSelector').value;
                 const filteredMaps = maps.filter(map => 
                   (selectedUser === '' || map.username === selectedUser || map.userId === selectedUser) &&
                   (selectedArtist === '' || map.artist === selectedArtist)
                 );
-                buildTable(filteredMaps);
+
+                applySortAndBuildTable(filteredMaps, selectedSort);
               });
+            }
+
+            function buildSortSelector(maps) {
+              const sortSelector = document.getElementById('sortSelector');
+
+              const options = [
+                { value: 'nameAsc', label: 'Name (Ascending)' },
+                { value: 'nameDesc', label: 'Name (Descending)' },
+                { value: 'dateAsc', label: 'Date (Ascending)' },
+                { value: 'dateDesc', label: 'Date (Descending)' }
+              ];
+
+              options.forEach(option => {
+                const sortOption = document.createElement('option');
+                sortOption.value = option.value;
+                sortOption.textContent = option.label;
+                sortSelector.appendChild(sortOption);
+              });
+
+              // Add event listener for input change
+              sortSelector.addEventListener('change', function() {
+                const selectedSort = this.value;
+                const selectedUser = document.getElementById('userSelector').value;
+                const selectedArtist = document.getElementById('artistSelector').value;
+                const filteredMaps = maps.filter(map => 
+                  (selectedUser === '' || map.username === selectedUser || map.userId === selectedUser) &&
+                  (selectedArtist === '' || map.artist === selectedArtist)
+                );
+
+                applySortAndBuildTable(filteredMaps, selectedSort);
+              });
+            }
+
+            function applySortAndBuildTable(maps, selectedSort) {
+              let sortedMaps;
+
+              switch (selectedSort) {
+                case 'nameAsc':
+                  sortedMaps = [...maps].sort((a, b) => a.artist.localeCompare(b.artist));
+                  break;
+                case 'nameDesc':
+                  sortedMaps = [...maps].sort((a, b) => b.artist.localeCompare(a.artist));
+                  break;
+                case 'dateAsc':
+                  sortedMaps = [...maps].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+                  break;
+                case 'dateDesc':
+                  sortedMaps = [...maps].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                  break;
+                default:
+                  sortedMaps = maps;
+              }
+
+              buildTable(sortedMaps);
             }
           });
 
@@ -124,6 +182,13 @@ html
                   div.input-group-prepend
                     div.input-group-text Artist
                   select#artistSelector.form-control
+            div.col
+              div.form-group
+                label.sr-only(for='sortSelector') Sort By:
+                div.input-group.mb-2.mr-sm-2
+                  div.input-group-prepend
+                    div.input-group-text Sort
+                  select#sortSelector.form-control
 
         table.table.table-striped#mapsTable
           thead
