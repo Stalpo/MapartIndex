@@ -1,4 +1,3 @@
-// Handle file upload with vanilla JavaScript
 document.addEventListener("DOMContentLoaded", function () {
   const form = document.querySelector("form");
   const progressBar = document.getElementById("uploadProgressBar");
@@ -35,14 +34,17 @@ document.addEventListener("DOMContentLoaded", function () {
         const response = JSON.parse(xhr.responseText);
         successMessage.style.display = "block";
         successMessage.innerHTML =
-          "Upload Successful! Click <a href='./public/uploads/" +
-          response.filename +
-          "' target='_blank'>here</a> to view your file.";
+          "Upload Successful!";
 
-        // Display the uploaded image in the success alert
-        if (response.filename) {
-          previewImg.src = "./public/uploads/" + response.filename;
-          console.dir(previewImg);
+        // Display the uploaded images in the success alert
+        if (response.files && response.files.length > 0) {
+          response.files.forEach((filename) => {
+            const img = document.createElement("img");
+            img.src = "./public/uploads/" + filename;
+            img.className = "img-fluid";
+            previewImg.appendChild(img);
+          });
+
           previewImg.style.display = "block";
         }
       } else {

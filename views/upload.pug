@@ -17,7 +17,7 @@ html
           form#uploadForm(action='/upload', method='post', enctype='multipart/form-data')
             .form-group
               label(for='image', class='mb-2') Choose a map:
-              input(type='file', name='image', id='image', class='form-control-file', accept='image/*', onchange='previewImage(this)')
+              input(type='file', name='images', id='images', class='form-control-file', accept='image/*', multiple, onchange='previewImages(this)')
             button.btn.btn-primary(type='submit')
               i.fas.fa-cloud-upload-alt
               |  Upload Image

@@ -174,33 +174,40 @@ app.get('/upload', async (req, res) => {
   res.render('upload');
 });
 
-app.post('/upload', upload.single('image'), async (req, res) => {
+app.post('/upload', upload.array('images', 10), async (req, res) => {
   try {
-    if (!req.file) {
-      // If no file is provided
-      return res.status(400).json({ error: 'No file uploaded' });
+    const { files } = req;
+
+    if (!files || files.length === 0) {
+      // If no files are provided
+      return res.status(400).json({ error: 'No files uploaded' });
     }
 
-    // Metadata from req.file
-    const { filename, path, size, mimetype } = req.file;
+    // Process each file
+    const filenames = [];
+    for (const file of files) {
+      const { filename, path, size, mimetype } = file;
 
-    // Read the image file and convert it to base64
-    const base64 = fs.readFileSync(path, { encoding: 'base64' });
+      // Read the image file and convert it to base64
+      const base64 = fs.readFileSync(path, { encoding: 'base64' });
 
-    // Calculate a hash of the base64 data
-    const hash = crypto.createHash('md5').update(base64).digest('hex');
+      // Calculate a hash of the base64 data
+      const hash = crypto.createHash('md5').update(base64).digest('hex');
 
-    // Add metadata to the db
-    await mapIdController.createMapId({
-      userId: res.locals.userId,
-      imgUrl: filename,
-      hash: hash,
-      
-    });
-    // Send a response with information about the uploaded file
-    res.status(200).json({ message: 'Upload successful', filename: filename });
+      // Add metadata to the db
+      await mapIdController.createMapId({
+        userId: res.locals.userId,
+        imgUrl: filename,
+        hash: hash,
+      });
+
+      filenames.push(filename);
+    }
+
+    // Send a response with information about the uploaded files
+    res.status(200).json({ message: 'Upload successful', files: filenames });
   } catch (error) {
-    console.error('Error uploading file:', error);
+    console.error('Error uploading files:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
