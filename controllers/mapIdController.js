@@ -39,7 +39,7 @@ const updateMapById = async (mapId, { artist, nsfw, mapArtData }) => {
 
 const deleteMapById = async (mapId) => {
   try {
-    return await mapIdModel.deleteMapId(mapId);
+    return await mapIdModel.deleteMapById(mapId);
   } catch (error) {
     console.error('Error in deleteMapId:', error);
     throw error;

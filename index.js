@@ -316,6 +316,28 @@ app.post('/deleteUser', async (req, res) => {
   }
 });
 
+// Delete user route
+app.get('/deleteMapId', (req, res) => {
+  const mapId = req.query.mapId;
+  res.render('deleteMapId', { mapId: mapId });
+});
+
+// Delete map by id ?mapId=
+app.post('/deleteMapId', async (req, res) => {
+  try {
+    const mapId = req.query.mapId || req.body.mapId;
+    console.log(mapId);
+    if (res.locals.admin) {
+      // Delete the map
+      const result = await mapIdController.deleteMapById(mapId);
+    }
+    res.redirect('/admin');
+  } catch (error) {
+    console.error('Error deleting mapId:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

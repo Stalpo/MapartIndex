@@ -9,7 +9,8 @@ html
       h1.text-center= pageTitle
       hr
       if !username
-        p You are not logged in!
+        div.alert.alert-danger(role="alert")
+          | You are not logged in!
       else
         div.row
           div.col-md-4.text-center

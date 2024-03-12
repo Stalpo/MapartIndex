@@ -7,7 +7,8 @@ html
     div.container
       h1.text-center= pageTitle
       if !admin
-        p You are not an administrator
+        div.alert.alert-danger(role="alert")
+          | You are not an administrator
       else
         script.
           document.addEventListener('DOMContentLoaded', function() {
@@ -41,12 +42,14 @@ html
                     <div class='btn-group' role='group' aria-label='Buttons'>
                       <button class='btn btn-secondary' type='button' onclick="location.href='/mapart/${map.id}'"><i class='fa fa-eye'></i></button>
                       <button class='btn btn-secondary' type='button' onclick="location.href='/mapart-edit/${map.id}'"><i class='fa fa-pencil-alt'></i></button>
+                      <button class='btn btn-danger' type='button' onclick="location.href='/deleteMapId?mapId=${map.id}'"><i class='fa fa-trash'></i></button>
                     </div>
                   </td>
                 `;
                 tableBody.appendChild(newRow);
               });
             }
+
 
             function buildUserSelector(maps) {
               const userSelector = document.getElementById('userSelector');

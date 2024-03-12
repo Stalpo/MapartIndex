@@ -8,12 +8,15 @@ html
     div.container
       h1.text-center= pageTitle
       hr
+      if !username
+        div.alert.alert-danger(role="alert")
+          | You are logged in!
+      else 
+        div.row
+          div.col-md-6.offset-md-3.text-center
+            h2 Are you sure you want to delete your account?
+            p This action cannot be undone.
 
-      div.row
-        div.col-md-6.offset-md-3.text-center
-          h2 Are you sure you want to delete your account?
-          p This action cannot be undone.
-
-          // Add a form for confirmation
-          form(action="/deleteUser", method="post")
-            button.btn.btn-danger(type="submit") Confirm Delete
+            // Add a form for confirmation
+            form(action="/deleteUser", method="post")
+              button.btn.btn-danger(type="submit") Confirm Delete

@@ -5,13 +5,17 @@ html
   body
     include includes/navbar.pug
     div.container
-      h1.text-center You have been logged out successfully.
-      p.text-center
-        | Redirecting to home page in 
-        span#countdown 5
-        |  seconds...
+      if !admin
+        div.alert.alert-danger(role="alert")
+          | You are not logged in!
+      else 
+        h1.text-center You have been logged out successfully.
+        p.text-center
+          | Redirecting to home page in 
+          span#countdown 5
+          |  seconds...
 
-    script(src="./public/js/logout.js")
+      script(src="./public/js/logout.js")
 
     // include includes/footer.pug
     include includes/scripts.pug

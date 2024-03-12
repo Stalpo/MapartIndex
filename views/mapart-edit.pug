@@ -7,7 +7,8 @@ html
     div.container
       h1.text-center= pageTitle
       if !admin
-        p You are not an administrator
+        div.alert.alert-danger(role="alert")
+          | You are not an administrator
       else
         hr
         p Editing: #{ map.id }

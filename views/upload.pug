@@ -9,9 +9,8 @@ html
       h1.text-center= pageTitle
       hr
       if !username
-        .alert.alert-warning.text-center(role='alert')
-          strong Warning:
-          |  You are not logged in!
+        div.alert.alert-danger(role="alert")
+          | You are not logged in!
       else
         .container.mt-5
           form#uploadForm(action='/upload', method='post', enctype='multipart/form-data')
@@ -31,6 +30,6 @@ html
           #imagePreview(style='display: none; margin-top: 10px;')
             img#previewImg(src='', alt='Preview Image', class='img-fluid')
 
-    script(src="./public/js/upload.js")
+      script(src="./public/js/upload.js")
     // include includes/footer.pug
     include includes/scripts.pug
