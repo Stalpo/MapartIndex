@@ -31,7 +31,10 @@ const getAllMaps = async () => {
 
 const getPaginatedMaps = async (currentPage, perPage) => {
   try {
-    const offset = (currentPage - 1) * perPage;
+    const safeCurrentPage = Math.max(currentPage, 1);
+
+    const offset = (safeCurrentPage - 1) * perPage;
+    
     const maps = await prisma.mapId.findMany({
       where: {
         userId: {

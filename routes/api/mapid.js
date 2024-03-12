@@ -49,17 +49,61 @@ const upload = multer({
  * @swagger
  * /api/mapId/maps:
  *   get:
- *     description: Returns a list of map ids.
+ *     description: Returns a list of map ids. Default pageSize is set to 5.
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         description: The page number for paginated results (default is 1).
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *       - in: query
+ *         name: pageSize
+ *         description: The number of map ids to return per page (default is 5).
+ *         schema:
+ *           type: integer
+ *           minimum: 1
  *     responses:
  *       200:
  *         description: Returns a list of map ids.
+ *       400:
+ *         description: Invalid page or pageSize parameters.
+ *       404:
+ *         description: Map ids not found.
  *     tags:
  *     - Map ID
  */
 router.get('/maps', async (req, res) => {
-    const result = await mapIdController.getAllMaps();
-    if (result) return res.status(200).json(result);
-    res.status(404).json({ error: 'Map ids not found' });
+  try {
+    let page = parseInt(req.query.page) || 1;
+    let pageSize = parseInt(req.query.pageSize) || 5; // Set a smaller default pageSize
+
+    if (isNaN(page) || isNaN(pageSize) || page <= 0 || pageSize <= 0) {
+      // Invalid page or pageSize, return error
+      return res.status(400).json({ error: 'Invalid page or pageSize parameters' });
+    }
+
+    const offset = (page - 1) * pageSize;
+
+    let result;
+
+    if (req.query.page || req.query.pageSize) {
+      // Use paginated logic for requests with page or pageSize parameters
+      result = await mapIdController.getPaginatedMaps(offset, pageSize);
+    } else {
+      // Return all maps for requests without page or pageSize parameters
+      result = await mapIdController.getAllMaps();
+    }
+
+    if (result.length > 0) {
+      res.status(200).json(result);
+    } else {
+      res.status(404).json({ error: 'Map ids not found' });
+    }
+  } catch (error) {
+    console.error('Error fetching maps:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 /**

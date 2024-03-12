@@ -49,7 +49,6 @@ const getMapIdByHash = async (hash) => {
   return await mapIdModel.getMapIdByHash(hash);
 };
 
-
 const getMapsByOwnerId = async (ownerId) => {
   return mapIdModel.getMapsByOwnerId(ownerId);
 };
