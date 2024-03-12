@@ -37,6 +37,7 @@ const updateProfile = async (userId, {
   discordId,
   mcUuid,
   lastSeenDate,
+  avatar,
   bio
 }) => {
   return await profileModel.updateProfile(userId, {
@@ -46,6 +47,7 @@ const updateProfile = async (userId, {
     discordId,
     mcUuid,
     lastSeenDate,
+    avatar,
     bio
   });
 };
