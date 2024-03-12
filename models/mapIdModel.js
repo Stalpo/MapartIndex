@@ -58,7 +58,7 @@ const getPaginatedMaps = async (currentPage, perPage) => {
   }
 };
 
-const createMapId = async ({ userId, mapId, imgUrl, hash }) => {
+const createMapId = async ({ userId, username, mapId, imgUrl, hash }) => {
   return await prisma.mapId.create({
     data: {
       user: {
@@ -66,6 +66,7 @@ const createMapId = async ({ userId, mapId, imgUrl, hash }) => {
           id: userId
         }
       },
+      username: username,
       mapId: mapId,
       imgUrl: imgUrl,
       hash: hash,

@@ -197,6 +197,7 @@ app.post('/upload', upload.array('images', 10), async (req, res) => {
       // Add metadata to the db
       await mapIdController.createMapId({
         userId: res.locals.userId,
+        username: res.locals.username,
         imgUrl: filename,
         hash: hash,
       });

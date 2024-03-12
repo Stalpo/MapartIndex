@@ -12,9 +12,10 @@ const getPaginatedMaps = async (currentPage, perPage) => {
   return await mapIdModel.getPaginatedMaps(currentPage, perPage);
 };
 
-const createMapId = async ({ userId, mapId, imgUrl, hash }) => {
+const createMapId = async ({ userId, username, mapId, imgUrl, hash }) => {
   return await mapIdModel.createMapId({
     userId,
+    username,
     mapId,
     imgUrl,
     hash
