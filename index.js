@@ -92,7 +92,8 @@ app.get('/register', (req, res) => {
 
 app.post('/register', async (req, res) => {
   const { username, password } = req.body;
-  const result = await userController.registerUser(username, password);
+  const lowercaseUsername = username.toLowerCase();
+  const result = await userController.registerUser(lowercaseUsername, password);
   return res.status(result.error ? 400 : 201).json(result);
 });
 
@@ -103,7 +104,8 @@ app.get('/login', (req, res) => {
 
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
-  const result = await userController.loginUser(username, password);
+  const lowercaseUsername = username.toLowerCase();
+  const result = await userController.loginUser(lowercaseUsername, password);
   return res.status(result.error ? 401 : 200).json(result);
 });
 
