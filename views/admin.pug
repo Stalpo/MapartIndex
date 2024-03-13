@@ -20,8 +20,12 @@ html
                 buildUserSelector(data);
                 buildArtistSelector(data);
                 buildSortSelector(data);
+                document.getElementById('loadingSpinner').style.display = 'none';
               })
-              .catch(error => console.error('Error fetching data:', error));
+            .catch(error => {
+              console.error('Error fetching data:', error);
+              document.getElementById('loadingSpinner').innerHTML = '<div class="alert alert-danger" role="alert">Error fetching data</div>';
+            });
 
             function buildTable(maps) {
               const tableBody = document.getElementById('mapsTableBody');
@@ -202,5 +206,9 @@ html
               th Actions
 
           tbody(id='mapsTableBody')
+
+        div#loadingSpinner.text-center.mt-4
+          i.fa.fa-spinner.fa-spin.fa-3x
+          p Loading...
 
       include includes/scripts.pug

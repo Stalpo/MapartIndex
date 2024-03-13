@@ -10,6 +10,7 @@ html
 
 
       div#mapContainer.text-center
+        i.fa.fa-spinner.fa-spin.fa-3x
         p Loading map data...
 
       script(src="https://code.jquery.com/jquery-3.6.0.min.js")
@@ -58,8 +59,8 @@ html
               }
             })
             .catch(error => {
-              console.error(`Error fetching map data for MapId ${mapId}:`, error);
-              mapContainer.innerHTML = '<div class="alert alert-danger" role="alert">Error fetching map data</div>';
+              console.error('Error fetching data:', error);
+              document.getElementById('loadingSpinner').innerHTML = '<div class="alert alert-danger" role="alert">Error fetching data</div>';
             });
         });
 
