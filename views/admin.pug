@@ -37,9 +37,9 @@ html
               maps.forEach(map => {
                 const newRow = document.createElement('tr');
                 newRow.innerHTML = `
-                  <td>${map.id}</td>
+                  <td>...${map.id.slice(-12)}</td>
                   <td>${new Date(map.createdAt).toLocaleString('en-US')}</td>
-                  <td>${map.username || map.userId}</td>
+                  <td>${map.username}</td>
                   <td><img src="/public/uploads/${map.imgUrl}" alt="Map Image" style="max-width: 100px; max-height: 100px;"></td>
                   <td>${map.artist}</td>
                   <td>${map.nsfw}</td>

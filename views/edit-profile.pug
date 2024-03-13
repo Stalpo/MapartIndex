@@ -12,29 +12,51 @@ html
         div.alert.alert-danger(role="alert")
           | You are not logged in!
       else
+
+        style.
+          .icon-prepend {
+            width: 40px;
+            text-align: center;
+          }
+
         div.row
           div.col-md-8.offset-md-2
-            form(action="/edit-profile" method="POST")
+            form(action="/edit-profile" method="POST" class="text-center")
 
               div.form-group
-                label(for="bioInput") Bio:
-                input#bioInput.form-control(type="text" name="bio" value=profile.bio placeholder="Enter your bio")
+                div.input-group
+                  div.input-group-prepend
+                    span.input-group-text.icon-prepend
+                      i.fas.fa-user
+                  input#bioInput.form-control(type="text" name="bio" value=profile.bio placeholder="Enter your bio")
 
               div.form-group
-                label(for="emailInput") Email:
-                input#emailInput.form-control(type="email" name="email" value=profile.email placeholder="Enter your email")
+                div.input-group
+                  div.input-group-prepend
+                    span.input-group-text.icon-prepend
+                      i.fas.fa-envelope
+                  input#emailInput.form-control(type="email" name="email" value=profile.email placeholder="Enter your email")
 
               div.form-group
-                label(for="locationInput") Location:
-                input#locationInput.form-control(type="text" name="location" value=profile.location placeholder="Enter your location")
+                div.input-group
+                  div.input-group-prepend
+                    span.input-group-text.icon-prepend
+                      i.fas.fa-map-marker-alt
+                  input#locationInput.form-control(type="text" name="location" value=profile.location placeholder="Enter your location")
 
               div.form-group
-                label(for="avatarInput") Avatar URL:
-                input#avatarInput.form-control(type="text" name="avatar" value=profile.avatar placeholder="Enter the URL of your avatar")
+                div.input-group
+                  div.input-group-prepend
+                    span.input-group-text.icon-prepend
+                      i.fas.fa-image
+                  input#avatarInput.form-control(type="text" name="avatar" value=profile.avatar placeholder="Enter the URL of your avatar")
 
               div.form-group
-                label(for="mcUuidInput") Minecraft UUID:
-                input#mcUuidInput.form-control(type="text" name="mcUuid" value=profile.mcUuid placeholder="Enter your Minecraft UUID")
+                div.input-group
+                  div.input-group-prepend
+                    span.input-group-text.icon-prepend
+                      i.fas.fa-gamepad
+                  input#mcUuidInput.form-control(type="text" name="mcUuid" value=profile.mcUuid placeholder="Enter your Minecraft UUID")
 
               // Submit button
               button.btn.btn-primary(type="submit") Save Changes
