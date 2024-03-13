@@ -1,17 +1,57 @@
 doctype html
 html
-- const pageTitle = "Home"
   include includes/head.pug
-  body
+  body 
     include includes/navbar.pug
 
-    div.container
-      h1.text-center Home
+    // Image Carousel Background
+    #imageCarousel.carousel.slide(data-ride='carousel', style='position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -1;')
+      .carousel-inner
+
+      script.
+        // Fetch random images from /api/mapId/maps
+        fetch('/api/mapId/maps')
+          .then(response => response.json())
+          .then(images => {
+            const carouselInner = document.querySelector('#imageCarousel .carousel-inner');
+            carouselInner.innerHTML = '';
+
+            images.forEach((image, index) => {
+              const activeClass = index === 0 ? 'active' : '';
+              const carouselItem = document.createElement('div');
+              carouselItem.className = `carousel-item ${activeClass}`;
+              const imgUrl = `/public/uploads/${image.imgUrl}`;
+              const brightnessValue = 350; // Brightness value
+
+              carouselItem.innerHTML = `<img src="${imgUrl}" class="d-block w-100" style="image-rendering: pixelated; filter: brightness(${brightnessValue}%);" alt="Map Image">`;
+              carouselInner.appendChild(carouselItem);
+            });
+          });
+
+    // Main Content
+    div.container.mt-4(style='position: relative; z-index: 1;')
       if !username
-        p Registration is open!
+        .alert.alert-success
+          p Registration is open! Join us now and be part of the awesomeness.
       else
-        p Welcome back, #{ username }!
-        p.small Your userId is #{ userId }
-        
+        .alert.alert-info
+          p Welcome back, #{username}!
+          p.small Your userId is #{userId}
+          
+      .jumbotron.text-center
+        h1.display-4 Welcome to the Mapart Index!
+        p.lead
+          | Unleash Creativity, Explore Wonders: Discover the amazing maps in our Minecraft Map Art Archive.
+
+    // JavaScript to change navbar background color
+    script.
+      document.addEventListener('DOMContentLoaded', function () {
+        // Select the navbar and change its background color
+        const navbar = document.querySelector('.navbar');
+        if (navbar) {
+          navbar.style.backgroundColor = 'white';
+        }
+      });
+
     // include includes/footer.pug
     include includes/scripts.pug

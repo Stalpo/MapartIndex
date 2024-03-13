@@ -63,7 +63,7 @@ html
                 </div>
                 <ul class="list-group list-group-flush">
                   <li class="list-group-item">Artist: ${map.artist}</li>
-                  <li class="list-group-item">Uploaded by: ${map.username || map.userId}</li>
+                  <li class="list-group-item">Uploaded by: <a href="/profile/${map.username}">${map.username}</li>
                 </ul>
                 <div class="card-body">
                   <a href="/mapId/${map.id}" class="card-link">View Map</a>
