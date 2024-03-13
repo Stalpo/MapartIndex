@@ -15,7 +15,7 @@ html
         div.row
           div.col-md-4.text-center
             img.img-fluid.rounded-circle(src=profile.avatar, alt="Profile Avatar")
-            h2 #{ username }
+            h2 #{ profile.username }
             p.text-center Bio: #{ profile.bio }
             p.text-center Last seen: #{ profile.lastSeen ? profile.lastSeen.toLocaleString('en-US', {month:'2-digit',day:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit',hour12:true}) : 'Unknown' }
             a.btn.btn-primary(href="/edit-profile") Edit Profile
@@ -50,11 +50,12 @@ html
                     i.fa.fa-trophy.mr-2
                     | Museum Collector
             br
-            div.col.text-center
-              button.btn.btn-primary(type="button", id="toggleApiKey", onclick="toggleApiKeyVisibility()") Show API Key
-              p#apiKey(style="display: none;") API Key: #{ apiKey }
+            if username === profile.username
+              div.col.text-center
+                button.btn.btn-primary(type="button", id="toggleApiKey", onclick="toggleApiKeyVisibility()") Show API Key
+                p#apiKey(style="display: none;") API Key: #{ apiKey }
 
-              a.btn.btn-danger(href="/deleteUser") Delete My Account
+                a.btn.btn-danger(href="/deleteUser") Delete My Account
               
 
       // include includes/footer.pug

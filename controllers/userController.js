@@ -60,6 +60,16 @@ const getUserById = async (userId) => {
   return user;
 };
 
+const getUserByUsername = async (username) => {
+  try {
+    const user = await userModel.getUserByUsername(username);
+    return user;
+  } catch (error) {
+    console.error('Error getting user by username:', error);
+    throw error;
+  }
+};
+
 // Register user
 const registerUser = async (username, password) => {
   // Sanitize inputs
@@ -157,6 +167,7 @@ module.exports = {
   registerUser,
   loginUser,
   getUserById,
+  getUserByUsername,
   verifyToken,
   getIdFromUsername,
   loginDiscordUser,

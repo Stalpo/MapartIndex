@@ -126,6 +126,29 @@ app.get('/profile', async (req, res) => {
   res.render('profile');
 });
 
+// Profile by username route
+app.get('/profile/:username', async (req, res) => {
+  try {
+    const requestedUsername = req.params.username.toLowerCase();
+    const user = await userController.getUserByUsername(requestedUsername);
+
+    if (!user) {
+      // User not found
+      return res.status(404).send('User not found');
+    }
+
+    const userId = user.id;
+    res.locals.loadedProfile = await profileController.getProfileById(userId);
+    res.locals.userMaps = await profileController.getAllMapsForUserId(userId);
+
+    res.render('profile');
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
 // Profile editing route
 app.get('/edit-profile', async (req, res) => {
   const userId = res.locals.userId;
