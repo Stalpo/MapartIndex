@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function() {
       // You may need to collect other form data as needed
 
       var xhr = new XMLHttpRequest();
-      xhr.open("POST", "/edit-profile", true);
+      xhr.open("POST", "/profile-edit", true);
       xhr.setRequestHeader("Content-Type", "application/json");
 
       xhr.onreadystatechange = function() {

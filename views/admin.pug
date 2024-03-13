@@ -10,6 +10,12 @@ html
         div.alert.alert-danger(role="alert")
           | You are not an administrator
       else
+
+        style.
+          .vertical-center td {
+            vertical-align: middle;
+          }
+
         script.
           document.addEventListener('DOMContentLoaded', function() {
             // Make API call to get maps
@@ -36,6 +42,7 @@ html
               // Build new rows
               maps.forEach(map => {
                 const newRow = document.createElement('tr');
+                newRow.className = 'vertical-center'; // Add a class for styling
                 newRow.innerHTML = `
                   <td>...${map.id.slice(-12)}</td>
                   <td>${new Date(map.createdAt).toLocaleString('en-US')}</td>
@@ -45,8 +52,8 @@ html
                   <td>${map.nsfw}</td>
                   <td>
                     <div class='btn-group' role='group' aria-label='Buttons'>
-                      <button class='btn btn-secondary' type='button' onclick="location.href='/mapId/${map.id}'"><i class='fa fa-eye'></i></button>
-                      <button class='btn btn-secondary' type='button' onclick="location.href='/mapId-edit/${map.id}'"><i class='fa fa-pencil-alt'></i></button>
+                      <button class='btn btn-primary' type='button' onclick="location.href='/mapId/${map.id}'"><i class='fa fa-eye'></i></button>
+                      <button class='btn btn-primary' type='button' onclick="location.href='/mapId-edit/${map.id}'"><i class='fa fa-pencil-alt'></i></button>
                       <button class='btn btn-danger' type='button' onclick="location.href='/deleteMapId?mapId=${map.id}'"><i class='fa fa-trash'></i></button>
                     </div>
                   </td>

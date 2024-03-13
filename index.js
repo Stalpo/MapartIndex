@@ -150,15 +150,15 @@ app.get('/profile/:username', async (req, res) => {
 
 
 // Profile editing route
-app.get('/edit-profile', async (req, res) => {
+app.get('/profile-edit', async (req, res) => {
   const userId = res.locals.userId;
   if (userId) {
     res.locals.profile = await profileController.getProfileById(userId);
   }
-  res.render('edit-profile');
+  res.render('profile-edit');
 });
 
-app.post('/edit-profile', async (req, res) => {
+app.post('/profile-edit', async (req, res) => {
   try {
     const userId = res.locals.userId;
 
