@@ -218,4 +218,61 @@ html
           i.fa.fa-spinner.fa-spin.fa-3x
           p Loading...
 
+        // Add the user list modal structure
+        div.modal#userListModal(tabindex='-1' role='dialog')
+          div.modal-dialog(role='document')
+            div.modal-content
+              div.modal-header
+                h5.modal-title User List
+                button.close(type='button', data-dismiss='modal', aria-label='Close')
+                  span(aria-hidden='true') ×
+              div.modal-body
+                ul#userList(class='list-group')
+                  // User list items will be dynamically added here
+              div.modal-footer
+                button.btn.btn-secondary(type='button', data-dismiss='modal') Close
+
+        script.
+          document.addEventListener('DOMContentLoaded', function() {
+            // Add button to open user list modal to the navbar
+            const navbarTitle = document.querySelector('.navbar-brand');
+            const userModalButton = document.createElement('button');
+            userModalButton.className = 'btn btn-primary';
+            userModalButton.textContent = 'User Menu';
+            userModalButton.setAttribute('type', 'button');
+            userModalButton.setAttribute('data-toggle', 'modal');
+            userModalButton.setAttribute('data-target', '#userListModal');
+            navbarTitle.parentNode.insertBefore(userModalButton, navbarTitle.nextSibling);
+          });
+      
+          document.addEventListener('DOMContentLoaded', function() {
+            const userListButton = document.getElementById('userListButton');
+            const userListModal = new bootstrap.Modal(document.getElementById('userListModal'));
+            const userList = document.getElementById('userList');
+
+            userListButton.addEventListener('click', function() {
+              fetch('/api/users')
+                .then(response => response.json())
+                .then(users => {
+                  // Clear existing list items
+                  userList.innerHTML = '';
+
+                  // Build new list items
+                  users.forEach(user => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'list-group-item';
+                    listItem.textContent = user.username;
+                    userList.appendChild(listItem);
+                  });
+
+                  userListModal.show(); // Show the modal after fetching and building the list
+                })
+                .catch(error => {
+                  console.error('Error fetching user data:', error);
+                  // Handle error if needed
+                });
+            });
+          });
+
+
       include includes/scripts.pug
