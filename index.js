@@ -137,9 +137,18 @@ app.get('/profile/:username', async (req, res) => {
       return res.status(404).send('User not found');
     }
 
-    const userId = user.id;
-    res.locals.loadedProfile = await profileController.getProfileById(userId);
-    res.locals.userMaps = await profileController.getAllMapsForUserId(userId);
+    const userId = res.locals.userId;
+    const reqUserId = user.id;
+
+    if (userId === reqUserId) {
+      // Logged in user requested
+      res.locals.profile = await profileController.getProfileById(userId);
+      res.locals.userMaps = await profileController.getAllMapsForUserId(userId);
+    } else {
+      // Not loggedIn user requested
+      res.locals.profile = await profileController.getProfileById(user.id);
+      res.locals.userMaps = await profileController.getAllMapsForUserId(user.id);
+    }
 
     res.render('profile');
   } catch (error) {
