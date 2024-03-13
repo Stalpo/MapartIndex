@@ -264,8 +264,8 @@ app.get('/mapId/:id', async (req, res) => {
 
 app.get('/admin', async (req, res) => {
   try {
-    const allUsers = await userController.getAllUsers();
-    res.render('admin', { allUsers });
+    // const allUsers = await userController.getAllUsers();
+    res.render('admin');
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
