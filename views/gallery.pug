@@ -57,7 +57,7 @@ html
               card.style = 'width: 18rem;';
 
               card.innerHTML = `
-                <img src="/public/uploads/${map.imgUrl}" class="card-img-top" alt="Map Image">
+                <img src="/public/uploads/${map.imgUrl}" class="pixelated-image card-img-top" alt="Map Image">
                 <div class="card-body">
                   <h5 class="card-title">${map.id}</h5>
                 </div>
@@ -66,7 +66,7 @@ html
                   <li class="list-group-item">Uploaded by: ${map.username || map.userId}</li>
                 </ul>
                 <div class="card-body">
-                  <a href="/mapart/${map.id}" class="card-link">View Map</a>
+                  <a href="/mapId/${map.id}" class="card-link">View Map</a>
                 </div>
               `;
 
@@ -191,5 +191,10 @@ html
 
       // Add grid container with added margin and mx-auto for centering
       div#gridContainer.row.mb-4
+
+      style.
+        .pixelated-image {
+          image-rendering: pixelated;
+        }
 
       include includes/scripts.pug

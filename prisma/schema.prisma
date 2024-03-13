@@ -20,7 +20,7 @@ model User {
   updatedAt DateTime @updatedAt
   username  String   @unique
   hashedPw  String?
-  mapIds    MapId[]  // Removed the @relation attribute
+  mapIds    MapId[]
   mapArts   MapArt[]
   Profile   Profile?
   discordId String?
@@ -69,7 +69,7 @@ model MapId {
   userId       String?
   username     String?
   artist       String?  @default("N/A")
-  Map          MapArt?  @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  Map          MapArt?  @relation(fields: [mapId], references: [id])
   mapId        String?
   imgUrl       String
   hash         String

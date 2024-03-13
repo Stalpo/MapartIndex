@@ -176,7 +176,7 @@ app.get('/upload', async (req, res) => {
   res.render('upload');
 });
 
-app.post('/upload', upload.array('images', 10), async (req, res) => {
+app.post('/upload', upload.array('images', 25), async (req, res) => {
   try {
     const { files } = req;
 
@@ -219,12 +219,11 @@ app.get('/gallery', async (req, res) => {
   res.render('gallery');
 });
 
-app.get('/mapart/:id', async (req, res) => {
+app.get('/mapId/:id', async (req, res) => {
   try {
     const mapId = req.params.id;
-    const map = await mapIdController.getMapById(mapId);
 
-    res.render('mapart', { pageTitle: 'Individual MapArt', map });
+    res.render('mapid', { pageTitle: 'MapId', mapId });
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
@@ -249,21 +248,21 @@ app.get('/admin', async (req, res) => {
   }
 });
 
-app.get('/mapart-edit/:id', async (req, res) => {
+app.get('/mapId-edit/:id', async (req, res) => {
   try {
     const mapId = req.params.id;
     const map = await mapIdController.getMapById(mapId);
 
     const user = await userController.getUserById(map.userId);
 
-    res.render('mapart-edit', { pageTitle: 'Edit MapArt', map, user });
+    res.render('mapid-edit', { pageTitle: 'Edit MapId', map, user });
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
   }
 });
 
-app.post('/mapart-edit/:id', async (req, res) => {
+app.post('/mapId-edit/:id', async (req, res) => {
   try {
     const mapId = req.params.id;
     const { artist, nsfw, /* Add other fields as needed */ } = req.body;

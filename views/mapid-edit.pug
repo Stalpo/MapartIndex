@@ -13,7 +13,7 @@ html
         hr
         p Editing: #{ map.id }
         // Form for editing map details
-        form(method='post' action=`/mapart-edit/${map.id}`)
+        form(id='editForm', method='post' action=`/mapart-edit/${map.id}`)
           // Artist
           .mb-3
             label(for='artist', class='form-label') Artist:
@@ -31,6 +31,18 @@ html
             input.form-control(type='text', id='user', name='user', value=user.username, readonly)
 
           // Submit button
-          button.btn.btn-primary(type='submit') Save Changes
+          button.btn.btn-primary(type='button', onclick='saveChanges()') Save Changes
 
     include includes/scripts.pug
+
+    script.
+      function saveChanges() {
+        // Get form data
+        var artist = document.getElementById('artist').value;
+        var nsfw = document.getElementById('nsfw').checked;
+
+        // Perform any additional processing if needed
+
+        // Submit the form
+        document.getElementById('editForm').submit();
+      }
