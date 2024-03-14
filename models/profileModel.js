@@ -2,12 +2,24 @@ const db = require('../util/db');
 const prisma = db.prisma;
 
 const getProfileById = async (userId) => {
-  return await prisma.profile.findUnique({
-    where: { userId }
-  });
+  try {
+    return await prisma.profile.findUnique({
+      where: { userId }
+    });
+  } catch (error) {
+    console.error('Error in getProfileById:', error);
+    return null;
+  }
 };
 
-const createProfile = async ( { userId } ) => { await prisma.profile.create(userId); };
+const createProfile = async ({ userId }) => {
+  try {
+    await prisma.profile.create({ data: { userId } });
+  } catch (error) {
+    console.error('Error in createProfile:', error);
+    return null;
+  }
+};
 
 const updateProfile = async (userId, {
   username,
@@ -18,70 +30,120 @@ const updateProfile = async (userId, {
   bio,
   avatar,
 }) => {
-  return await prisma.profile.update({
-    where: { userId },
-    data: {
-      username,
-      location,
-      email,
-      mcUuid,
-      lastSeen,
-      bio,
-      avatar,
-    }
-  });
+  try {
+    return await prisma.profile.update({
+      where: { userId },
+      data: {
+        username,
+        location,
+        email,
+        mcUuid,
+        lastSeen,
+        bio,
+        avatar,
+      }
+    });
+  } catch (error) {
+    console.error('Error in updateProfile:', error);
+    return null;
+  }
 };
 
 const updateUsername = async (userId, username) => {
+  try {
     return await prisma.profile.update({
-        where: { userId },
-        data: { username }
+      where: { userId },
+      data: { username }
     });
+  } catch (error) {
+    console.error('Error in updateUsername:', error);
+    return null;
+  }
+};
 
-}
 const updateLocation = async (userId, location) => {
+  try {
     return await prisma.profile.update({
-        where: { userId },
-        data: { location }
+      where: { userId },
+      data: { location }
     });
+  } catch (error) {
+    console.error('Error in updateLocation:', error);
+    return null;
+  }
+};
 
-}
 const updateEmail = async (userId, email) => {
+  try {
     return await prisma.profile.update({
-        where: { userId },
-        data: { email }
+      where: { userId },
+      data: { email }
     });
-}
+  } catch (error) {
+    console.error('Error in updateEmail:', error);
+    return null;
+  }
+};
+
 const updateMcUuid = async (userId, mcUuid) => {
+  try {
     return await prisma.profile.update({
-        where: { userId },
-        data: { mcUuid }
+      where: { userId },
+      data: { mcUuid }
     });
-}
+  } catch (error) {
+    console.error('Error in updateMcUuid:', error);
+    return null;
+  }
+};
+
 const updateLastSeen = async (userId, lastSeen) => {
+  try {
     return await prisma.profile.update({
-        where: { userId },
-        data: { lastSeen }
+      where: { userId },
+      data: { lastSeen }
     });
-}
+  } catch (error) {
+    console.error('Error in updateLastSeen:', error);
+    return null;
+  }
+};
+
 const updateBio = async (userId, bio) => {
+  try {
     return await prisma.profile.update({
-        where: { userId },
-        data: { bio }
+      where: { userId },
+      data: { bio }
     });
-}
+  } catch (error) {
+    console.error('Error in updateBio:', error);
+    return null;
+  }
+};
+
 const updateAvatar = async (userId, avatar) => {
+  try {
     return await prisma.profile.update({
-        where: { userId },
-        data: { avatar }
+      where: { userId },
+      data: { avatar }
     });
-}
+  } catch (error) {
+    console.error('Error in updateAvatar:', error);
+    return null;
+  }
+};
+
 const updateLinks = async (userId, links) => {
+  try {
     return await prisma.profile.update({
-        where: { userId },
-        data: { links }
+      where: { userId },
+      data: { links }
     });
-}
+  } catch (error) {
+    console.error('Error in updateLinks:', error);
+    return null;
+  }
+};
 
 module.exports = {
   getProfileById,
