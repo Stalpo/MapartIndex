@@ -1,16 +1,23 @@
+const { v4: uuidv4 } = require('uuid');
 const db = require('../util/db');
 const prisma = db.prisma;
 
-const { v4: uuidv4 } = require('uuid');
+const generateApiKey = () => uuidv4();
 
-const generateApiKey = () => {
-  return uuidv4();
+const isAdmin = async (userId) => {
+  try {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    return user?.admin || false;
+  } catch (error) {
+    console.error('Error in isAdmin:', error);
+    return false;
+  }
 };
 
 const getApiKeyById = async (userId) => {
   try {
     const user = await prisma.user.findUnique({ where: { id: userId } });
-    return user.apiKey;
+    return user?.apiKey;
   } catch (error) {
     console.error('Error in getApiKeyById:', error);
     return null;
@@ -20,11 +27,7 @@ const getApiKeyById = async (userId) => {
 const verifyApiKey = async (apiKey) => {
   try {
     const user = await prisma.user.findFirst({
-      where: {
-        apiKey: {
-          equals: apiKey,
-        },
-      },
+      where: { apiKey: apiKey },
     });
     return !!user;
   } catch (error) {
@@ -36,15 +39,11 @@ const verifyApiKey = async (apiKey) => {
 const getUserByApiKey = async (apiKey) => {
   try {
     return await prisma.user.findFirst({
-      where: {
-        apiKey: {
-          equals: apiKey,
-        },
-      },
+      where: { apiKey: apiKey },
     });
   } catch (error) {
     console.error('Error in getUserByApiKey:', error);
-    return false;
+    return null;
   }
 };
 
@@ -57,64 +56,72 @@ const newApiKey = async (userId) => {
     });
     return newApiKey;
   } catch (error) {
-    console.error('Error in renewApiKey:', error);
+    console.error('Error in newApiKey:', error);
     return null;
   }
 };
 
-const isAdmin = async (userId) => {
+const getUserByUsername = async (username) => {
   try {
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-    return user.admin;
+    return await prisma.user.findUnique({ where: { username: username }});
   } catch (error) {
-    console.error('Error in isAdmin:', error);
-    return false;
+    console.error('Error in getUserByUsername:', error);
+    return null;
   }
 };
 
-const getUserByUsername = async (username) => {
-  const user = await prisma.user.findUnique({ where: { username: username }});
-  return user;
-};
-
 const getUserById = async (id) => {
-  const user = await prisma.user.findUnique({ where: { id : id }});
-  return user;
+  try {
+    return await prisma.user.findUnique({ where: { id: id }});
+  } catch (error) {
+    console.error('Error in getUserById:', error);
+    return null;
+  }
 };
 
 const getUserByDiscordId = async (discordId) => {
-  const user = await prisma.user.findFirst({
-    where: {
-      discordId: {
-        equals: discordId,
-        not: null,
-      },
-    },
-  });
-
-  return user;
+  try {
+    return await prisma.user.findFirst({
+      where: { discordId: { equals: discordId, not: null } },
+    });
+  } catch (error) {
+    console.error('Error in getUserByDiscordId:', error);
+    return null;
+  }
 };
 
 const createUser = async ({ username, hashedPw }) => {
-  const apiKey = generateApiKey();
-  const user = await prisma.user.create({ data: { username, hashedPw, apiKey }});
-  await prisma.profile.create({ data: { userId: user.id, username: username }});
-  return user;
+  try {
+    const apiKey = generateApiKey();
+    const user = await prisma.user.create({
+      data: { username, hashedPw, apiKey },
+      include: { Profile: true },
+    });
+    return user;
+  } catch (error) {
+    console.error('Error in createUser:', error);
+    return null;
+  }
 };
 
 const createUserDiscord = async ({ discordId, username, avatar, email }) => {
-  const apiKey = generateApiKey();
-  const user = await prisma.user.create({ data: { discordId, username, apiKey }});
-  await prisma.profile.create({ data: { userId: user.id, avatar: avatar, email: email, username: username }});
-  return user;
+  try {
+    const apiKey = generateApiKey();
+    const user = await prisma.user.create({
+      data: { discordId, username, apiKey },
+      include: { Profile: true },
+    });
+    return user;
+  } catch (error) {
+    console.error('Error in createUserDiscord:', error);
+    return null;
+  }
 };
 
 const deleteUserById = async (userId) => {
   try {
-    await prisma.user.delete({
-      where: { id: userId },
-    });
-    // Delete profiles too?
+    await prisma.user.delete({ where: { id: userId } });
+    // Consider deleting profiles too, if needed
     return { message: 'User deleted successfully' };
   } catch (error) {
     console.error('Error in deleteUserById:', error);
@@ -123,15 +130,15 @@ const deleteUserById = async (userId) => {
 };
 
 module.exports = {
-  isAdmin,
   getApiKeyById,
   verifyApiKey,
   newApiKey,
+  getUserByApiKey,
   getUserByUsername,
   createUser,
   getUserById,
   getUserByDiscordId,
   createUserDiscord,
-  getUserByApiKey,
+  isAdmin,
   deleteUserById,
 };
