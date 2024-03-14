@@ -114,6 +114,7 @@ app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   const lowercaseUsername = username.toLowerCase();
   const result = await userController.loginUser(lowercaseUsername, password);
+  res.cookie("token",result.token);
   return res.status(result.error ? 401 : 200).json(result);
 });
 

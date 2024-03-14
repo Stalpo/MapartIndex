@@ -10,9 +10,6 @@ function sendLogin(username, password){
 
         // Check if login was successful
         if (data.token) {
-          // Save the token as a cookie
-          document.cookie = "token=" + data.token;
-
           // Redirect to a new page or perform other actions
           window.location.href = "/"; // Change this URL as needed
         } else {
