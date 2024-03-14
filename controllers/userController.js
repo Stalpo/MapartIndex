@@ -1,4 +1,5 @@
 const userModel = require('../models/userModel');
+const profileController = require('../controllers/profileController');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const validator = require('validator');
@@ -73,10 +74,6 @@ const getAllUsers = async () => {
 };
 
 const registerUser = async (username, password) => {
-  // Sanitize inputs
-  username = sanitizeInput(username);
-  password = sanitizeInput(password);
-
   // Validate username
   if (username.length < 5 || !isAlphanumeric(username)) {
     return { error: 'Invalid username. It must be at least 5 characters and only alphanumeric.' };
@@ -95,7 +92,19 @@ const registerUser = async (username, password) => {
 
   try {
     const hashedPw = await bcrypt.hash(password, 10);
-    await userModel.createUser({ username, hashedPw });
+    // Create the user
+    const user = await userModel.createUser({ username, hashedPw });
+    
+    // Create the profile for the user
+    await profileController.createProfile({
+      userId: user.id,
+      username: username,
+      location: "Unknown",
+      email: "Unknown",
+      mcUid: "Unknown",
+      joinDate: new Date(),
+      lastSeenDate: new Date(),
+    });
 
     return { message: 'User registered successfully' };
   } catch (error) {

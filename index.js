@@ -99,9 +99,22 @@ app.get('/register', (req, res) => {
 });
 
 app.post('/register', async (req, res) => {
-  const { username, password } = req.body;
-  const lowercaseUsername = username.toLowerCase();
-  const result = await userController.registerUser(lowercaseUsername, password);
+  let { username, password } = req.body;
+
+  // Sanitize and validate username
+  username = validator.trim(username);
+  username = typeof username === 'string' ? username.toLowerCase() : '';
+
+  // Sanitize password
+  password = validator.trim(password);
+
+  // Check if username or password are empty after trimming
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Username and password are required.' });
+  }
+
+  // Proceed with registration
+  const result = await userController.registerUser(username, password);
   return res.status(result.error ? 400 : 201).json(result);
 });
 

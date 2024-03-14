@@ -12,12 +12,13 @@ const getProfileById = async (userId) => {
   }
 };
 
-const createProfile = async ({ userId }) => {
+const createProfile = async ({ userId, username }) => {
   try {
-    await prisma.profile.create({ data: { userId } });
+    // Create the profile with the provided userId and username
+    await prisma.profile.create({ data: { userId, username } });
   } catch (error) {
     console.error('Error in createProfile:', error);
-    return null;
+    throw error;
   }
 };
 
@@ -98,16 +99,28 @@ const updateMcUuid = async (userId, mcUuid) => {
 };
 
 const updateLastSeen = async (userId, lastSeen) => {
-  try {
-    return await prisma.profile.update({
-      where: { userId },
-      data: { lastSeen }
-    });
-  } catch (error) {
-    console.error('Error in updateLastSeen:', error);
-    return null;
-  }
-};
+    try {
+      // Check if the profile exists
+      const existingProfile = await prisma.profile.findUnique({
+        where: { userId },
+      });
+  
+      // If the profile doesn't exist, handle the error accordingly
+      if (!existingProfile) {
+        console.error(`Profile not found for userId: ${userId}`);
+        throw new Error(`Profile not found for userId: ${userId}`);
+      }
+  
+      // Update the lastSeen field
+      return await prisma.profile.update({
+        where: { userId },
+        data: { lastSeen },
+      });
+    } catch (error) {
+      console.error('Error in updateLastSeen:', error);
+      throw error;
+    }
+  };
 
 const updateBio = async (userId, bio) => {
   try {
