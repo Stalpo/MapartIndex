@@ -69,6 +69,7 @@ model MapId {
   userId       String?
   username     String?
   artist       String?  @default("N/A")
+  server       String?
   Map          MapArt?  @relation(fields: [mapId], references: [id])
   mapId        String?
   imgUrl       String

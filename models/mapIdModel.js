@@ -119,6 +119,19 @@ const getMaps = async (page, perPage, user, artist, sort) => {
   }
 };
 
+const countMapIdsByServer = async (server) => {
+  try {
+    return await prisma.mapId.count({
+      where: {
+        server: server,
+      },
+    });
+  } catch (error) {
+    console.error('Error counting map IDs by server:', error);
+    throw error;
+  }
+};
+
 const createMapId = async ({ userId, username, mapId, imgUrl, hash }) => {
   try {
     return await prisma.mapId.create({
@@ -173,6 +186,7 @@ module.exports = {
   getAllMaps,
   getAllMapsForUserId,
   getMaps,
+  countMapIdsByServer,
   createMapId,
   updateMapById,
   deleteMapById,

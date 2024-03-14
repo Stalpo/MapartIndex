@@ -28,6 +28,15 @@ const getMapById = async (mapId) => {
   }
 };
 
+const countMapIdsByServer = async (server) => {
+  try {
+    return await mapIdModel.countMapIdsByServer(server);
+  } catch (error) {
+    console.error('Error counting map IDs by server:', error);
+    throw error;
+  }
+};
+
 const createMapId = async ({ userId, username, mapId, imgUrl, hash }) => {
   try {
     return await mapIdModel.createMapId({
@@ -87,6 +96,7 @@ module.exports = {
   getMapById,
   getAllMaps,
   getMaps,
+  countMapIdsByServer,
   createMapId,
   updateMapById,
   deleteMapById,
