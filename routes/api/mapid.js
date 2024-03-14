@@ -49,61 +49,63 @@ const upload = multer({
  * @swagger
  * /api/mapId/maps:
  *   get:
- *     description: Returns a list of map ids. Default pageSize is set to 5.
+ *     description: Returns a list of maps with pagination, filtering, and sorting options.
  *     parameters:
  *       - in: query
  *         name: page
- *         description: The page number for paginated results (default is 1).
  *         schema:
  *           type: integer
- *           minimum: 1
+ *         description: Page number for pagination.
  *       - in: query
- *         name: pageSize
- *         description: The number of map ids to return per page (default is 5).
+ *         name: perPage
  *         schema:
  *           type: integer
- *           minimum: 1
+ *         description: Number of maps per page.
+ *       - in: query
+ *         name: user
+ *         schema:
+ *           type: string
+ *         description: Filter maps by username.
+ *       - in: query
+ *         name: artist
+ *         schema:
+ *           type: string
+ *         description: Filter maps by artist.
+ *       - in: query
+ *         name: sort
+ *         schema:
+ *           type: string
+ *           enum: [nameAsc, nameDesc, dateAsc, dateDesc]
+ *         description: Sorting criteria.
  *     responses:
  *       200:
- *         description: Returns a list of map ids.
- *       400:
- *         description: Invalid page or pageSize parameters.
+ *         description: Returns a list of maps with pagination, filtering, and sorting options.
  *       404:
- *         description: Map ids not found.
+ *         description: Maps not found.
  *     tags:
  *     - Map ID
  */
 router.get('/maps', async (req, res) => {
-  try {
-    let page = parseInt(req.query.page) || 1;
-    let pageSize = parseInt(req.query.pageSize) || 5; // Set a smaller default pageSize
+    try {
+        // Extract query parameters
+        const { page, perPage, user, artist, sort } = req.query;
 
-    if (isNaN(page) || isNaN(pageSize) || page <= 0 || pageSize <= 0) {
-      // Invalid page or pageSize, return error
-      return res.status(400).json({ error: 'Invalid page or pageSize parameters' });
+        // Convert page and perPage to integers (if provided)
+        const pageNumber = page ? parseInt(page) : undefined;
+        const mapsPerPage = perPage ? parseInt(perPage) : undefined;
+
+        // Fetch maps based on pagination, filtering, and sorting criteria
+        const maps = await mapIdController.getMaps(pageNumber, mapsPerPage, user, artist, sort);
+
+        if (maps.length > 0) {
+            return res.status(200).json(maps);
+        } else {
+            return res.status(404).json({ error: 'Maps not found' });
+        }
+    } catch (error) {
+        console.error('Error fetching maps:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
-
-    const offset = (page - 1) * pageSize;
-
-    let result;
-
-    if (req.query.page || req.query.pageSize) {
-      // Use paginated logic for requests with page or pageSize parameters
-      result = await mapIdController.getPaginatedMaps(offset, pageSize);
-    } else {
-      // Return all maps for requests without page or pageSize parameters
-      result = await mapIdController.getAllMaps();
-    }
-
-    if (result.length > 0) {
-      res.status(200).json(result);
-    } else {
-      res.status(404).json({ error: 'Map ids not found' });
-    }
-  } catch (error) {
-    console.error('Error fetching maps:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
 });
 
 /**

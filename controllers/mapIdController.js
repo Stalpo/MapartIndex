@@ -8,8 +8,15 @@ const getAllMaps = async () => {
   return await mapIdModel.getAllMaps();
 };
 
-const getPaginatedMaps = async (currentPage, perPage) => {
-  return await mapIdModel.getPaginatedMaps(currentPage, perPage);
+// New method for api call
+const getMaps = async (page, perPage, user, artist, sort) => {
+  try {
+    const maps = await mapIdModel.getMaps(page, perPage, user, artist, sort);
+    return maps;
+  } catch (error) {
+    console.error('Error fetching maps:', error);
+    throw error;
+  }
 };
 
 const createMapId = async ({ userId, username, mapId, imgUrl, hash }) => {
@@ -57,7 +64,7 @@ const getMapsByOwnerId = async (ownerId) => {
 module.exports = {
   getMapById,
   getAllMaps,
-  getPaginatedMaps,
+  getMaps,
   createMapId,
   updateMapById,
   deleteMapById,
