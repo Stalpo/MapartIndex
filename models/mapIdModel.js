@@ -1,11 +1,28 @@
 const prisma = require('../util/db').prisma;
 
 const getMapIdById = async (mapId) => {
-  return await prisma.mapId.findUnique({
-    where: { id: mapId }
-  });
+  try {
+    return await prisma.mapId.findUnique({
+      where: { id: mapId }
+    });
+  } catch (error) {
+    console.error('Error in getMapIdById:', error);
+    throw error;
+  }
 };
 
+const getMapIdByHash = async (hash) => {
+  try {
+    return await prisma.mapId.findFirst({
+      where: { hash }
+    });
+  } catch (error) {
+    console.error('Error in getMapIdByHash:', error);
+    throw error;
+  }
+};
+
+// Getting replaced by getMaps, still here until all references are removed
 const getAllMaps = async () => {
   try {
     const maps = await prisma.mapId.findMany({
@@ -29,7 +46,22 @@ const getAllMaps = async () => {
   }
 };
 
-// New method for api call
+const getAllMapsForUserId = async (userId) => {
+  try {
+    return await prisma.mapId.findMany({
+      where: {
+        userId: userId,
+      },
+      include: {
+        Map: true,
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching maps for user:', error);
+    throw error;
+  }
+};
+
 const getMaps = async (page, perPage, user, artist, sort) => {
   try {
     const where = {};
@@ -88,32 +120,42 @@ const getMaps = async (page, perPage, user, artist, sort) => {
 };
 
 const createMapId = async ({ userId, username, mapId, imgUrl, hash }) => {
-  return await prisma.mapId.create({
-    data: {
-      user: {
-        connect: {
-          id: userId
-        }
-      },
-      username: username,
-      mapId: mapId,
-      imgUrl: imgUrl,
-      hash: hash,
-    }
-  });
+  try {
+    return await prisma.mapId.create({
+      data: {
+        user: {
+          connect: {
+            id: userId
+          }
+        },
+        username: username,
+        mapId: mapId,
+        imgUrl: imgUrl,
+        hash: hash,
+      }
+    });
+  } catch (error) {
+    console.error('Error in createMapId:', error);
+    throw error;
+  }
 };
 
 const updateMapById = async (mapId, { artist, nsfw, mapArtData }) => {
-  return await prisma.mapId.update({
-    where: { id: mapId },
-    data: {
-      artist,
-      nsfw,
-      Map: {
-        update: mapArtData,
+  try {
+    return await prisma.mapId.update({
+      where: { id: mapId },
+      data: {
+        artist,
+        nsfw,
+        Map: {
+          update: mapArtData,
+        },
       },
-    },
-  });
+    });
+  } catch (error) {
+    console.error('Error in updateMapById:', error);
+    throw error;
+  }
 };
 
 const deleteMapById = async (mapId) => {
@@ -125,30 +167,13 @@ const deleteMapById = async (mapId) => {
   }
 };
 
-const getMapIdByHash = async (hash) => {
-  return await prisma.mapId.findFirst({
-    where: { hash }
-  });
-};
-
-const getAllMapsForUserId = async (userId) => {
-  return await prisma.mapId.findMany({
-    where: {
-      userId: userId,
-    },
-    include: {
-      Map: true,
-    },
-  });
-};
-
 module.exports = {
   getMapIdById,
+  getMapIdByHash,
   getAllMaps,
+  getAllMapsForUserId,
   getMaps,
   createMapId,
   updateMapById,
   deleteMapById,
-  getMapIdByHash,
-  getAllMapsForUserId,
 };
