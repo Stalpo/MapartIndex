@@ -43,21 +43,14 @@ const newApiKey = async (userId) => {
   }
 };
 
-// Function to check if a string is alphanumeric
-const isAlphanumeric = (str) => /^[a-zA-Z0-9]+$/.test(str);
-
-// Sanitize input
-const sanitizeInput = (input) => validator.escape(input);
-
-// Get userId from username
-const getIdFromUsername = async (username) => {
-  const user = await userModel.getUserByUsername(username);
-  return user ? user.id : null;
-};
-
 const getUserById = async (userId) => {
-  const user = await userModel.getUserById(userId);
-  return user;
+  try {
+    const user = await userModel.getUserById(userId);
+    return user;
+  } catch (error) {
+    console.error('Error in getUserById:', error);
+    return null;
+  }
 };
 
 const getUserByUsername = async (username) => {
@@ -70,7 +63,6 @@ const getUserByUsername = async (username) => {
   }
 };
 
-// Register user
 const registerUser = async (username, password) => {
   // Sanitize inputs
   username = sanitizeInput(username);
@@ -103,28 +95,31 @@ const registerUser = async (username, password) => {
   }
 };
 
-// Login user
 const loginUser = async (username, password) => {
   // Sanitize inputs
   username = sanitizeInput(username);
   password = sanitizeInput(password);
 
-  const user = await userModel.getUserByUsername(username);
+  try {
+    const user = await userModel.getUserByUsername(username);
 
-  if (!user) {
-    return { error: 'Invalid username or password' };
+    if (!user) {
+      return { error: 'Invalid username or password' };
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.hashedPw);
+    if (!passwordMatch) {
+      return { error: 'Invalid username or password' };
+    }
+
+    const token = jwt.sign({ username }, process.env.SECRET_KEY, { expiresIn: '24h' });
+    return { token };
+  } catch (error) {
+    console.error('Error in loginUser:', error);
+    throw error;
   }
-
-  const passwordMatch = await bcrypt.compare(password, user.hashedPw);
-  if (!passwordMatch) {
-    return { error: 'Invalid username or password' };
-  }
-
-  const token = jwt.sign({ username }, process.env.SECRET_KEY, { expiresIn: '24h' });
-  return { token };
 };
 
-// Function to verify a JWT token
 const verifyToken = (token) => {
   try {
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
@@ -137,16 +132,26 @@ const verifyToken = (token) => {
 };
 
 const loginDiscordUser = async (discordId, username, avatar, email) => {
-  const user = await userModel.getUserByDiscordId(discordId);
-  if(!user) {
-    await userModel.createUserDiscord({ discordId, username, avatar, email })
+  try {
+    const user = await userModel.getUserByDiscordId(discordId);
+    if (!user) {
+      await userModel.createUserDiscord({ discordId, username, avatar, email });
+    }
+    const token = jwt.sign({ username }, process.env.SECRET_KEY, { expiresIn: '24h' });
+    return { token };
+  } catch (error) {
+    console.error('Error in loginDiscordUser:', error);
+    throw error;
   }
-  const token = jwt.sign({ username }, process.env.SECRET_KEY, { expiresIn: '24h' });
-  return { token };
-}
+};
 
 const getUserByApiKey = async (apiKey) => {
-  return await userModel.getUserByApiKey(apiKey);
+  try {
+    return await userModel.getUserByApiKey(apiKey);
+  } catch (error) {
+    console.error('Error in getUserByApiKey:', error);
+    throw error;
+  }
 };
 
 const deleteUserById = async (userId) => {
@@ -156,6 +161,23 @@ const deleteUserById = async (userId) => {
   } catch (error) {
     console.error('Error in deleteUserById:', error);
     return { error: 'Error deleting user' };
+  }
+};
+
+// Function to check if a string is alphanumeric
+const isAlphanumeric = (str) => /^[a-zA-Z0-9]+$/.test(str);
+
+// Sanitize input
+const sanitizeInput = (input) => validator.escape(input);
+
+// Get userId from username
+const getIdFromUsername = async (username) => {
+  try {
+    const user = await userModel.getUserByUsername(username);
+    return user ? user.id : null;
+  } catch (error) {
+    console.error('Error in getIdFromUsername:', error);
+    throw error;
   }
 };
 
