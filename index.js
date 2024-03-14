@@ -124,10 +124,24 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
+  let { username, password } = req.body;
+
+  // Sanitize username
+  username = validator.trim(username);
+  username = validator.escape(username);
+
+  // Sanitize password
+  password = validator.trim(password);
+  password = validator.escape(password);
+
   const lowercaseUsername = username.toLowerCase();
   const result = await userController.loginUser(lowercaseUsername, password);
-  res.cookie("token",result.token);
+  
+  // Set cookie
+  if (result.token) {
+    res.cookie("token", result.token);
+  }
+
   return res.status(result.error ? 401 : 200).json(result);
 });
 
@@ -148,10 +162,17 @@ app.get('/profile', async (req, res) => {
   res.render('profile');
 });
 
-// Profile by username route
+// Profile route, request other user profile
 app.get('/profile/:username', async (req, res) => {
   try {
-    const requestedUsername = req.params.username.toLowerCase();
+    let requestedUsername = req.params.username;
+
+    // Sanitize username
+    requestedUsername = validator.trim(requestedUsername);
+    requestedUsername = validator.escape(requestedUsername);
+
+    requestedUsername = requestedUsername.toLowerCase();
+
     const user = await userController.getUserByUsername(requestedUsername);
 
     if (!user) {
@@ -178,7 +199,6 @@ app.get('/profile/:username', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
-
 
 // Profile editing route
 app.get('/profile-edit', async (req, res) => {
@@ -275,7 +295,11 @@ app.get('/gallery', async (req, res) => {
 
 app.get('/mapId/:id', async (req, res) => {
   try {
-    const mapId = req.params.id;
+    let mapId = req.params.id;
+
+    // Sanitize mapId
+    mapId = validator.trim(mapId);
+    mapId = validator.escape(mapId);
 
     res.render('mapid', { pageTitle: 'MapId', mapId });
   } catch (error) {
@@ -316,7 +340,12 @@ app.get('/admin/download', (req, res) => {
 
 app.get('/mapId-edit/:id', async (req, res) => {
   try {
-    const mapId = req.params.id;
+    let mapId = req.params.id;
+
+    // Sanitize mapId
+    mapId = validator.trim(mapId);
+    mapId = validator.escape(mapId);
+
     const map = await mapIdController.getMapById(mapId);
 
     const user = await userController.getUserById(map.userId);
@@ -330,13 +359,22 @@ app.get('/mapId-edit/:id', async (req, res) => {
 
 app.post('/mapId-edit/:id', async (req, res) => {
   try {
+    // Check if user is an admin
+    if (!res.locals.admin) {
+      return res.status(403).send('Forbidden');
+    }
+
     const mapId = req.params.id;
-    const { artist, nsfw, /* Add other fields as needed */ } = req.body;
+    const { artist, nsfw /* Add other fields as needed */ } = req.body;
+
+    // Sanitize inputs
+    const sanitizedArtist = validator.trim(artist);
+    const sanitizedNsfw = validator.toBoolean(nsfw);
 
     // Update map details, including MapArt data
     await mapIdController.updateMapById(mapId, {
-      artist,
-      nsfw: nsfw === 'on',
+      artist: sanitizedArtist,
+      nsfw: sanitizedNsfw,
       mapArtData: {
         // Add other MapArt data fields here
       },
@@ -359,7 +397,7 @@ app.post('/deleteUser', async (req, res) => {
     const userId = res.locals.userId;
 
     // Delete the user
-    const result = await userController.deleteUserById(userId);
+    await userController.deleteUserById(userId);
     res.clearCookie('token');
     res.redirect('/');
 
@@ -371,19 +409,36 @@ app.post('/deleteUser', async (req, res) => {
 
 // Delete user route
 app.get('/deleteMapId', (req, res) => {
-  const mapId = req.query.mapId;
-  res.render('deleteMapId', { mapId: mapId });
+  try {
+    let mapId = req.query.mapId;
+
+    // Sanitize mapId
+    mapId = validator.trim(mapId);
+    mapId = validator.escape(mapId);
+
+    res.render('deleteMapId', { mapId: mapId });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
-// Delete map by id ?mapId=
 app.post('/deleteMapId', async (req, res) => {
   try {
-    const mapId = req.query.mapId || req.body.mapId;
-    console.log(mapId);
-    if (res.locals.admin) {
-      // Delete the map
-      const result = await mapIdController.deleteMapById(mapId);
+    // Check if user is an admin
+    if (!res.locals.admin) {
+      return res.status(403).send('Forbidden');
     }
+
+    let mapId = req.query.mapId || req.body.mapId;
+
+    // Sanitize mapId
+    mapId = validator.trim(mapId);
+    mapId = validator.escape(mapId);
+
+    // Delete the map
+    await mapIdController.deleteMapById(mapId);
+
     res.redirect('/admin');
   } catch (error) {
     console.error('Error deleting mapId:', error);
