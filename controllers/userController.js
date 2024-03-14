@@ -58,7 +58,16 @@ const getUserByUsername = async (username) => {
     const user = await userModel.getUserByUsername(username);
     return user;
   } catch (error) {
-    console.error('Error getting user by username:', error);
+    console.error('Error in getUserByUsername:', error);
+    throw error;
+  }
+};
+
+const getAllUsers = async () => {
+  try {
+    return await userModel.getAllUsers();
+  } catch (error) {
+    console.error('Error in getAllUsers:', error);
     throw error;
   }
 };
@@ -190,6 +199,7 @@ module.exports = {
   loginUser,
   getUserById,
   getUserByUsername,
+  getAllUsers,
   verifyToken,
   getIdFromUsername,
   loginDiscordUser,

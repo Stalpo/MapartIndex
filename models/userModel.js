@@ -90,6 +90,15 @@ const getUserByDiscordId = async (discordId) => {
   }
 };
 
+const getAllUsers = async () => {
+  try {
+    return await prisma.user.findMany();
+  } catch (error) {
+    console.error('Error in getAllUsers:', error);
+    return null;
+  }
+};
+
 const createUser = async ({ username, hashedPw }) => {
   try {
     const apiKey = generateApiKey();
@@ -135,6 +144,7 @@ module.exports = {
   newApiKey,
   getUserByApiKey,
   getUserByUsername,
+  getAllUsers,
   createUser,
   getUserById,
   getUserByDiscordId,

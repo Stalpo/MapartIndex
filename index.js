@@ -81,8 +81,15 @@ const api = require('./routes/api');
 app.use('/api', api);
 
 // Index route
-app.get('/', (req, res) => {
-  res.render('index');
+app.get('/', async (req, res) => {
+  try {
+    const totalMaps = (await mapIdController.getMaps()).length;
+    const totalUsers = (await userController.getAllUsers()).length;
+    res.render('index', { totalMaps, totalUsers });
+  } catch {
+    console.error('Error fetching statistics:', error);
+    res.render('index');
+  }
 });
 
 // Register route

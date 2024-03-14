@@ -62,7 +62,22 @@ html
         p.lead
           | Unleash Creativity, Explore Wonders: Discover the amazing maps in our Minecraft Map Art Archive.
 
+      // Stats Section
+      if totalMaps && totalUsers 
+        .row.justify-content-center
+          .col-md-3
+            .card.border-primary.mb-3(style='max-width: 18rem;').text-center
+              .card-header Total Maps
+              .card-body.text-primary
+                h5.card-title #{totalMaps}
+          .col-md-3
+            .card.border-success.mb-3(style='max-width: 18rem;').text-center
+              .card-header Total Users
+              .card-body.text-success
+                h5.card-title #{totalUsers}
+
     // JavaScript to change navbar background color
+    // Carousel fix
     script.
       document.addEventListener('DOMContentLoaded', function () {
         // Select the navbar and change its background color
