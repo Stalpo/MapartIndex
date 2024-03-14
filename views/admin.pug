@@ -228,11 +228,26 @@ html
                   span(aria-hidden='true') ×
               div.modal-body
                 ul#userList(class='list-group')
-                  // User list items will be dynamically added here
+                  p= allUsers
               div.modal-footer
                 button.btn.btn-secondary(type='button', data-dismiss='modal') Close
 
         script.
+          document.addEventListener('DOMContentLoaded', function() {
+            // Add button to download all files to the navbar
+            const navbarTitle = document.querySelector('.navbar-brand');
+            const downloadAllButton = document.createElement('button');
+            downloadAllButton.className = 'btn btn-primary';
+            downloadAllButton.textContent = 'Download All';
+            downloadAllButton.setAttribute('type', 'button');
+            downloadAllButton.style.padding = '2px 10px';
+            downloadAllButton.style.marginLeft = '10px';
+            downloadAllButton.addEventListener('click', function() {
+              window.location.href = '/admin/download';
+            });
+            navbarTitle.parentNode.insertBefore(downloadAllButton, navbarTitle.nextSibling);
+          });
+
           document.addEventListener('DOMContentLoaded', function() {
             // Add button to open user list modal to the navbar
             const navbarTitle = document.querySelector('.navbar-brand');
@@ -242,9 +257,12 @@ html
             userModalButton.setAttribute('type', 'button');
             userModalButton.setAttribute('data-toggle', 'modal');
             userModalButton.setAttribute('data-target', '#userListModal');
+            userModalButton.style.padding = '2px 10px';
+            userModalButton.style.marginLeft = '10px';
             navbarTitle.parentNode.insertBefore(userModalButton, navbarTitle.nextSibling);
           });
-      
+
+
           document.addEventListener('DOMContentLoaded', function() {
             const userListButton = document.getElementById('userListButton');
             const userListModal = new bootstrap.Modal(document.getElementById('userListModal'));

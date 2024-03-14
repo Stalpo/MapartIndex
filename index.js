@@ -8,6 +8,7 @@ const fs = require('fs');
 const crypto = require('crypto');
 const sanitize = require('sanitize-filename');
 const validator = require('validator');
+const archiver = require('archiver');
 
 // Internal dependencies
 const { loggedInMiddleware, loggingMiddleware, checkAdminStatus } = require('./middleware');
@@ -271,11 +272,31 @@ app.get('/mapId/:id', async (req, res) => {
 
 app.get('/admin', async (req, res) => {
   try {
-    // const allUsers = await userController.getAllUsers();
-    res.render('admin');
+    const allUsers = await userController.getAllUsers();
+    res.render('admin', { allUsers });
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
+  }
+});
+
+// Route to download the zip file
+app.get('/admin/download', (req, res) => {
+  if (res.locals.admin) {
+    const uploadDir = './public/uploads';
+    const zipFileName = 'uploads.zip';
+  
+    const archive = archiver('zip', {
+        zlib: { level: 9 } // Set compression level
+    });
+  
+    archive.pipe(res);
+    archive.directory(uploadDir, false);
+    archive.finalize();
+  
+    res.attachment(zipFileName);
+  } else {
+    res.redirect('/admin');
   }
 });
 

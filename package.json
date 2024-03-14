@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@prisma/client": "^5.10.2",
+    "archiver": "^7.0.1",
     "axios": "^1.6.7",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
