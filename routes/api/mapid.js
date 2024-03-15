@@ -129,7 +129,7 @@ router.get('/maps', async (req, res) => {
  *     - Map ID
  */
 router.get('/:id', async (req, res) => {
-    const id = req.params.id;
+    const id = validator.trim(req.params.id);
     const result = await mapIdController.getMapById(id)
     if(result) return res.status(result.error ? 400 : 200).json(result);
     res.status(404).json({error: 'Map id not found'});
