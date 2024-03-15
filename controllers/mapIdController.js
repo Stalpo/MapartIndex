@@ -90,13 +90,8 @@ const deleteMapById = async (mapId) => {
 
 const getUniqueUsernames = async () => {
   try {
-    const uniqueUsernames = await prisma.mapId.findMany({
-      distinct: ['username'],
-      select: {
-        username: true,
-      },
-    });
-    return uniqueUsernames.map(({ username }) => username);
+    const uniqueUsernames = await uniqueUsernameModel.getUniqueUsernames();
+    return uniqueUsernames;
   } catch (error) {
     console.error('Error fetching unique usernames:', error);
     throw error;
