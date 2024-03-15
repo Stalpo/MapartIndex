@@ -32,7 +32,7 @@ html
               div.col-md-6
                 h3.text-center Recent Uploads
                 ul.list-group
-                each map in userMaps.slice(0, 5)
+                each map in userMaps.slice(-5).reverse()
                   li.list-group-item.text-center
                     a(href="/mapid/" + map.id, target="_blank")
                       | ...#{ map.id.slice(-12) }
