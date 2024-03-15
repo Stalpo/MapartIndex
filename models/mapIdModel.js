@@ -173,6 +173,36 @@ const updateMapById = async (mapId, { artist, nsfw, mapArtData }) => {
   }
 };
 
+const getUniqueUsernames = async () => {
+  try {
+    const uniqueUsernames = await prisma.mapId.findMany({
+      distinct: ['username'],
+      select: {
+        username: true,
+      },
+    });
+    return uniqueUsernames.map(({ username }) => username);
+  } catch (error) {
+    console.error('Error fetching unique usernames:', error);
+    throw error;
+  }
+};
+
+const getUniqueArtists = async () => {
+  try {
+    const uniqueArtists = await prisma.mapId.findMany({
+      distinct: ['artist'],
+      select: {
+        artist: true,
+      },
+    });
+    return uniqueArtists.map(({ artist }) => artist);
+  } catch (error) {
+    console.error('Error fetching unique artists:', error);
+    throw error;
+  }
+};
+
 const deleteMapById = async (mapId) => {
   try {
     return await prisma.mapId.delete({ where: { id: mapId } });
@@ -191,5 +221,7 @@ module.exports = {
   countMapIdsByServer,
   createMapId,
   updateMapById,
+  getUniqueUsernames,
+  getUniqueArtists,
   deleteMapById,
 };
