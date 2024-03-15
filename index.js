@@ -403,11 +403,29 @@ app.post('/mapId-edit/:id', upload.none(), async (req, res) => {
         // Add other MapArt data fields here
       },
     });
-
+    
     res.redirect(`/admin`);
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
+  }
+});
+
+app.get('/mapId-info/uniqueUsernames', async (req, res) => {
+  try {
+    const uniqueUsernames = await mapIdController.getUniqueUsernames();
+    res.json(uniqueUsernames);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.get('/mapId-info/uniqueArtists', async (req, res) => {
+  try {
+    const uniqueArtists = await mapIdController.getUniqueArtists();
+    res.json(uniqueArtists);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
