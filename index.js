@@ -89,7 +89,11 @@ app.get('/', async (req, res) => {
 
 // Register route
 app.get('/register', (req, res) => {
-  res.render('register');
+  if (res.locals.username) {
+    res.redirect('/');
+  } else {
+    res.render('register');
+  }
 });
 
 app.post('/register', async (req, res) => {
@@ -114,7 +118,11 @@ app.post('/register', async (req, res) => {
 
 // Login route
 app.get('/login', (req, res) => {
-  res.render('login');
+  if (res.locals.username) {
+    res.redirect('/');
+  } else {
+    res.render('login');
+  }
 });
 
 app.post('/login', async (req, res) => {
