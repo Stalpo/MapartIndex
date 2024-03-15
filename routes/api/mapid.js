@@ -7,6 +7,7 @@ const sanitize = require('sanitize-filename');
 const path = require('path');
 const crypto = require("crypto");
 const multer = require('multer');
+const validator = require('validator');
 
 // Set up the storage for multer
 const storage = multer.diskStorage({
@@ -87,15 +88,15 @@ const upload = multer({
  */
 router.get('/maps', async (req, res) => {
     try {
-        // Extract query parameters
-        const { page, perPage, user, artist, sort } = req.query;
-
-        // Convert page and perPage to integers (if provided)
-        const pageNumber = page ? parseInt(page) : undefined;
-        const mapsPerPage = perPage ? parseInt(perPage) : undefined;
+        // Sanitize and validate query parameters
+        const page = validator.isInt(req.query.page) ? parseInt(req.query.page) : undefined;
+        const perPage = validator.isInt(req.query.perPage) ? parseInt(req.query.perPage) : undefined;
+        const user = validator.escape(req.query.user || '');
+        const artist = validator.escape(req.query.artist || '');
+        const sort = ['nameAsc', 'nameDesc', 'dateAsc', 'dateDesc'].includes(req.query.sort) ? req.query.sort : undefined;
 
         // Fetch maps based on pagination, filtering, and sorting criteria
-        const maps = await mapIdController.getMaps(pageNumber, mapsPerPage, user, artist, sort);
+        const maps = await mapIdController.getMaps(page, perPage, user, artist, sort);
 
         if (maps.length > 0) {
             return res.status(200).json(maps);
