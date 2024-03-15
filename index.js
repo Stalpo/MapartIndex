@@ -150,7 +150,7 @@ app.post('/login', async (req, res) => {
 // Logout route
 app.get('/logout', (req, res) => {
   res.clearCookie('token');
-  res.render('logout');
+  res.redirect('/');
 });
 
 // Profile route
