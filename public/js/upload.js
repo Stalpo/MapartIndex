@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const progressBar = document.getElementById("uploadProgressBar");
   const successMessage = document.getElementById("successMessage");
   const errorMessage = document.getElementById("errorMessage");
-  const previewImg = document.getElementById("previewImg");
+  const previewImg = document.getElementById("imagePreview");
 
   form.addEventListener("submit", function (event) {
     event.preventDefault(); // Prevent the form from submitting normally
@@ -33,19 +33,20 @@ document.addEventListener("DOMContentLoaded", function () {
         // Handle a successful upload response
         const response = JSON.parse(xhr.responseText);
         successMessage.style.display = "block";
-        successMessage.innerHTML =
-          "Upload Successful!";
+        successMessage.innerHTML = "Upload Successful!";
 
         // Display the uploaded images in the success alert
         if (response.files && response.files.length > 0) {
+          console.log(response.files);
           response.files.forEach((filename) => {
-            const img = document.createElement("img");
-            img.src = "./public/uploads/" + filename;
-            img.className = "img-fluid";
-            previewImg.appendChild(img);
+            // const img = document.createElement("img");
+            // img.src = "./public/uploads/" + filename;
+            // console.log(img.src);
+            // img.className = "img-fluid";
+            // imagePreview.appendChild(img);
           });
 
-          previewImg.style.display = "block";
+          imagePreview.style.display = "block";
         }
       } else {
         // Handle other server errors or HTTP status codes

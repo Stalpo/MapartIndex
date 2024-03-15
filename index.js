@@ -41,19 +41,13 @@ app.use(checkAdminStatus);
 // Set up the storage for multer
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'public/uploads');
+    cb(null, 'public/uploads/tmp'); // Upload files to a temporary directory
   },
   filename: function (req, file, cb) {
-    crypto.randomBytes(16, (err, buffer) => {
-      if (err) return cb(err);
-
-      const hash = buffer.toString('hex');
-      const sanitizedFilename = sanitize(file.originalname);
-      const filename = `${hash}${path.extname(sanitizedFilename)}`;
-      
-      cb(null, filename);
-    });
-  },
+    // Generate a unique filename
+    const filename = Date.now() + '-' + file.originalname;
+    cb(null, filename);
+  }
 });
 
 // File filter for multer
@@ -250,8 +244,14 @@ app.get('/upload', async (req, res) => {
   res.render('upload');
 });
 
+// POST endpoint for uploading files
 app.post('/upload', upload.array('images', 25), async (req, res) => {
   try {
+    // Check if user is an admin
+    if (!res.locals.admin) {
+      return res.status(403).send('Forbidden');
+    }
+
     const { files } = req;
 
     if (!files || files.length === 0) {
@@ -259,13 +259,24 @@ app.post('/upload', upload.array('images', 25), async (req, res) => {
       return res.status(400).json({ error: 'No files uploaded' });
     }
 
+    const uploadedFiles = [];
+
     // Process each file
-    const filenames = [];
     for (const file of files) {
-      const { filename, path, size, mimetype } = file;
+      const { filename, path, originalname } = file;
+
+      // Generate the desired filename based on server
+      const server = req.body.server;
+      const newFilename = await mapIdController.generateFilename(server);
+
+      // Construct the new filepath manually
+      const newFilepath = __dirname + '/public/uploads/' + newFilename;
+
+      // Rename the file
+      fs.renameSync(path, newFilepath);
 
       // Read the image file and convert it to base64
-      const base64 = fs.readFileSync(path, { encoding: 'base64' });
+      const base64 = fs.readFileSync(newFilepath, { encoding: 'base64' });
 
       // Calculate a hash of the base64 data
       const hash = crypto.createHash('md5').update(base64).digest('hex');
@@ -274,15 +285,20 @@ app.post('/upload', upload.array('images', 25), async (req, res) => {
       await mapIdController.createMapId({
         userId: res.locals.userId,
         username: res.locals.username,
-        imgUrl: filename,
+        imgUrl: newFilename,
         hash: hash,
+        server: req.body.server
       });
 
-      filenames.push(filename);
+      uploadedFiles.push({
+        originalname,
+        filename: newFilename,
+        path: newFilepath
+      });
     }
 
     // Send a response with information about the uploaded files
-    res.status(200).json({ message: 'Upload successful', files: filenames });
+    res.status(200).json({ message: 'Upload successful', files: uploadedFiles[0] });
   } catch (error) {
     console.error('Error uploading files:', error);
     res.status(500).json({ error: 'Internal server error' });

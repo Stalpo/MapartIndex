@@ -37,14 +37,28 @@ const countMapIdsByServer = async (server) => {
   }
 };
 
-const createMapId = async ({ userId, username, mapId, imgUrl, hash }) => {
+const generateFilename = async (server) => {
+  try {
+    const mapCount = await countMapIdsByServer(server) + 1;
+    // Construct the filename
+    const filename = `${server}_${mapCount}.png`;
+
+    return filename;
+  } catch (error) {
+    console.error('Error generating filename:', error);
+    throw error;
+  }
+};
+
+const createMapId = async ({ userId, username, mapId, imgUrl, hash, server }) => {
   try {
     return await mapIdModel.createMapId({
       userId,
       username,
       mapId,
       imgUrl,
-      hash
+      hash,
+      server,
     });
   } catch (error) {
     console.error('Error creating map ID:', error);
@@ -97,6 +111,7 @@ module.exports = {
   getAllMaps,
   getMaps,
   countMapIdsByServer,
+  generateFilename,
   createMapId,
   updateMapById,
   deleteMapById,

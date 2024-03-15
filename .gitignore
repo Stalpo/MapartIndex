@@ -135,3 +135,5 @@ package-lock.json
 /prisma/src/
 public/uploads/*.png
 public/uploads/*.jpg
+public/uploads/tmp/*.png
+public/uploads/tmp/*.jpg

@@ -121,18 +121,19 @@ const getMaps = async (page, perPage, user, artist, sort) => {
 
 const countMapIdsByServer = async (server) => {
   try {
-    return await prisma.mapId.count({
+    const count = await prisma.mapId.count({
       where: {
         server: server,
       },
     });
+    return count;
   } catch (error) {
     console.error('Error counting map IDs by server:', error);
     throw error;
   }
 };
 
-const createMapId = async ({ userId, username, mapId, imgUrl, hash }) => {
+const createMapId = async ({ userId, username, mapId, imgUrl, hash, server }) => {
   try {
     return await prisma.mapId.create({
       data: {
@@ -145,6 +146,7 @@ const createMapId = async ({ userId, username, mapId, imgUrl, hash }) => {
         mapId: mapId,
         imgUrl: imgUrl,
         hash: hash,
+        server: server,
       }
     });
   } catch (error) {

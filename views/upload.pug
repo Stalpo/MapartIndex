@@ -16,7 +16,14 @@ html
           form#uploadForm(action='/upload', method='post', enctype='multipart/form-data')
             .form-group
               label(for='image', class='mb-2') Choose a map:
-              input(type='file', name='images', id='images', class='form-control-file', accept='image/*', multiple, onchange='previewImages(this)')
+              input(type='file', name='images', id='images', class='form-control-file', accept='image/*', multiple)
+            .form-group
+              label(for='server', class='mb-2') Select a server:
+              select(name='server', id='server', class='form-control')
+                option(value='2b2t') 2b2t
+                option(value='constantium') constantium
+                // Add more options as needed
+
             button.btn.btn-primary(type='submit')
               i.fas.fa-cloud-upload-alt
               |  Upload Image
@@ -28,8 +35,6 @@ html
 
           // Preview Image Section
           #imagePreview(style='display: none; margin-top: 10px;')
-            img#previewImg(src='', alt='Preview Image', class='img-fluid')
 
       script(src="./public/js/upload.js")
-    // include includes/footer.pug
     include includes/scripts.pug
