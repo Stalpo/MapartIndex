@@ -90,7 +90,7 @@ const deleteMapById = async (mapId) => {
 
 const getUniqueUsernames = async () => {
   try {
-    const uniqueUsernames = await uniqueUsernameModel.getUniqueUsernames();
+    const uniqueUsernames = await mapIdModel.getUniqueUsernames();
     return uniqueUsernames;
   } catch (error) {
     console.error('Error fetching unique usernames:', error);
@@ -100,7 +100,7 @@ const getUniqueUsernames = async () => {
 
 const getUniqueArtists = async () => {
   try {
-    const uniqueArtists = await uniqueArtistModel.getUniqueArtists();
+    const uniqueArtists = await mapIdModel.getUniqueArtists();
     return uniqueArtists;
   } catch (error) {
     console.error('Error fetching unique artists:', error);
