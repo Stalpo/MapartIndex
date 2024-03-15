@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const validator = require('validator');
+
 const userController = require('../../controllers/userController');
 const profileController = require('../../controllers/profileController');
 
@@ -9,10 +11,10 @@ const profileController = require('../../controllers/profileController');
  *   get:
  *     description: Returns a list of map ids owned by the user.
  *     parameters:
- *     - in: user-id
- *     name: user-id
- *     type: string
- *     required: true
+ *     - in: query
+ *       name: userId
+ *       type: string
+ *       required: true
  *     responses:
  *       200:
  *         description: Returns a list of map ids.
@@ -23,7 +25,8 @@ const profileController = require('../../controllers/profileController');
  */
 
 router.get('/maps', async (req, res) => {
-  const userId = req.query.userId;
+  let { userId } = req.query;
+  userId = validator.trim(validator.escape(userId)); // Sanitize userId
   const result = await profileController.getAllMapsForUserId(userId);
   if (result) return res.status(200).json(result);
   res.status(404).json({ error: 'Map ids not found' });
@@ -50,11 +53,11 @@ router.get('/maps', async (req, res) => {
  *      - User
  */
 router.get("/:id", async (req, res) => {
-    const id = req.params.id;
+    let { id } = req.params;
+    id = validator.trim(validator.escape(id)); // Sanitize id
     const result = await profileController.getProfileById(id);
     if (result) return res.status(200).json(result);
     res.status(404).json({ error: "User id not found" });
-
 });
 
 module.exports = router;
