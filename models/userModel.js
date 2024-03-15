@@ -139,16 +139,16 @@ const deleteUserById = async (userId) => {
 };
 
 module.exports = {
+  isAdmin,
   getApiKeyById,
   verifyApiKey,
-  newApiKey,
   getUserByApiKey,
+  newApiKey,
   getUserByUsername,
-  getAllUsers,
-  createUser,
   getUserById,
   getUserByDiscordId,
+  getAllUsers,
+  createUser,
   createUserDiscord,
-  isAdmin,
   deleteUserById,
 };
