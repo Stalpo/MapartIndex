@@ -155,7 +155,7 @@ router.get('/:id', async (req, res) => {
  *     - Map ID
  */
 router.get('/owner', async (req, res) => {
-    const id = req.query.id;
+    const id = validator.trim(req.query.id);
     const result = await mapIdController.getMapsByOwnerId(id)
     if(result) return res.status(200).json(result);
     res.status(404).json({error: 'Owner id not found'});
