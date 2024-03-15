@@ -12,6 +12,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
     var username = document.querySelector('[name="username"]').value;
     var password = document.querySelector('[name="password"]').value;
+    var confirmPassword = document.querySelector('[name="confirmPassword"]').value;
+
+    // Check if passwords match
+    if (password !== confirmPassword) {
+      showError("Passwords do not match.");
+      return;
+    }
 
     var xhr = new XMLHttpRequest();
     xhr.open("POST", "/register", true);
@@ -21,7 +28,6 @@ document.addEventListener("DOMContentLoaded", function() {
       if (xhr.readyState == 4) {
         if (xhr.status == 201) {
           // Registration successful
-
           sendLogin(username, password);
         } else {
           var data = JSON.parse(xhr.responseText);

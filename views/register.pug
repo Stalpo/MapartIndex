@@ -20,7 +20,13 @@ html
                 div.input-group-prepend
                   span.input-group-text
                     i.fas.fa-lock
-                input(type="password", class="form-control", name="password", placeholder="Password", required)
+                input(type="password", class="form-control", name="password", id="password", placeholder="Password", required)
+            div.form-group
+              div.input-group
+                div.input-group-prepend
+                  span.input-group-text
+                    i.fas.fa-lock
+                input(type="password", class="form-control", name="confirmPassword", id="confirmPassword", placeholder="Confirm Password", required)
             button(type="submit", class="btn btn-primary btn-block") Submit
             button(type="button", class="btn btn-primary btn-block mt-3", onclick="window.location.href='/discord/login'") Login With Discord
 

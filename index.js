@@ -245,7 +245,7 @@ app.get('/upload', async (req, res) => {
 });
 
 // POST endpoint for uploading files
-app.post('/upload', upload.array('images', 25), async (req, res) => {
+app.post('/upload', upload.array('images', 4000), async (req, res) => {
   try {
     // Check if user is an admin
     if (!res.locals.admin) {
@@ -309,21 +309,6 @@ app.get('/gallery', async (req, res) => {
   res.render('gallery');
 });
 
-app.get('/mapId/:id', async (req, res) => {
-  try {
-    let mapId = req.params.id;
-
-    // Sanitize mapId
-    mapId = validator.trim(mapId);
-    mapId = validator.escape(mapId);
-
-    res.render('mapid', { pageTitle: 'MapId', mapId });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Internal Server Error');
-  }
-});
-
 app.get('/admin', async (req, res) => {
   try {
     const allUsers = await userController.getAllUsers();
@@ -354,6 +339,21 @@ app.get('/admin/download', (req, res) => {
   }
 });
 
+app.get('/mapId/:id', async (req, res) => {
+  try {
+    let mapId = req.params.id;
+
+    // Sanitize mapId
+    mapId = validator.trim(mapId);
+    mapId = validator.escape(mapId);
+
+    res.render('mapid', { pageTitle: 'MapId', mapId });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 app.get('/mapId-edit/:id', async (req, res) => {
   try {
     let mapId = req.params.id;
@@ -373,7 +373,7 @@ app.get('/mapId-edit/:id', async (req, res) => {
   }
 });
 
-app.post('/mapId-edit/:id', async (req, res) => {
+app.post('/mapId-edit/:id', upload.none(), async (req, res) => {
   try {
     // Check if user is an admin
     if (!res.locals.admin) {

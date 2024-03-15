@@ -42,7 +42,11 @@ const loggedInMiddleware = async (req, res, next) => {
     } else {
       // Token is not valid, handle the error as needed
       console.error(verificationResult.error);
+      res.locals.userId = null;
     }
+  } else {
+    // No token present, set userId to null
+    res.locals.userId = null;
   }
 
   next();
