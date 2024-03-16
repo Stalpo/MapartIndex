@@ -52,11 +52,11 @@ const storage = multer.diskStorage({
 
 // File filter for multer
 const fileFilter = (req, file, cb) => {
-  // Check if the file is an image
-  if (file.mimetype.startsWith('image/')) {
+  // Check if the file is a PNG image
+  if (file.mimetype === 'image/png') {
     cb(null, true);
   } else {
-    cb(new Error('Only images are allowed!'), false);
+    cb(new Error('Only PNG images are allowed!'), false);
   }
 };
 
