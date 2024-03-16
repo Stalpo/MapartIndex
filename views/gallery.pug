@@ -31,10 +31,6 @@ html
                   div.input-group-text Sort
                 select#sortSelector.form-control
 
-      div#loadingSpinner.text-center.mt-4
-        i.fa.fa-spinner.fa-spin.fa-3x
-        p Loading...
-
       script.
         // Function to fetch data from the API
         async function fetchData(url) {
@@ -222,9 +218,31 @@ html
           fetchMaps();
         });
 
-
-      // Add grid container with added margin and mx-auto for centering
+      // Grid container for images
       div#gridContainer.row.mb-4
+
+      // Keep loadingSpinner at bottom of page
+      script.
+        function createLoadingSpinner() {
+          const loadingSpinner = document.createElement('div');
+          loadingSpinner.id = 'loadingSpinner';
+          loadingSpinner.className = 'text-center mt-4';
+          
+          const spinnerIcon = document.createElement('i');
+          spinnerIcon.className = 'fa fa-spinner fa-spin fa-3x';
+          
+          const loadingText = document.createElement('p');
+          loadingText.textContent = 'Loading...';
+          
+          loadingSpinner.appendChild(spinnerIcon);
+          loadingSpinner.appendChild(loadingText);
+          
+          return loadingSpinner;
+        }
+
+        const container = document.querySelector('.container');
+        const loadingSpinner = createLoadingSpinner();
+        container.appendChild(loadingSpinner);
 
       style.
         .pixelated-image {
