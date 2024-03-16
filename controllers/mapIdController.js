@@ -108,6 +108,16 @@ const getUniqueArtists = async () => {
   }
 };
 
+const getUniqueServers = async () => {
+  try {
+    const uniqueServers = await mapIdModel.getUniqueServers();
+    return uniqueServers;
+  } catch (error) {
+    console.error('Error fetching unique servers:', error);
+    throw error;
+  }
+};
+
 const getMapIdByHash = async (hash) => {
   try {
     return await mapIdModel.getMapIdByHash(hash);
@@ -137,6 +147,7 @@ module.exports = {
   deleteMapById,
   getUniqueUsernames,
   getUniqueArtists,
+  getUniqueServers,
   getMapIdByHash,
   getMapsByOwnerId,
 };

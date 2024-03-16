@@ -203,6 +203,21 @@ const getUniqueArtists = async () => {
   }
 };
 
+const getUniqueServers = async () => {
+  try {
+    const uniqueServers = await prisma.mapId.findMany({
+      distinct: ['server'],
+      select: {
+        server: true,
+      },
+    });
+    return uniqueServers.map(({ server }) => server);
+  } catch (error) {
+    console.error('Error fetching unique servers:', error);
+    throw error;
+  }
+};
+
 const deleteMapById = async (mapId) => {
   try {
     return await prisma.mapId.delete({ where: { id: mapId } });
@@ -223,5 +238,6 @@ module.exports = {
   updateMapById,
   getUniqueUsernames,
   getUniqueArtists,
+  getUniqueServers,
   deleteMapById,
 };
