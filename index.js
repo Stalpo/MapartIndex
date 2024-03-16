@@ -346,8 +346,8 @@ app.post('/upload', upload.array('images', 4000), async (req, res) => {
   }
 });
 
-app.get('/gallery', async (req, res) => {
-  res.render('gallery');
+app.get('/map-gallery', async (req, res) => {
+  res.render('mapid-gallery');
 });
 
 app.get('/admin', async (req, res) => {

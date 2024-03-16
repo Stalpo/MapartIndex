@@ -211,7 +211,8 @@ const getUniqueServers = async () => {
         server: true,
       },
     });
-    return uniqueServers.map(({ server }) => server);
+    const filteredServers = uniqueServers.filter(({ server }) => server !== null);
+    return filteredServers.map(({ server }) => server);
   } catch (error) {
     console.error('Error fetching unique servers:', error);
     throw error;
