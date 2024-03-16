@@ -20,6 +20,7 @@ const openapiSpecification = swaggerJsdoc(options);
 router.use('/docs', swaggerUi.serve, swaggerUi.setup(openapiSpecification));
 
 router.use('/mapId', require('./api/mapid'));
+router.use('/mapArt', require('./api/mapart'));
 router.use('/user', require('./api/user'));
 
 router.use((_, res) => res.redirect("/api/docs"));

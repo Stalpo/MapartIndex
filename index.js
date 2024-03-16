@@ -520,6 +520,21 @@ app.post('/mapArt-create', mapArtUpload.single('file'), async (req, res) => {
   }
 });
 
+app.get('/mapArt/:id', async (req, res) => {
+  try {
+    let mapId = req.params.id;
+
+    // Sanitize mapId
+    mapId = validator.trim(mapId);
+    mapId = validator.escape(mapId);
+
+    res.render('mapart', { pageTitle: 'MapArt', mapId });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 // Delete user route
 app.get('/deleteUser', (req, res) => {
   res.render('deleteUser');
