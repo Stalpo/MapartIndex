@@ -13,9 +13,9 @@ html
           if profile.avatar 
             img.img-fluid.rounded-circle(src=profile.avatar, alt="Profile Avatar", style="width: 128px; height: 128px;")
           h2 #{ profile.username }
-          //if isAdmin
+          if isAdmin
             span.badge.badge-secondary Admin
-          //else if isMod
+          else if isMod
             span.badge.badge-secondary Mod
           p.text-center #{ profile.bio }
           p.text-center Last seen: #{ profile.lastSeen ? profile.lastSeen.toLocaleString('en-US', {month:'2-digit',day:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit',hour12:true}) : 'Unknown' }

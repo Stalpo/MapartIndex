@@ -216,8 +216,8 @@ app.get('/profile/:username', async (req, res) => {
       res.locals.profile = await profileController.getProfileById(userId);
       res.locals.userMaps = await profileController.getAllMapsForUserId(userId);
       res.locals.apiKey = await userController.getApiKeyById(userId);
-      res.locals.isAdmin = await userController.isAdmin(userId);
-      res.locals.isMod = await userController.isMod(userId);
+      res.locals.isAdmin = await userController.isAdmin(user.id);
+      res.locals.isMod = await userController.isMod(user.id);
     } else {
       // Not loggedIn user requested
       res.locals.profile = await profileController.getProfileById(user.id);
