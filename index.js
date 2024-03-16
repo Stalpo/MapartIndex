@@ -105,7 +105,8 @@ app.get('/', async (req, res) => {
     const totalMaps = (await mapIdController.getMaps()).length;
     const totalMaparts = (await mapArtController.getAllMapArts()).length;
     const totalUsers = (await userController.getAllUsers()).length;
-    res.render('index', { totalMaps, totalUsers, totalMaparts });
+    const totalServers = (await mapIdController.getUniqueServers()).length;
+    res.render('index', { totalMaps, totalUsers, totalMaparts, totalServers });
   } catch {
     console.error('Error fetching statistics:', error);
     res.render('index');
