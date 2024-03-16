@@ -69,6 +69,27 @@ const upload = multer({
   },
 });
 
+// Multer setup for handling file uploads in /mapArt-create
+const mapArtStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'public/uploads/mapArt/tmp'); // Upload files to a directory specific to mapArt
+  },
+  filename: function (req, file, cb) {
+    // Generate a unique filename based on timestamp and random string
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+// Init multer storage, file filter, and limits for /mapArt-create
+const mapArtUpload = multer({
+  storage: mapArtStorage,
+  fileFilter: fileFilter, // Assuming fileFilter is defined elsewhere
+  limits: {
+    fileSize: 1024 * 1024 * 10, // 10 MB limit for mapArt images
+  },
+});
+
 // Custom routes
 const discord = require('./routes/discord');
 app.use('/discord', discord);
@@ -439,14 +460,26 @@ app.get('/mapArt-create', (req, res) => {
 
 app.post('/mapArt-create', async (req, res) => {
   try {
+    const imageFile = req.file;
+    const { mapName, description, artist } = req.body;
+
+    // Save to db
+    console.log('Map Name:', mapName);
+    console.log('Description:', description);
+    console.log('Artist:', artist);
+    console.log('Uploaded Image:', imageFile);
+
+    // Need userId to place in db
     const userId = res.locals.userId;
-    res.send('wip');
+
+    // Add logic to save to db
+
+    res.send(mapName, description, artist, imageFile);
   } catch (error) {
-    console.error('Error deleting user:', error);
+    console.error('Error creating map art:', error);
     res.status(500).send('Internal Server Error');
   }
 });
-
 
 // Delete user route
 app.get('/deleteUser', (req, res) => {
