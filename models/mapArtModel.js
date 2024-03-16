@@ -1,6 +1,6 @@
 const prisma = require('../util/db').prisma;
 
-const createMapId = async ({ userId, username, mapId, imgUrl, hash, server }) => {
+const createMapId = async ({ userId, username, name, description, mapId, imgUrl, hash, server }) => {
   try {
     return await prisma.mapArt.create({
       data: {
@@ -10,6 +10,8 @@ const createMapId = async ({ userId, username, mapId, imgUrl, hash, server }) =>
           }
         },
         username: username,
+        name: name,
+        description: description,
         mapId: mapId,
         imgUrl: imgUrl,
         hash: hash,

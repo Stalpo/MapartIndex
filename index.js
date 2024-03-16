@@ -21,6 +21,7 @@ const PORT = 3000;
 const userController = require('./controllers/userController');
 const profileController = require('./controllers/profileController');
 const mapIdController = require('./controllers/mapIdController');
+const mapArtController = require('./controllers/mapArtController');
 
 // View engine
 app.set('view engine', 'pug');
@@ -77,7 +78,8 @@ const mapArtStorage = multer.diskStorage({
   filename: function (req, file, cb) {
     // Generate a unique filename based on timestamp and random string
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
+    const filename = uniqueSuffix + '.png'; // Ensure the file ends with .png
+    cb(null, filename);
   }
 });
 
@@ -467,18 +469,18 @@ app.get('/mapArt-create', (req, res) => {
   res.render('mapart-create');
 });
 
-app.post('/mapArt-create', mapArtUpload.single('images'), async (req, res) => {
+app.post('/mapArt-create', mapArtUpload.single('file'), async (req, res) => {
   try {
     const { name, description, artist, server } = req.body;
     const { filename, path, originalname } = req.file;
 
-    if (!file) {
+    if (!req.file) {
       // If no files are provided
       return res.status(400).json({ error: 'No files uploaded' });
     }
 
     // Generate the desired filename based on server
-    const newFilename = await mapIdController.generateFilename(server);
+    const newFilename = await mapArtController.generateFilename(server);
 
     // Construct the new filepath manually
     const newFilepath = __dirname + '/public/uploads/mapart/' + newFilename;
@@ -492,18 +494,18 @@ app.post('/mapArt-create', mapArtUpload.single('images'), async (req, res) => {
     // Calculate a hash of the base64 data
     const hash = crypto.createHash('md5').update(base64).digest('hex');
 
-    // Add metadata to the db
-    //await mapArtController.createMapId({
-    //  userId: res.locals.userId,
-    //  username: res.locals.username,
-    //  imgUrl: newFilename,
-    //  hash: hash,
-    //  server: req.body.server
-    //});
+    const result = await mapArtController.createMapId({
+      userId: res.locals.userId,
+      username: res.locals.username,
+      imgUrl: newFilename,
+      name: name,
+      description: description,
+      artist: artist,
+      hash: hash,
+      server: server,
+    });
 
-
-    let data = { name: name, description: description, artist: artist, server: server, hash: hash, filename: newFilename };
-    res.send(data);
+    res.send(result);
   } catch (error) {
     console.error('Error creating map art:', error);
     res.status(500).send('Internal Server Error');

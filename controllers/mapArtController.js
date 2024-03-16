@@ -1,10 +1,12 @@
 const mapArtModel = require('../models/mapArtModel');
 
-const createMapId = async ({ userId, username, mapId, imgUrl, hash, server }) => {
+const createMapId = async ({ userId, username, name, description, mapId, imgUrl, hash, server }) => {
   try {
     return await mapArtModel.createMapId({
       userId,
       username,
+      name,
+      description,
       mapId,
       imgUrl,
       hash,
