@@ -350,6 +350,10 @@ app.get('/map-gallery', async (req, res) => {
   res.render('mapid-gallery');
 });
 
+app.get('/mapart-gallery', async (req, res) => {
+  res.render('mapart-gallery');
+});
+
 app.get('/admin', async (req, res) => {
   try {
     const allUsers = await userController.getAllUsers();
@@ -539,6 +543,33 @@ app.get('/mapArt/:id', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
+  }
+});
+
+app.get('/mapArt-info/uniqueUsernames', async (req, res) => {
+  try {
+    const uniqueUsernames = await mapArtController.getUniqueUsernames();
+    res.json(uniqueUsernames);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.get('/mapArt-info/uniqueArtists', async (req, res) => {
+  try {
+    const uniqueArtists = await mapArtController.getUniqueArtists();
+    res.json(uniqueArtists);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.get('/mapArt-info/uniqueServers', async (req, res) => {
+  try {
+    const uniqueServers = await mapArtController.getUniqueServers();
+    res.json(uniqueServers);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 

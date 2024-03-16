@@ -1,0 +1,322 @@
+doctype html
+html
+  - const pageTitle = "Map Arts"
+  include includes/head.pug
+  body
+    include includes/navbar.pug
+    div.container
+      h1.text-center= pageTitle
+      hr
+      form
+        div.row
+          div.col
+            div.form-group
+              label.sr-only(for='userSelector') Select User:
+              div.input-group.mb-2.mr-sm-2
+                div.input-group-prepend
+                  div.input-group-text User
+                select#userSelector.form-control
+          div.col
+            div.form-group
+              label.sr-only(for='artistSelector') Select Artist:
+              div.input-group.mb-2.mr-sm-2
+                div.input-group-prepend
+                  div.input-group-text Artist
+                select#artistSelector.form-control
+        div.row
+          div.col
+            div.form-group
+              label.sr-only(for='sortSelector') Sort By:
+              div.input-group.mb-2.mr-sm-2
+                div.input-group-prepend
+                  div.input-group-text Sort
+                select#sortSelector.form-control
+          div.col
+            div.form-group
+              label.sr-only(for='viewSelector') View Type:
+              div.input-group.mb-2.mr-sm-2
+                div.input-group-prepend
+                  div.input-group-text View
+                select#viewSelector.form-control
+                  option(value='smallGrid') Thumbnails
+                  option(value='grid' selected='true') Cards
+
+      script.
+        // Function to fetch data from the API
+        async function fetchData(url) {
+          const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        }
+
+        // Function to populate select element with options
+        function populateSelect(selectorId, data) {
+          const selector = document.getElementById(selectorId);
+          selector.innerHTML = ''; // Clear previous options
+          data.forEach(item => {
+            const option = document.createElement('option');
+            option.text = item;
+            selector.add(option);
+          });
+        }
+
+        // Function to populate user selector
+        async function populateUserSelector() {
+          try {
+            const uniqueUsernames = await fetchData('/mapArt-info/uniqueUsernames');
+            uniqueUsernames.unshift("All Users");
+            populateSelect('userSelector', uniqueUsernames);
+          } catch (error) {
+            console.error('Error fetching user data:', error);
+          }
+        }
+
+        // Function to populate artist selector
+        async function populateArtistSelector() {
+          try {
+            const uniqueArtists = await fetchData('/mapArt-info/uniqueArtists');
+            uniqueArtists.unshift("All Artists");
+            populateSelect('artistSelector', uniqueArtists);
+          } catch (error) {
+            console.error('Error fetching artist data:', error);
+          }
+        }
+
+        async function populateSortSelector() {
+          const sortSelector = document.getElementById('sortSelector');
+
+          const options = [
+            { value: 'nameAsc', label: 'Name (Ascending)' },
+            { value: 'nameDesc', label: 'Name (Descending)' },
+            { value: 'dateAsc', label: 'Date (Ascending)' },
+            { value: 'dateDesc', label: 'Date (Descending)', selected: true }
+          ];
+
+          options.forEach(option => {
+            const sortOption = document.createElement('option');
+            sortOption.value = option.value;
+            sortOption.textContent = option.label;
+            if (option.selected) {
+              sortOption.setAttribute('selected', true);
+            }
+            sortSelector.appendChild(sortOption);
+          });
+        }
+
+        let view;
+
+        // Function to handle view selector change events
+        function handleViewSelectorChange() {
+          const viewSelector = document.getElementById('viewSelector');
+          const viewType = viewSelector.value;
+
+          // Clear the grid before switching view
+          clearGrid();
+
+          // Based on the selected view type
+          switch (viewType) {
+            case 'smallGrid':
+              view = 'smallGrid';
+              break;
+            case 'grid':
+              view = 'grid';
+              break;
+            default:
+              view = 'grid';
+              break;
+          }
+
+          fetchMaps(1, user, artist, sort, view);
+        }
+
+        // Attach event listener to view selector
+        document.getElementById('viewSelector').addEventListener('change', handleViewSelectorChange);
+
+        // Function to handle API call with updated parameters
+        async function fetchMaps(page = 1, user = "", artist = "", sort = "dateDesc", view) {
+          const perPage = 25;
+          let url = `/api/mapArt/maps?page=${page}&perPage=${perPage}&sort=${sort}`;
+          // Construct URL based on selected values
+          if (user && user !== "All Users") {
+            url += `&user=${user}`;
+          }
+          if (artist && artist !== "All Artists") {
+            url += `&artist=${artist}`;
+          }
+
+          // Show loading spinner
+          document.getElementById('loadingSpinner').style.display = 'block';
+
+          try {
+            const response = await fetch(url);
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            
+            // Based on the selected view type
+            // Update the grid from response
+            switch (view) {
+              case 'smallGrid':
+                buildSmallGrid(data);
+                break;
+              case 'grid':
+                buildGrid(data);
+                break;
+              default:
+                buildGrid(data);
+                break;
+            }
+
+            // Start observing intersection once grid is populated
+            startObservingIntersection();
+          } catch (error) {
+            console.error('Error fetching map data:', error);
+          } finally {
+            // Hide loading spinner regardless of success or failure
+            document.getElementById('loadingSpinner').style.display = 'none';
+          }
+        }
+
+        // Function to handle input selector change events
+        function handleSelectorChange() {
+          const user = document.getElementById('userSelector').value;
+          const artist = document.getElementById('artistSelector').value;
+          const sort = document.getElementById('sortSelector').value;
+          const view = document.getElementById('viewSelector').value;
+
+          // Clear the grid before fetching new data
+          clearGrid();
+
+          // Pass selected view type to fetchMaps
+          fetchMaps(1, user, artist, sort, view);
+        }
+
+        // Function to clear the grid
+        function clearGrid() {
+          const gridContainer = document.getElementById('gridContainer');
+          gridContainer.innerHTML = '';
+        }
+
+        // Attach event listeners to input selectors
+        document.getElementById('userSelector').addEventListener('change', handleSelectorChange);
+        document.getElementById('artistSelector').addEventListener('change', handleSelectorChange);
+        document.getElementById('sortSelector').addEventListener('change', handleSelectorChange);
+
+        // Function to build the grid
+        function buildSmallGrid(maps) {
+          const gridContainer = document.getElementById('gridContainer');
+
+          // Build grid
+          maps.forEach(map => {
+            const card = document.createElement('div');
+            card.className = 'card mb-3 mx-auto';
+            card.innerHTML = `
+              <a href="/mapart/${map.id}">
+                <img src="/public/uploads/mapart/${map.imgUrl}" class="pixelated-image" alt="Map Image">
+              </a>
+            `;
+            gridContainer.appendChild(card);
+          });
+        
+        };
+
+        // Function to build the grid
+        function buildGrid(maps) {
+          const gridContainer = document.getElementById('gridContainer');
+
+          // Build grid
+          maps.forEach(map => {
+            const card = document.createElement('div');
+            card.className = 'card mb-3 mx-auto';
+            card.style = 'width: 18rem;';
+            card.innerHTML = `
+              <img src="/public/uploads/mapart/${map.imgUrl}" class="pixelated-image card-img-top" alt="Map Image">
+              <div class="card-body">
+                <h5 class="card-title">...${map.id.slice(-12)}</h5>
+              </div>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">Artist: ${map.artist}</li>
+                <li class="list-group-item">Uploaded by: <a href="/profile/${map.username}">${map.username}</li>
+              </ul>
+              <div class="card-body">
+                <a href="/mapart/${map.id}" class="card-link">View Map</a>
+              </div>
+            `;
+            gridContainer.appendChild(card);
+          });
+        }
+
+        // Lazy loading
+        let observer;
+        let currentPage = 1;
+        let user = "";
+        let artist = "";
+        let sort = "dateDesc";
+
+        function startObservingIntersection() {
+          observer = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting) {
+              fetchNextPage();
+            }
+          }, {
+            root: null,
+            rootMargin: '0px',
+            threshold: 1.0
+          });
+
+          const lastGridElement = document.getElementById('gridContainer').lastElementChild;
+          observer.observe(lastGridElement);
+        }
+
+        async function fetchNextPage() {
+          currentPage++;
+          sort = document.getElementById('sortSelector').value;
+          const lastGridElement = document.getElementById('gridContainer').lastElementChild;
+          observer.unobserve(lastGridElement);
+          fetchMaps(currentPage, user, artist, sort, view);
+        }
+
+        // Call the function to populate selectors and fetch initial data when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+          populateUserSelector();
+          populateArtistSelector();
+          populateSortSelector();
+          // Initial API call on page load
+          fetchMaps();
+        });
+
+      // Grid container for images
+      div#gridContainer.row.mb-4
+
+      // Keep loadingSpinner at bottom of page
+      script.
+        function createLoadingSpinner() {
+          const loadingSpinner = document.createElement('div');
+          loadingSpinner.id = 'loadingSpinner';
+          loadingSpinner.className = 'text-center mt-4';
+          
+          const spinnerIcon = document.createElement('i');
+          spinnerIcon.className = 'fa fa-spinner fa-spin fa-3x';
+          
+          const loadingText = document.createElement('p');
+          loadingText.textContent = 'Loading...';
+          
+          loadingSpinner.appendChild(spinnerIcon);
+          loadingSpinner.appendChild(loadingText);
+          
+          return loadingSpinner;
+        }
+
+        const container = document.querySelector('.container');
+        const loadingSpinner = createLoadingSpinner();
+        container.appendChild(loadingSpinner);
+
+      style.
+        .pixelated-image {
+          image-rendering: pixelated;
+        };
+
+      include includes/scripts.pug

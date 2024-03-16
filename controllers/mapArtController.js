@@ -18,6 +18,46 @@ const getMapById = async (mapId) => {
   }
 };
 
+const getMaps = async (page, perPage, user, artist, sort) => {
+  try {
+    const maps = await mapArtModel.getMaps(page, perPage, user, artist, sort);
+    return maps;
+  } catch (error) {
+    console.error('Error fetching maps:', error);
+    throw error;
+  }
+};
+
+const getUniqueUsernames = async () => {
+  try {
+    const uniqueUsernames = await mapArtModel.getUniqueUsernames();
+    return uniqueUsernames;
+  } catch (error) {
+    console.error('Error fetching unique usernames:', error);
+    throw error;
+  }
+};
+
+const getUniqueArtists = async () => {
+  try {
+    const uniqueArtists = await mapArtModel.getUniqueArtists();
+    return uniqueArtists;
+  } catch (error) {
+    console.error('Error fetching unique artists:', error);
+    throw error;
+  }
+};
+
+const getUniqueServers = async () => {
+  try {
+    const uniqueServers = await mapArtModel.getUniqueServers();
+    return uniqueServers;
+  } catch (error) {
+    console.error('Error fetching unique servers:', error);
+    throw error;
+  }
+};
+
 const createMapId = async ({ userId, username, name, description, mapId, imgUrl, hash, server }) => {
   try {
     return await mapArtModel.createMapId({
@@ -60,7 +100,11 @@ const generateFilename = async (server) => {
 
 module.exports = {
   getAllMapArts,
+  getMaps,
   getMapById,
+  getUniqueArtists,
+  getUniqueUsernames,
+  getUniqueServers,
   createMapId,
   countMapIdsByServer,
   generateFilename,
