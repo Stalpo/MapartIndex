@@ -55,9 +55,6 @@ model MapArt {
   name         String
   description  String
   mapIds       MapId[]
-  rotations    Int[] // 0-3 rotation
-  hSize        Int
-  vSize        Int
   nsfw         Boolean  @default(false)
 }
 

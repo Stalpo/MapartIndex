@@ -433,9 +433,20 @@ app.get('/mapId-info/uniqueArtists', async (req, res) => {
 });
 
 // MapArt route
-app.get('/mapArt', (req, res) => {
-  res.render('mapart');
+app.get('/mapArt-create', (req, res) => {
+  res.render('mapart-create');
 });
+
+app.post('/mapArt-create', async (req, res) => {
+  try {
+    const userId = res.locals.userId;
+    res.send('wip');
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 
 // Delete user route
 app.get('/deleteUser', (req, res) => {
