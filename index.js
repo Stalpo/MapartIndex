@@ -103,8 +103,9 @@ app.use('/api', api);
 app.get('/', async (req, res) => {
   try {
     const totalMaps = (await mapIdController.getMaps()).length;
+    const totalMaparts = (await mapArtController.getAllMapArts()).length;
     const totalUsers = (await userController.getAllUsers()).length;
-    res.render('index', { totalMaps, totalUsers });
+    res.render('index', { totalMaps, totalUsers, totalMaparts });
   } catch {
     console.error('Error fetching statistics:', error);
     res.render('index');

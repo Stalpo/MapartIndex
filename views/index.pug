@@ -31,7 +31,7 @@ html
           | Unleash Creativity, Explore Wonders: Discover the amazing maps in our Minecraft Map Art Archive.
 
       // Stats Section
-      if totalMaps && totalUsers 
+      if totalMaps && totalMaparts && totalUsers 
         .row.justify-content-center
           .col-md-3
             .card.border-primary.mb-3(style='max-width: 18rem;').text-center
@@ -39,10 +39,20 @@ html
               .card-body.text-primary
                 h5.card-title #{totalMaps}
           .col-md-3
+            .card.border-primary.mb-3(style='max-width: 18rem;').text-center
+              .card-header Total Maparts
+              .card-body.text-primary
+                h5.card-title #{totalMaparts}
+          .col-md-3
             .card.border-success.mb-3(style='max-width: 18rem;').text-center
               .card-header Total Users
               .card-body.text-success
                 h5.card-title #{totalUsers}
+          .col-md-3
+            .card.border-success.mb-3(style='max-width: 18rem;').text-center
+              .card-header Total Servers
+              .card-body.text-success
+                h5.card-title 2
 
     // include includes/footer.pug
     script(src='/public/js/index-page.js')
