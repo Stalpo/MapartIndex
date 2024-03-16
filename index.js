@@ -479,6 +479,11 @@ app.get('/mapArt-create', (req, res) => {
 
 app.post('/mapArt-create', mapArtUpload.single('file'), async (req, res) => {
   try {
+    // Check if user is an admin
+    if (!res.locals.admin) {
+      return res.status(403).send('Forbidden');
+    }
+
     const { name, description, artist, server } = req.body;
     const { filename, path, originalname } = req.file;
 

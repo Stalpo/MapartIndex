@@ -7,291 +7,295 @@ html
     script(src="/public/js/joinImages.js")
     div.container.text-center
       h1= pageTitle
-      hr
-      div#container
-        .row
-          .col
-            div.form-group
-              label.sr-only(for='width') Width:
-              div.input-group.mb-2.mr-sm-2
-                div.input-group-prepend
-                  div.input-group-text Width
-                select#width.form-control
-                  for i in [...Array(32).keys()]
-                    option(value=`${i+1}`)= `${i+1}`
-          .col
-            div.form-group
-              label.sr-only(for='height') Height:
-              div.input-group.mb-2.mr-sm-2
-                div.input-group-prepend
-                  div.input-group-text Height
-                select#height.form-control
-                  for i in [...Array(32).keys()]
-                    option(value=`${i+1}`)= `${i+1}`
-
-        div#inputContainer
-
-        .row
-          .col
-            div.form-group
-              button#fetchImages.btn.btn-primary Fetch and Build MapArt
-
+      if !admin
+        div.alert.alert-danger(role="alert")
+          | You are not an administrator
+      else
         hr
-        div#outputContainer
+        div#container
+          .row
+            .col
+              div.form-group
+                label.sr-only(for='width') Width:
+                div.input-group.mb-2.mr-sm-2
+                  div.input-group-prepend
+                    div.input-group-text Width
+                  select#width.form-control
+                    for i in [...Array(32).keys()]
+                      option(value=`${i+1}`)= `${i+1}`
+            .col
+              div.form-group
+                label.sr-only(for='height') Height:
+                div.input-group.mb-2.mr-sm-2
+                  div.input-group-prepend
+                    div.input-group-text Height
+                  select#height.form-control
+                    for i in [...Array(32).keys()]
+                      option(value=`${i+1}`)= `${i+1}`
 
-    script.
-      // Get references to width and height selectors
-      const widthSelector = document.getElementById('width');
-      const heightSelector = document.getElementById('height');
-      const fetchButton = document.getElementById('fetchImages');
+          div#inputContainer
 
-      let blobObj = undefined;
+          .row
+            .col
+              div.form-group
+                button#fetchImages.btn.btn-primary Fetch and Build MapArt
 
-      // Add event listener to both selectors to handle changes
-      widthSelector.addEventListener('change', generateInputs);
-      heightSelector.addEventListener('change', generateInputs);
+          hr
+          div#outputContainer
 
-      // Function to generate text input boxes based on selected dimensions
-      function generateInputs() {
-        const width = parseInt(widthSelector.value);
-        const height = parseInt(heightSelector.value);
-        const totalInputs = width * height;
+      script.
+        // Get references to width and height selectors
+        const widthSelector = document.getElementById('width');
+        const heightSelector = document.getElementById('height');
+        const fetchButton = document.getElementById('fetchImages');
 
-        const container = document.getElementById('inputContainer');
-        container.innerHTML = ''; // Clear previous inputs
+        let blobObj = undefined;
 
-        for (let i = 0; i < totalInputs; i++) {
-          const inputGroup = document.createElement('div');
-          inputGroup.classList.add('form-group');
+        // Add event listener to both selectors to handle changes
+        widthSelector.addEventListener('change', generateInputs);
+        heightSelector.addEventListener('change', generateInputs);
 
-          const input = document.createElement('input');
-          input.type = 'text';
-          input.classList.add('form-control');
-          input.placeholder = `mapId uuid ${i + 1}`;
+        // Function to generate text input boxes based on selected dimensions
+        function generateInputs() {
+          const width = parseInt(widthSelector.value);
+          const height = parseInt(heightSelector.value);
+          const totalInputs = width * height;
 
-          inputGroup.appendChild(input);
-          container.appendChild(inputGroup);
+          const container = document.getElementById('inputContainer');
+          container.innerHTML = ''; // Clear previous inputs
+
+          for (let i = 0; i < totalInputs; i++) {
+            const inputGroup = document.createElement('div');
+            inputGroup.classList.add('form-group');
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.classList.add('form-control');
+            input.placeholder = `mapId uuid ${i + 1}`;
+
+            inputGroup.appendChild(input);
+            container.appendChild(inputGroup);
+          }
         }
-      }
 
-      // Function to fetch images based on UUIDs
-      function fetchImages() {
-        return new Promise((resolve, reject) => {
-          const inputs = document.querySelectorAll('#inputContainer input');
-          const promises = []; // Array to store all fetch promises
+        // Function to fetch images based on UUIDs
+        function fetchImages() {
+          return new Promise((resolve, reject) => {
+            const inputs = document.querySelectorAll('#inputContainer input');
+            const promises = []; // Array to store all fetch promises
 
-          inputs.forEach(input => {
-            const uuid = input.value;
-            if (uuid) {
-              const promise = fetch(`/api/mapId/${uuid}`)
+            inputs.forEach(input => {
+              const uuid = input.value;
+              if (uuid) {
+                const promise = fetch(`/api/mapId/${uuid}`)
+                  .then(response => {
+                    if (!response.ok) {
+                      throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                  })
+                  .then(data => {
+                    // Handle the JSON data, e.g., collect image URLs
+                    return data.imgUrl ? `/public/uploads/${data.imgUrl}` : null; // Prepend '/public/uploads/' to each URL
+                  })
+                  .catch(error => {
+                    console.error('Error fetching data:', error.message);
+                    return null; // Return null if fetch fails
+                  });
+
+                promises.push(promise); // Push each fetch promise into the array
+              }
+            });
+
+            // Wait for all fetch promises to resolve
+            Promise.all(promises)
+              .then(imgUrls => {
+                resolve(imgUrls.filter(url => url !== null)); // Resolve with the array of image URLs
+              })
+              .catch(error => {
+                reject(error); // Reject with the error if any fetch fails
+              });
+          });
+        }
+
+        fetchButton.addEventListener('click', () => {
+          fetchImages()
+            .then(imgUrls => {
+              // imgUrls is an array containing all the image URLs
+              return joinImages(parseInt(widthSelector.value), parseInt(heightSelector.value), imgUrls.filter(url => url !== null));
+            })
+            .then(resultImageUrl => {
+              // Use the resulting image URL, display it in an img tag
+              const outputContainer = document.getElementById('outputContainer');
+              outputContainer.innerHTML = ""; // Clear output
+              const resultImage = document.createElement('img');
+              resultImage.src = resultImageUrl;
+              outputContainer.appendChild(resultImage);
+
+              // Add form for map name, description, and artist
+              const formContainer = document.createElement('div');
+              formContainer.classList.add('mt-3');
+
+              // Input for Map Name
+              const nameInputGroup = document.createElement('div');
+              nameInputGroup.classList.add('form-group');
+              const nameInput = document.createElement('input');
+              nameInput.type = 'text';
+              nameInput.classList.add('form-control');
+              nameInput.placeholder = 'Map Name';
+              nameInputGroup.appendChild(nameInput);
+
+              // Input for Description
+              const descriptionInputGroup = document.createElement('div');
+              descriptionInputGroup.classList.add('form-group');
+              const descriptionInput = document.createElement('input');
+              descriptionInput.type = 'text';
+              descriptionInput.classList.add('form-control');
+              descriptionInput.placeholder = 'Description';
+              descriptionInputGroup.appendChild(descriptionInput);
+
+              // Input for Artist
+              const artistInputGroup = document.createElement('div');
+              artistInputGroup.classList.add('form-group');
+              const artistInput = document.createElement('input');
+              artistInput.type = 'text';
+              artistInput.classList.add('form-control');
+              artistInput.placeholder = 'Artist';
+              artistInputGroup.appendChild(artistInput);
+
+              // Input selector for unique servers
+              const serverInputGroup = document.createElement('div');
+              serverInputGroup.classList.add('form-group');
+              const serverSelect = document.createElement('select');
+              serverSelect.classList.add('form-control');
+              serverSelect.placeholder = 'Unique Servers';
+
+              fetch(resultImageUrl)
+                .then(response => response.blob())
+                .then(resultBlob => {
+                  blobObj = resultBlob;
+                })
+                .catch(error => {
+                  console.error('Error fetching blob:', error);
+                });
+
+              // Add file input
+              const fileInput = document.createElement('input');
+              fileInput.style.display = 'none';
+              fileInput.type = 'file';
+              fileInput.name = 'images';
+              fileInput.accept = 'image/*';
+
+              // Add change event listener to handle file selection
+              fileInput.addEventListener('change', () => {
+                const file = fileInput.files[0];
+                console.log('Selected file:', file);
+              });
+
+              // Fetch data from endpoint
+              fetch('/mapId-info/uniqueServers')
+                .then(response => response.json())
+                .then(data => {
+                  // Populate options with received data
+                  data.forEach(server => {
+                    const option = document.createElement('option');
+                    option.value = server; // assuming 'id' is the property containing unique server IDs
+                    option.textContent = server; // assuming 'name' is the property containing server names
+                    serverSelect.appendChild(option);
+                  });
+                })
+                .catch(error => {
+                  console.error('Error fetching unique servers:', error);
+                });
+
+              serverInputGroup.appendChild(serverSelect);
+
+              // Add the input groups to the form container
+              formContainer.appendChild(nameInputGroup);
+              formContainer.appendChild(descriptionInputGroup);
+              formContainer.appendChild(artistInputGroup);
+              formContainer.appendChild(serverInputGroup);
+              formContainer.appendChild(fileInput);
+
+              // Add button to add image to the database
+              const addButton = document.createElement('button');
+              addButton.textContent = 'Add to Database';
+              addButton.classList.add('btn', 'btn-primary', 'mt-2');
+              addButton.addEventListener('click', () => {
+
+                // Create FormData object
+                const formData = new FormData();
+                // Append form data
+                formData.append('name', nameInput.value);
+                formData.append('description', descriptionInput.value);
+                formData.append('artist', artistInput.value);
+                formData.append('server', serverSelect.value);
+                // Append Blob
+                formData.append('file', blobObj);
+
+                // Send request to server to add image to database
+                return fetch('/mapart-create', {
+                  method: 'POST',
+                  body: formData
+                })
                 .then(response => {
                   if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    throw new Error('Failed to add image to database');
                   }
                   return response.json();
                 })
                 .then(data => {
-                  // Handle the JSON data, e.g., collect image URLs
-                  return data.imgUrl ? `/public/uploads/${data.imgUrl}` : null; // Prepend '/public/uploads/' to each URL
+                    console.log('Image added to database:', data);
+                    const successDiv = document.createElement('div');
+                    successDiv.classList.add('alert', 'alert-success');
+                    successDiv.style.paddingTop = '10px';
+                    
+                    const successText = document.createElement('span');
+                    successText.textContent = 'Image added to database successfully. Click ';
+
+                    const link = document.createElement('a');
+                    link.textContent = 'here';
+                    link.href = '/mapart/' + data.id;
+
+                    successText.appendChild(link);
+                    successText.appendChild(document.createTextNode(' to view.'));
+
+                    successDiv.appendChild(successText);
+                    document.getElementById('outputContainer').appendChild(successDiv);
+
+                    document.getElementById('inputContainer').style.display = 'none';
+                    document.querySelectorAll('button').forEach(button => {
+                        button.style.display = 'none';
+                    });
+                    document.querySelectorAll('.form-group').forEach(select => {
+                        select.style.display = 'none';
+                    });
                 })
                 .catch(error => {
-                  console.error('Error fetching data:', error.message);
-                  return null; // Return null if fetch fails
-                });
-
-              promises.push(promise); // Push each fetch promise into the array
-            }
-          });
-
-          // Wait for all fetch promises to resolve
-          Promise.all(promises)
-            .then(imgUrls => {
-              resolve(imgUrls.filter(url => url !== null)); // Resolve with the array of image URLs
-            })
-            .catch(error => {
-              reject(error); // Reject with the error if any fetch fails
-            });
-        });
-      }
-
-      fetchButton.addEventListener('click', () => {
-        fetchImages()
-          .then(imgUrls => {
-            // imgUrls is an array containing all the image URLs
-            return joinImages(parseInt(widthSelector.value), parseInt(heightSelector.value), imgUrls.filter(url => url !== null));
-          })
-          .then(resultImageUrl => {
-            // Use the resulting image URL, display it in an img tag
-            const outputContainer = document.getElementById('outputContainer');
-            outputContainer.innerHTML = ""; // Clear output
-            const resultImage = document.createElement('img');
-            resultImage.src = resultImageUrl;
-            outputContainer.appendChild(resultImage);
-
-            // Add form for map name, description, and artist
-            const formContainer = document.createElement('div');
-            formContainer.classList.add('mt-3');
-
-            // Input for Map Name
-            const nameInputGroup = document.createElement('div');
-            nameInputGroup.classList.add('form-group');
-            const nameInput = document.createElement('input');
-            nameInput.type = 'text';
-            nameInput.classList.add('form-control');
-            nameInput.placeholder = 'Map Name';
-            nameInputGroup.appendChild(nameInput);
-
-            // Input for Description
-            const descriptionInputGroup = document.createElement('div');
-            descriptionInputGroup.classList.add('form-group');
-            const descriptionInput = document.createElement('input');
-            descriptionInput.type = 'text';
-            descriptionInput.classList.add('form-control');
-            descriptionInput.placeholder = 'Description';
-            descriptionInputGroup.appendChild(descriptionInput);
-
-            // Input for Artist
-            const artistInputGroup = document.createElement('div');
-            artistInputGroup.classList.add('form-group');
-            const artistInput = document.createElement('input');
-            artistInput.type = 'text';
-            artistInput.classList.add('form-control');
-            artistInput.placeholder = 'Artist';
-            artistInputGroup.appendChild(artistInput);
-
-            // Input selector for unique servers
-            const serverInputGroup = document.createElement('div');
-            serverInputGroup.classList.add('form-group');
-            const serverSelect = document.createElement('select');
-            serverSelect.classList.add('form-control');
-            serverSelect.placeholder = 'Unique Servers';
-
-            fetch(resultImageUrl)
-              .then(response => response.blob())
-              .then(resultBlob => {
-                blobObj = resultBlob;
-              })
-              .catch(error => {
-                console.error('Error fetching blob:', error);
-              });
-
-            // Add file input
-            const fileInput = document.createElement('input');
-            fileInput.style.display = 'none';
-            fileInput.type = 'file';
-            fileInput.name = 'images';
-            fileInput.accept = 'image/*';
-
-            // Add change event listener to handle file selection
-            fileInput.addEventListener('change', () => {
-              const file = fileInput.files[0];
-              console.log('Selected file:', file);
-            });
-
-            // Fetch data from endpoint
-            fetch('/mapId-info/uniqueServers')
-              .then(response => response.json())
-              .then(data => {
-                // Populate options with received data
-                data.forEach(server => {
-                  const option = document.createElement('option');
-                  option.value = server; // assuming 'id' is the property containing unique server IDs
-                  option.textContent = server; // assuming 'name' is the property containing server names
-                  serverSelect.appendChild(option);
-                });
-              })
-              .catch(error => {
-                console.error('Error fetching unique servers:', error);
-              });
-
-            serverInputGroup.appendChild(serverSelect);
-
-            // Add the input groups to the form container
-            formContainer.appendChild(nameInputGroup);
-            formContainer.appendChild(descriptionInputGroup);
-            formContainer.appendChild(artistInputGroup);
-            formContainer.appendChild(serverInputGroup);
-            formContainer.appendChild(fileInput);
-
-            // Add button to add image to the database
-            const addButton = document.createElement('button');
-            addButton.textContent = 'Add to Database';
-            addButton.classList.add('btn', 'btn-primary', 'mt-2');
-            addButton.addEventListener('click', () => {
-
-              // Create FormData object
-              const formData = new FormData();
-              // Append form data
-              formData.append('name', nameInput.value);
-              formData.append('description', descriptionInput.value);
-              formData.append('artist', artistInput.value);
-              formData.append('server', serverSelect.value);
-              // Append Blob
-              formData.append('file', blobObj);
-
-              // Send request to server to add image to database
-              return fetch('/mapart-create', {
-                method: 'POST',
-                body: formData
-              })
-              .then(response => {
-                if (!response.ok) {
-                  throw new Error('Failed to add image to database');
-                }
-                return response.json();
-              })
-              .then(data => {
-                  console.log('Image added to database:', data);
-                  const successDiv = document.createElement('div');
-                  successDiv.classList.add('alert', 'alert-success');
-                  successDiv.style.paddingTop = '10px';
-                  
-                  const successText = document.createElement('span');
-                  successText.textContent = 'Image added to database successfully. Click ';
-
-                  const link = document.createElement('a');
-                  link.textContent = 'here';
-                  link.href = '/mapart/' + data.id;
-
-                  successText.appendChild(link);
-                  successText.appendChild(document.createTextNode(' to view.'));
-
-                  successDiv.appendChild(successText);
-                  document.getElementById('outputContainer').appendChild(successDiv);
-
+                  console.error('Error adding image to database:', error);
+                  const errorDiv = document.createElement('div');
+                  errorDiv.classList.add('alert', 'alert-danger');
+                  errorDiv.textContent = `Error adding image to database: ${error.message}`;
+                  errorDiv.style.paddingTop = '10px';
+                  document.getElementById('outputContainer').appendChild(errorDiv);
                   document.getElementById('inputContainer').style.display = 'none';
                   document.querySelectorAll('button').forEach(button => {
-                      button.style.display = 'none';
+                    button.style.display = 'none';
                   });
                   document.querySelectorAll('.form-group').forEach(select => {
-                      select.style.display = 'none';
+                    select.style.display = 'none';
                   });
-              })
-              .catch(error => {
-                console.error('Error adding image to database:', error);
-                const errorDiv = document.createElement('div');
-                errorDiv.classList.add('alert', 'alert-danger');
-                errorDiv.textContent = `Error adding image to database: ${error.message}`;
-                errorDiv.style.paddingTop = '10px';
-                document.getElementById('outputContainer').appendChild(errorDiv);
-                document.getElementById('inputContainer').style.display = 'none';
-                document.querySelectorAll('button').forEach(button => {
-                  button.style.display = 'none';
-                });
-                document.querySelectorAll('.form-group').forEach(select => {
-                  select.style.display = 'none';
                 });
               });
+
+              formContainer.appendChild(addButton);
+              outputContainer.appendChild(formContainer);
+
+            })
+            .catch(error => {
+              console.error('Error fetching images:', error);
             });
+        });
 
-            formContainer.appendChild(addButton);
-            outputContainer.appendChild(formContainer);
-
-          })
-          .catch(error => {
-            console.error('Error fetching images:', error);
-          });
-      });
-
-      // Initial generation on page load
-      generateInputs();
+        // Initial generation on page load
+        generateInputs();
