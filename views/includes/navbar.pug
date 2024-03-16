@@ -23,15 +23,6 @@ nav.navbar.navbar-expand-lg.navbar-light
             | Stitch
       li.nav-item
         if !username
-          a.nav-link(href="/login")
-            i.fa.fa-sign-in-alt.mr-1
-            | Login
-        else
-          a.nav-link(href="/logout")
-            i.fa.fa-sign-out-alt.mr-1
-            | Logout
-      li.nav-item
-        if !username
           a.nav-link(href="/register")
             i.fa.fa-user-plus.mr-1
             | Register
@@ -39,6 +30,15 @@ nav.navbar.navbar-expand-lg.navbar-light
           a.nav-link(href="/profile")
             i.fa.fa-user.mr-1
             | Profile
+      li.nav-item
+        if !username
+          a.nav-link(href="/login")
+            i.fa.fa-sign-in-alt.mr-1
+            | Login
+        else
+          a.nav-link(href="/logout")
+            i.fa.fa-sign-out-alt.mr-1
+            | Logout
       if admin
         li.nav-item
           a.nav-link(href="/admin")
