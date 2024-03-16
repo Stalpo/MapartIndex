@@ -208,6 +208,8 @@ html
         async function fetchNextPage() {
           currentPage++;
           sort = document.getElementById('sortSelector').value;
+          const lastGridElement = document.getElementById('gridContainer').lastElementChild;
+          observer.unobserve(lastGridElement);
           fetchMaps(currentPage, user, artist, sort);
         }
 
