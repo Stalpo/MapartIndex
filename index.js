@@ -86,7 +86,7 @@ const mapArtUpload = multer({
   storage: mapArtStorage,
   fileFilter: fileFilter, // Assuming fileFilter is defined elsewhere
   limits: {
-    fileSize: 1024 * 1024 * 10, // 10 MB limit for mapArt images
+    fileSize: 1024 * 1024 * 2, // 10 MB limit for mapArt images
   },
 });
 
@@ -453,28 +453,57 @@ app.get('/mapId-info/uniqueArtists', async (req, res) => {
   }
 });
 
+app.get('/mapId-info/uniqueServers', async (req, res) => {
+  try {
+    const uniqueServers = await mapIdController.getUniqueServers();
+    res.json(uniqueServers);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 // MapArt route
 app.get('/mapArt-create', (req, res) => {
   res.render('mapart-create');
 });
 
-app.post('/mapArt-create', async (req, res) => {
+app.post('/mapArt-create', mapArtUpload.single('images'), async (req, res) => {
   try {
-    const imageFile = req.file;
-    const { mapName, description, artist } = req.body;
+    const { name, description, artist, server } = req.body;
+    const { filename, path, originalname } = req.file;
 
-    // Save to db
-    console.log('Map Name:', mapName);
-    console.log('Description:', description);
-    console.log('Artist:', artist);
-    console.log('Uploaded Image:', imageFile);
+    if (!file) {
+      // If no files are provided
+      return res.status(400).json({ error: 'No files uploaded' });
+    }
 
-    // Need userId to place in db
-    const userId = res.locals.userId;
+    // Generate the desired filename based on server
+    const newFilename = await mapIdController.generateFilename(server);
 
-    // Add logic to save to db
+    // Construct the new filepath manually
+    const newFilepath = __dirname + '/public/uploads/mapart/' + newFilename;
 
-    res.send(mapName, description, artist, imageFile);
+    // Rename the file
+    fs.renameSync(path, newFilepath);
+
+    // Read the image file and convert it to base64
+    const base64 = fs.readFileSync(newFilepath, { encoding: 'base64' });
+
+    // Calculate a hash of the base64 data
+    const hash = crypto.createHash('md5').update(base64).digest('hex');
+
+    // Add metadata to the db
+    //await mapArtController.createMapId({
+    //  userId: res.locals.userId,
+    //  username: res.locals.username,
+    //  imgUrl: newFilename,
+    //  hash: hash,
+    //  server: req.body.server
+    //});
+
+
+    let data = { name: name, description: description, artist: artist, server: server, hash: hash, filename: newFilename };
+    res.send(data);
   } catch (error) {
     console.error('Error creating map art:', error);
     res.status(500).send('Internal Server Error');

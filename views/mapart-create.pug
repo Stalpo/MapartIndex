@@ -156,10 +156,50 @@ html
             artistInput.placeholder = 'Artist';
             artistInputGroup.appendChild(artistInput);
 
+            // Input selector for unique servers
+            const serverInputGroup = document.createElement('div');
+            serverInputGroup.classList.add('form-group');
+            const serverSelect = document.createElement('select');
+            serverSelect.classList.add('form-control');
+            serverSelect.placeholder = 'Unique Servers';
+
+            // Add file input
+            const fileInput = document.createElement('input');
+            fileInput.style.display = 'none';
+            fileInput.type = 'file';
+            fileInput.name = 'images';
+            fileInput.accept = 'image/*';
+
+            // Add change event listener to handle file selection
+            fileInput.addEventListener('change', () => {
+              const file = fileInput.files[0];
+              console.log('Selected file:', file);
+            });
+
+            // Fetch data from endpoint
+            fetch('/mapId-info/uniqueServers')
+              .then(response => response.json())
+              .then(data => {
+                // Populate options with received data
+                data.forEach(server => {
+                  const option = document.createElement('option');
+                  option.value = server; // assuming 'id' is the property containing unique server IDs
+                  option.textContent = server; // assuming 'name' is the property containing server names
+                  serverSelect.appendChild(option);
+                });
+              })
+              .catch(error => {
+                console.error('Error fetching unique servers:', error);
+              });
+
+            serverInputGroup.appendChild(serverSelect);
+
             // Add the input groups to the form container
             formContainer.appendChild(nameInputGroup);
             formContainer.appendChild(descriptionInputGroup);
             formContainer.appendChild(artistInputGroup);
+            formContainer.appendChild(serverInputGroup);
+            formContainer.appendChild(fileInput);
 
             // Add button to add image to the database
             const addButton = document.createElement('button');
@@ -167,16 +207,16 @@ html
             addButton.classList.add('btn', 'btn-primary', 'mt-2');
             addButton.addEventListener('click', () => {
               // Send request to server to add image to database
-              fetch('/junk/randompoint', {
+              fetch('/mapart-create', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ 
-                  imageUrl: resultImageUrl,
-                  mapName: nameInput.value,
+                  name: nameInput.value,
                   description: descriptionInput.value,
-                  artist: artistInput.value
+                  artist: artistInput.value,
+                  server: serverSelect.value,
                 })
               })
                 .then(response => {
@@ -195,7 +235,6 @@ html
 
             formContainer.appendChild(addButton);
             outputContainer.appendChild(formContainer);
-
 
           })
           .catch(error => {
