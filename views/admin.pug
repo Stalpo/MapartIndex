@@ -10,173 +10,6 @@ html
         div.alert.alert-danger(role="alert")
           | You are not an administrator
       else
-
-        style.
-          .vertical-center td {
-            vertical-align: middle;
-          }
-
-        script.
-          document.addEventListener('DOMContentLoaded', function() {
-            // Make API call to get maps
-            fetch('/api/mapId/maps')
-              .then(response => response.json())
-              .then(data => {
-                buildTable(data);
-                buildUserSelector(data);
-                buildArtistSelector(data);
-                buildSortSelector(data);
-                document.getElementById('loadingSpinner').style.display = 'none';
-              })
-            .catch(error => {
-              console.error('Error fetching data:', error);
-              document.getElementById('loadingSpinner').innerHTML = '<div class="alert alert-danger" role="alert">Error fetching data</div>';
-            });
-
-            function buildTable(maps) {
-              const tableBody = document.getElementById('mapsTableBody');
-
-              // Clear existing rows
-              tableBody.innerHTML = '';
-
-              // Build new rows
-              maps.forEach(map => {
-                const newRow = document.createElement('tr');
-                newRow.className = 'vertical-center'; // Add a class for styling
-                newRow.innerHTML = `
-                  <td>...${map.id.slice(-12)}</td>
-                  <td>${new Date(map.createdAt).toLocaleString('en-US')}</td>
-                  <td>${map.username}</td>
-                  <td><img src="/public/uploads/${map.imgUrl}" alt="Map Image" style="max-width: 100px; max-height: 100px;"></td>
-                  <td>${map.artist}</td>
-                  <td>${map.nsfw}</td>
-                  <td>
-                    <div class='btn-group' role='group' aria-label='Buttons'>
-                      <button class='btn btn-primary' type='button' onclick="location.href='/mapId/${map.id}'"><i class='fa fa-eye'></i></button>
-                      <button class='btn btn-primary' type='button' onclick="location.href='/mapId-edit/${map.id}'"><i class='fa fa-pencil-alt'></i></button>
-                      <button class='btn btn-danger' type='button' onclick="location.href='/deleteMapId?mapId=${map.id}'"><i class='fa fa-trash'></i></button>
-                    </div>
-                  </td>
-                `;
-                tableBody.appendChild(newRow);
-              });
-            }
-
-            function buildUserSelector(maps) {
-              const userSelector = document.getElementById('userSelector');
-              const uniqueUsers = [...new Set(maps.map(map => map.username || map.userId))];
-
-              const allOption = document.createElement('option');
-              allOption.value = '';
-              allOption.textContent = 'All Users';
-              userSelector.appendChild(allOption);
-
-              uniqueUsers.forEach(user => {
-                const option = document.createElement('option');
-                option.value = user;
-                option.textContent = user;
-                userSelector.appendChild(option);
-              });
-
-              // Add event listener for input change
-              userSelector.addEventListener('change', function() {
-                const selectedUser = this.value;
-                const selectedArtist = document.getElementById('artistSelector').value;
-                const selectedSort = document.getElementById('sortSelector').value;
-                const filteredMaps = maps.filter(map => 
-                  (selectedUser === '' || map.username === selectedUser || map.userId === selectedUser) &&
-                  (selectedArtist === '' || map.artist === selectedArtist)
-                );
-
-                applySortAndBuildTable(filteredMaps, selectedSort);
-              });
-            }
-
-            function buildArtistSelector(maps) {
-              const artistSelector = document.getElementById('artistSelector');
-              const uniqueArtists = [...new Set(maps.map(map => map.artist))];
-
-              const allOption = document.createElement('option');
-              allOption.value = '';
-              allOption.textContent = 'All Artists';
-              artistSelector.appendChild(allOption);
-
-              uniqueArtists.forEach(artist => {
-                const option = document.createElement('option');
-                option.value = artist;
-                option.textContent = artist;
-                artistSelector.appendChild(option);
-              });
-
-              // Add event listener for input change
-              artistSelector.addEventListener('change', function() {
-                const selectedArtist = this.value;
-                const selectedUser = document.getElementById('userSelector').value;
-                const selectedSort = document.getElementById('sortSelector').value;
-                const filteredMaps = maps.filter(map => 
-                  (selectedUser === '' || map.username === selectedUser || map.userId === selectedUser) &&
-                  (selectedArtist === '' || map.artist === selectedArtist)
-                );
-
-                applySortAndBuildTable(filteredMaps, selectedSort);
-              });
-            }
-
-            function buildSortSelector(maps) {
-              const sortSelector = document.getElementById('sortSelector');
-
-              const options = [
-                { value: 'nameAsc', label: 'Name (Ascending)' },
-                { value: 'nameDesc', label: 'Name (Descending)' },
-                { value: 'dateAsc', label: 'Date (Ascending)' },
-                { value: 'dateDesc', label: 'Date (Descending)' }
-              ];
-
-              options.forEach(option => {
-                const sortOption = document.createElement('option');
-                sortOption.value = option.value;
-                sortOption.textContent = option.label;
-                sortSelector.appendChild(sortOption);
-              });
-
-              // Add event listener for input change
-              sortSelector.addEventListener('change', function() {
-                const selectedSort = this.value;
-                const selectedUser = document.getElementById('userSelector').value;
-                const selectedArtist = document.getElementById('artistSelector').value;
-                const filteredMaps = maps.filter(map => 
-                  (selectedUser === '' || map.username === selectedUser || map.userId === selectedUser) &&
-                  (selectedArtist === '' || map.artist === selectedArtist)
-                );
-
-                applySortAndBuildTable(filteredMaps, selectedSort);
-              });
-            }
-
-            function applySortAndBuildTable(maps, selectedSort) {
-              let sortedMaps;
-
-              switch (selectedSort) {
-                case 'nameAsc':
-                  sortedMaps = [...maps].sort((a, b) => a.artist.localeCompare(b.artist));
-                  break;
-                case 'nameDesc':
-                  sortedMaps = [...maps].sort((a, b) => b.artist.localeCompare(a.artist));
-                  break;
-                case 'dateAsc':
-                  sortedMaps = [...maps].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-                  break;
-                case 'dateDesc':
-                  sortedMaps = [...maps].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                  break;
-                default:
-                  sortedMaps = maps;
-              }
-
-              buildTable(sortedMaps);
-            }
-          });
-
         form
           div.row
             div.col
@@ -214,84 +47,223 @@ html
 
           tbody(id='mapsTableBody')
 
-        div#loadingSpinner.text-center.mt-4
-          i.fa.fa-spinner.fa-spin.fa-3x
-          p Loading...
-
-        // Add the user list modal structure
-        div.modal#userListModal(tabindex='-1' role='dialog')
-          div.modal-dialog(role='document')
-            div.modal-content
-              div.modal-header
-                h5.modal-title User List
-                button.close(type='button', data-dismiss='modal', aria-label='Close')
-                  span(aria-hidden='true') ×
-              div.modal-body
-                ul#userList(class='list-group')
-                  each user in allUsers 
-                    a(href=`/profile/${user.username}`)= user.username
-              div.modal-footer
-                button.btn.btn-secondary(type='button', data-dismiss='modal') Close
-
         script.
-          document.addEventListener('DOMContentLoaded', function() {
-            // Add button to download all files to the navbar
-            const navbarTitle = document.querySelector('.navbar-brand');
-            const downloadAllButton = document.createElement('button');
-            downloadAllButton.className = 'btn btn-primary';
-            downloadAllButton.textContent = 'Download All';
-            downloadAllButton.setAttribute('type', 'button');
-            downloadAllButton.style.padding = '2px 10px';
-            downloadAllButton.style.marginLeft = '10px';
-            downloadAllButton.addEventListener('click', function() {
-              window.location.href = '/admin/download';
+          // Function to fetch data from the API
+          async function fetchData(url) {
+            const response = await fetch(url);
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          }
+
+          // Function to populate select element with options
+          function populateSelect(selectorId, data) {
+            const selector = document.getElementById(selectorId);
+            selector.innerHTML = ''; // Clear previous options
+            data.forEach(item => {
+              const option = document.createElement('option');
+              option.text = item;
+              selector.add(option);
             });
-            navbarTitle.parentNode.insertBefore(downloadAllButton, navbarTitle.nextSibling);
-          });
+          }
 
-          document.addEventListener('DOMContentLoaded', function() {
-            // Add button to open user list modal to the navbar
-            const navbarTitle = document.querySelector('.navbar-brand');
-            const userModalButton = document.createElement('button');
-            userModalButton.className = 'btn btn-primary';
-            userModalButton.textContent = 'User Menu';
-            userModalButton.setAttribute('type', 'button');
-            userModalButton.setAttribute('data-toggle', 'modal');
-            userModalButton.setAttribute('data-target', '#userListModal');
-            userModalButton.style.padding = '2px 10px';
-            userModalButton.style.marginLeft = '10px';
-            navbarTitle.parentNode.insertBefore(userModalButton, navbarTitle.nextSibling);
-          });
+          // Function to populate user selector
+          async function populateUserSelector() {
+            try {
+              const uniqueUsernames = await fetchData('/mapId-info/uniqueUsernames');
+              uniqueUsernames.unshift("All Users");
+              populateSelect('userSelector', uniqueUsernames);
+            } catch (error) {
+              console.error('Error fetching user data:', error);
+            }
+          }
 
+          // Function to populate artist selector
+          async function populateArtistSelector() {
+            try {
+              const uniqueArtists = await fetchData('/mapId-info/uniqueArtists');
+              uniqueArtists.unshift("All Artists");
+              populateSelect('artistSelector', uniqueArtists);
+            } catch (error) {
+              console.error('Error fetching artist data:', error);
+            }
+          }
 
-          document.addEventListener('DOMContentLoaded', function() {
-            const userListButton = document.getElementById('userListButton');
-            const userListModal = new bootstrap.Modal(document.getElementById('userListModal'));
-            const userList = document.getElementById('userList');
+          async function populateSortSelector() {
+            const sortSelector = document.getElementById('sortSelector');
 
-            userListButton.addEventListener('click', function() {
-              fetch('/api/users')
-                .then(response => response.json())
-                .then(users => {
-                  // Clear existing list items
-                  userList.innerHTML = '';
+            const options = [
+              { value: 'nameAsc', label: 'Name (Ascending)' },
+              { value: 'nameDesc', label: 'Name (Descending)' },
+              { value: 'dateAsc', label: 'Date (Ascending)' },
+              { value: 'dateDesc', label: 'Date (Descending)', selected: true }
+            ];
 
-                  // Build new list items
-                  users.forEach(user => {
-                    const listItem = document.createElement('li');
-                    listItem.className = 'list-group-item';
-                    listItem.textContent = user.username;
-                    userList.appendChild(listItem);
-                  });
-
-                  userListModal.show(); // Show the modal after fetching and building the list
-                })
-                .catch(error => {
-                  console.error('Error fetching user data:', error);
-                  // Handle error if needed
-                });
+            options.forEach(option => {
+              const sortOption = document.createElement('option');
+              sortOption.value = option.value;
+              sortOption.textContent = option.label;
+              if (option.selected) {
+                sortOption.setAttribute('selected', true);
+              }
+              sortSelector.appendChild(sortOption);
             });
+          }
+
+          // Function to handle API call with updated parameters
+          async function fetchMaps(page = 1, user = "", artist = "", sort = "dateDesc") {
+            const perPage = 25;
+            let url = `/api/mapId/maps?page=${page}&perPage=${perPage}&sort=${sort}`;
+            // Construct URL based on selected values
+            if (user && user !== "All Users") {
+              url += `&user=${user}`;
+            }
+            if (artist && artist !== "All Artists") {
+              url += `&artist=${artist}`;
+            }
+
+            // Show loading spinner
+            document.getElementById('loadingSpinner').style.display = 'block';
+
+            try {
+              const response = await fetch(url);
+              if (!response.ok) {
+                throw new Error('Network response was not ok');
+              }
+              const data = await response.json();
+              // Update the UI with the fetched maps
+              buildTable(data);
+              console.log(data);
+
+              // Start observing intersection once grid is populated
+              startObservingIntersection();
+            } catch (error) {
+              console.error('Error fetching map data:', error);
+            } finally {
+              // Hide loading spinner regardless of success or failure
+              document.getElementById('loadingSpinner').style.display = 'none';
+            }
+          }
+
+          // Function to handle input selector change events
+          function handleSelectorChange() {
+            const user = document.getElementById('userSelector').value;
+            const artist = document.getElementById('artistSelector').value;
+            const sort = document.getElementById('sortSelector').value;
+            
+            // Clear the grid before fetching new data
+            clearGrid();
+
+            fetchMaps(1, user, artist, sort);
+          }
+
+          // Function to clear the grid
+          function clearGrid() {
+            const gridContainer = document.getElementById('mapsTableBody');
+            gridContainer.innerHTML = '';
+          }
+
+          // Attach event listeners to input selectors
+          document.getElementById('userSelector').addEventListener('change', handleSelectorChange);
+          document.getElementById('artistSelector').addEventListener('change', handleSelectorChange);
+          document.getElementById('sortSelector').addEventListener('change', handleSelectorChange);
+
+          // Function to build the table
+          function buildTable(maps) {
+            const tableBody = document.getElementById('mapsTableBody');
+
+            // Build new rows
+            maps.forEach(map => {
+              const newRow = document.createElement('tr');
+              newRow.className = 'vertical-center';
+              newRow.innerHTML = `
+                <td>...${map.id.slice(-12)}</td>
+                <td>${new Date(map.createdAt).toLocaleString('en-US')}</td>
+                <td>${map.username}</td>
+                <td><img src="/public/uploads/${map.imgUrl}" alt="Map Image" style="max-width: 100px; max-height: 100px;"></td>
+                <td>${map.artist}</td>
+                <td>${map.nsfw}</td>
+                <td>
+                  <div class='btn-group' role='group' aria-label='Buttons'>
+                    <button class='btn btn-primary' type='button' onclick="location.href='/mapId/${map.id}'"><i class='fa fa-eye'></i></button>
+                    <button class='btn btn-primary' type='button' onclick="location.href='/mapId-edit/${map.id}'"><i class='fa fa-pencil-alt'></i></button>
+                    <button class='btn btn-danger' type='button' onclick="location.href='/deleteMapId?mapId=${map.id}'"><i class='fa fa-trash'></i></button>
+                  </div>
+                </td>
+              `;
+              tableBody.appendChild(newRow);
+            });
+          }
+
+          // Lazy loading
+          let observer;
+          let currentPage = 1;
+          let user = "";
+          let artist = "";
+          let sort = "dateDesc";
+
+          function startObservingIntersection() {
+            observer = new IntersectionObserver(entries => {
+              if (entries[0].isIntersecting) {
+                fetchNextPage();
+              }
+            }, {
+              root: null,
+              rootMargin: '0px',
+              threshold: 1.0
+            });
+
+            const lastGridElement = document.getElementById('mapsTableBody').lastElementChild;
+            observer.observe(lastGridElement);
+          }
+
+          async function fetchNextPage() {
+            currentPage++;
+            sort = document.getElementById('sortSelector').value;
+            const lastGridElement = document.getElementById('mapsTableBody').lastElementChild;
+            observer.unobserve(lastGridElement);
+            fetchMaps(currentPage, user, artist, sort);
+          }
+
+          // Call the function to populate selectors and fetch initial data when the page loads
+          document.addEventListener('DOMContentLoaded', () => {
+            populateUserSelector();
+            populateArtistSelector();
+            populateSortSelector();
+            // Initial API call on page load
+            fetchMaps();
           });
 
+        // Grid container for images
+        div#gridContainer.row.mb-4
+
+        // Keep loadingSpinner at bottom of page
+        script.
+          function createLoadingSpinner() {
+            const loadingSpinner = document.createElement('div');
+            loadingSpinner.id = 'loadingSpinner';
+            loadingSpinner.className = 'text-center mt-4';
+            
+            const spinnerIcon = document.createElement('i');
+            spinnerIcon.className = 'fa fa-spinner fa-spin fa-3x';
+            
+            const loadingText = document.createElement('p');
+            loadingText.textContent = 'Loading...';
+            
+            loadingSpinner.appendChild(spinnerIcon);
+            loadingSpinner.appendChild(loadingText);
+            
+            return loadingSpinner;
+          }
+
+          const container = document.querySelector('.container');
+          const loadingSpinner = createLoadingSpinner();
+          container.appendChild(loadingSpinner);
+
+        style.
+          .pixelated-image {
+            image-rendering: pixelated;
+          };
 
       include includes/scripts.pug
