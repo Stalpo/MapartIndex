@@ -19,6 +19,23 @@ const checkAdminStatus = async (req, res, next) => {
   }
 };
 
+// Check mod status middleware
+const checkModStatus = async (req, res, next) => {
+  try {
+    const userId = res.locals.userId;
+    if(!userId) return next();
+    const isModUser = await userController.isMod(userId);
+    
+    res.locals.mod = !!isModUser;
+
+    next();
+  } catch (error) {
+    console.error('Error checking mod status:', error);
+    res.locals.mod = false;
+    next(error);
+  }
+};
+
 // loggedIn variable middleware
 const loggedInMiddleware = async (req, res, next) => {
   const token = req.cookies.token;
@@ -70,6 +87,7 @@ const loggingMiddleware = (req, res, next) => {
 
 module.exports = {
   checkAdminStatus,
+  checkModStatus,
   loggedInMiddleware,
   loggingMiddleware,
 };

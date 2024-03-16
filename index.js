@@ -11,7 +11,7 @@ const validator = require('validator');
 const archiver = require('archiver');
 
 // Internal dependencies
-const { loggedInMiddleware, loggingMiddleware, checkAdminStatus } = require('./middleware');
+const { loggedInMiddleware, loggingMiddleware, checkAdminStatus, checkModStatus } = require('./middleware');
 
 // Init express
 const app = express();
@@ -38,6 +38,7 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use(loggedInMiddleware);
 app.use(loggingMiddleware);
 app.use(checkAdminStatus);
+app.use(checkModStatus);
 
 // Set up the storage for multer
 const storage = multer.diskStorage({
@@ -183,6 +184,8 @@ app.get('/profile', async (req, res) => {
     res.locals.profile = await profileController.getProfileById(userId);
     res.locals.userMaps = await profileController.getAllMapsForUserId(userId);
     res.locals.apiKey = await userController.getApiKeyById(userId);
+    res.locals.isAdmin = await userController.isAdmin(userId);
+    res.locals.isMod = await userController.isMod(userId);
   }
   res.render('profile');
 });
@@ -212,10 +215,15 @@ app.get('/profile/:username', async (req, res) => {
       // Logged in user requested
       res.locals.profile = await profileController.getProfileById(userId);
       res.locals.userMaps = await profileController.getAllMapsForUserId(userId);
+      res.locals.apiKey = await userController.getApiKeyById(userId);
+      res.locals.isAdmin = await userController.isAdmin(userId);
+      res.locals.isMod = await userController.isMod(userId);
     } else {
       // Not loggedIn user requested
       res.locals.profile = await profileController.getProfileById(user.id);
       res.locals.userMaps = await profileController.getAllMapsForUserId(user.id);
+      res.locals.isAdmin = await userController.isAdmin(user.id);
+      res.locals.isMod = await userController.isMod(user.id);
     }
 
     res.render('profile');

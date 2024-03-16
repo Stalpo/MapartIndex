@@ -14,6 +14,16 @@ const isAdmin = async (userId) => {
   }
 };
 
+const isMod = async (userId) => {
+  try {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    return user?.mod || false;
+  } catch (error) {
+    console.error('Error in isMod:', error);
+    return false;
+  }
+};
+
 const getApiKeyById = async (userId) => {
   try {
     const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -140,6 +150,7 @@ const deleteUserById = async (userId) => {
 
 module.exports = {
   isAdmin,
+  isMod,
   getApiKeyById,
   verifyApiKey,
   getUserByApiKey,

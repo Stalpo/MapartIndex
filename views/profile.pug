@@ -8,57 +8,57 @@ html
     div.container
       h1.text-center= pageTitle
       hr
-      if !username
-        div.alert.alert-danger(role="alert")
-          | You are not logged in!
-      else
-        div.row
-          div.col-md-4.text-center
-            if profile.avatar 
-              img.img-fluid.rounded-circle(src=profile.avatar, alt="Profile Avatar", style="width: 128px; height: 128px;")
-            h2 #{ profile.username }
-            p.text-center #{ profile.bio }
-            p.text-center Last seen: #{ profile.lastSeen ? profile.lastSeen.toLocaleString('en-US', {month:'2-digit',day:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit',hour12:true}) : 'Unknown' }
-            if profile.username === username
-              a.btn.btn-primary(href="/profile-edit") Edit Profile
-            hr
-            h3 Details
-            p Email: #{ profile.email || 'Unknown' }
-            p Location: #{ profile.location || 'Unknown' }
-            p Minecraft UUID: #{ profile.mcUuid || 'Unknown' }
-            p Joined: #{ profile.createdAt ? profile.createdAt.toLocaleString('en-US', {month:'2-digit',day:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit',hour12:true}) : 'Unknown' }
-          div.col-md-8
-            div.row
-              div.col-md-6
-                h3.text-center Recent Uploads
-                ul.list-group
-                each map in userMaps.slice(-5).reverse()
-                  li.list-group-item.text-center
-                    a(href="/mapid/" + map.id, target="_blank")
-                      | ...#{ map.id.slice(-12) }
-              div.col-md-6
-                h3.text-center Upload Count
-                p.text-center(style="font-size: 2em; font-weight: bold; color: #4285f4;") #{ userMaps.length }
-            div.row.mt-4
-              div.col-md-12
-                h3.text-center Achievements
-                ul.list-group
-                  li.list-group-item
-                    i.fa.fa-trophy.mr-2
-                    | Newfag
-                  li.list-group-item
-                    i.fa.fa-trophy.mr-2
-                    | Died in Spawn
-                  li.list-group-item
-                    i.fa.fa-trophy.mr-2
-                    | Museum Collector
-            br
-            if username === profile.username
-              div.col.text-center
-                button.btn.btn-primary(type="button", id="toggleApiKey", onclick="toggleApiKeyVisibility()") Show API Key
-                p#apiKey(style="display: none;") API Key: #{ apiKey }
+      div.row
+        div.col-md-4.text-center
+          if profile.avatar 
+            img.img-fluid.rounded-circle(src=profile.avatar, alt="Profile Avatar", style="width: 128px; height: 128px;")
+          h2 #{ profile.username }
+          p.text-center #{ profile.bio }
+          p.text-center Last seen: #{ profile.lastSeen ? profile.lastSeen.toLocaleString('en-US', {month:'2-digit',day:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit',hour12:true}) : 'Unknown' }
+          if isAdmin
+            p.text-center Admin
+          else if isMod
+            p.text-center Mod
+          if profile.username === username
+            a.btn.btn-primary(href="/profile-edit") Edit Profile
+          hr
+          h3 Details
+          p Email: #{ profile.email || 'Unknown' }
+          p Location: #{ profile.location || 'Unknown' }
+          p Minecraft UUID: #{ profile.mcUuid || 'Unknown' }
+          p Joined: #{ profile.createdAt ? profile.createdAt.toLocaleString('en-US', {month:'2-digit',day:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit',hour12:true}) : 'Unknown' }
+        div.col-md-8
+          div.row
+            div.col-md-6
+              h3.text-center Recent Uploads
+              ul.list-group
+              each map in userMaps.slice(-5).reverse()
+                li.list-group-item.text-center
+                  a(href="/mapid/" + map.id, target="_blank")
+                    | ...#{ map.id.slice(-12) }
+            div.col-md-6
+              h3.text-center Upload Count
+              p.text-center(style="font-size: 2em; font-weight: bold; color: #4285f4;") #{ userMaps.length }
+          div.row.mt-4
+            div.col-md-12
+              h3.text-center Achievements
+              ul.list-group
+                li.list-group-item
+                  i.fa.fa-trophy.mr-2
+                  | Newfag
+                li.list-group-item
+                  i.fa.fa-trophy.mr-2
+                  | Died in Spawn
+                li.list-group-item
+                  i.fa.fa-trophy.mr-2
+                  | Museum Collector
+          br
+          if username === profile.username
+            div.col.text-center
+              button.btn.btn-primary(type="button", id="toggleApiKey", onclick="toggleApiKeyVisibility()") Show API Key
+              p#apiKey(style="display: none;") API Key: #{ apiKey }
 
-                a.btn.btn-danger(href="/deleteUser") Delete My Account
+              a.btn.btn-danger(href="/deleteUser") Delete My Account
               
 
       // include includes/footer.pug

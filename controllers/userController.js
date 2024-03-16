@@ -14,6 +14,16 @@ const isAdmin = async (userId) => {
   }
 };
 
+const isMod = async (userId) => {
+  try {
+    const user = await userModel.isMod(userId);
+    return user;
+  } catch (error) {
+    console.error('Error in isMod:', error);
+    return false;
+  }
+};
+
 const getApiKeyById = async (userId) => {
   try {
     const apiKey = await userModel.getApiKeyById(userId);
@@ -201,6 +211,7 @@ const getIdFromUsername = async (username) => {
 
 module.exports = {
   isAdmin,
+  isMod,
   getApiKeyById,
   verifyApiKey,
   newApiKey,
