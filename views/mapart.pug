@@ -27,11 +27,16 @@ html
               select#height.form-control
                 for i in [...Array(32).keys()]
                   option(value=`${i+1}`)= `${i+1}`
+
+      div#inputContainer
+
       .row
         .col
           div.form-group
-            button#fetchImages.btn.btn-primary Fetch Images
-      #inputContainer
+            button#fetchImages.btn.btn-primary Fetch and Build MapArt
+
+      hr
+      div#outputContainer
 
       script.
         // Get references to width and height selectors
@@ -113,10 +118,12 @@ html
               return joinImages(parseInt(widthSelector.value), parseInt(heightSelector.value), imgUrls.filter(url => url !== null));
             })
             .then(resultImageUrl => {
-              // Use the resulting image URL, for example, display it in an img tag
+              // Use the resulting image URL, display it in an img tag
+              const outputContainer = document.getElementById('outputContainer');
+              outputContainer.innerHTML = ""; // Clear output
               const resultImage = document.createElement('img');
               resultImage.src = resultImageUrl;
-              document.body.appendChild(resultImage);
+              outputContainer.appendChild(resultImage);
             })
             .catch(error => {
               console.error('Error fetching images:', error);
