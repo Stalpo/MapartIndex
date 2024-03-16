@@ -8,35 +8,36 @@ html
     div.container.text-center
       h1= pageTitle
       hr
-      .row
-        .col
-          div.form-group
-            label.sr-only(for='width') Width:
-            div.input-group.mb-2.mr-sm-2
-              div.input-group-prepend
-                div.input-group-text Width
-              select#width.form-control
-                for i in [...Array(32).keys()]
-                  option(value=`${i+1}`)= `${i+1}`
-        .col
-          div.form-group
-            label.sr-only(for='height') Height:
-            div.input-group.mb-2.mr-sm-2
-              div.input-group-prepend
-                div.input-group-text Height
-              select#height.form-control
-                for i in [...Array(32).keys()]
-                  option(value=`${i+1}`)= `${i+1}`
+      div#container
+        .row
+          .col
+            div.form-group
+              label.sr-only(for='width') Width:
+              div.input-group.mb-2.mr-sm-2
+                div.input-group-prepend
+                  div.input-group-text Width
+                select#width.form-control
+                  for i in [...Array(32).keys()]
+                    option(value=`${i+1}`)= `${i+1}`
+          .col
+            div.form-group
+              label.sr-only(for='height') Height:
+              div.input-group.mb-2.mr-sm-2
+                div.input-group-prepend
+                  div.input-group-text Height
+                select#height.form-control
+                  for i in [...Array(32).keys()]
+                    option(value=`${i+1}`)= `${i+1}`
 
-      div#inputContainer
+        div#inputContainer
 
-      .row
-        .col
-          div.form-group
-            button#fetchImages.btn.btn-primary Fetch and Build MapArt
+        .row
+          .col
+            div.form-group
+              button#fetchImages.btn.btn-primary Fetch and Build MapArt
 
-      hr
-      div#outputContainer
+        hr
+        div#outputContainer
 
     script.
       // Get references to width and height selectors
@@ -241,9 +242,33 @@ html
               })
               .then(data => {
                 console.log('Image added to database:', data);
+                const successDiv = document.createElement('div');
+                successDiv.classList.add('alert', 'alert-success');
+                successDiv.style.paddingTop = '10px';
+                successDiv.textContent = 'Image added to database successfully.';
+                document.getElementById('outputContainer').appendChild(successDiv);
+                document.getElementById('inputContainer').style.display = 'none';
+                document.querySelectorAll('button').forEach(button => {
+                  button.style.display = 'none';
+                });
+                document.querySelectorAll('.form-group').forEach(select => {
+                  select.style.display = 'none';
+                });
               })
               .catch(error => {
                 console.error('Error adding image to database:', error);
+                const errorDiv = document.createElement('div');
+                errorDiv.classList.add('alert', 'alert-danger');
+                errorDiv.textContent = `Error adding image to database: ${error.message}`;
+                errorDiv.style.paddingTop = '10px';
+                document.getElementById('outputContainer').appendChild(errorDiv);
+                document.getElementById('inputContainer').style.display = 'none';
+                document.querySelectorAll('button').forEach(button => {
+                  button.style.display = 'none';
+                });
+                document.querySelectorAll('.form-group').forEach(select => {
+                  select.style.display = 'none';
+                });
               });
             });
 
