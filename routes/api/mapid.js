@@ -11,39 +11,33 @@ const multer = require('multer');
 // Set up the storage for multer
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'public/uploads');
+      cb(null, 'public/uploads/tmp'); // Upload files to a temporary directory
     },
     filename: function (req, file, cb) {
-        crypto.randomBytes(16, (err, buffer) => {
-            if (err) return cb(err);
-
-            const hash = buffer.toString('hex');
-            const sanitizedFilename = sanitize(file.originalname);
-            const filename = `${hash}${path.extname(sanitizedFilename)}`;
-
-            cb(null, filename);
-        });
-    },
-});
-
-// File filter for multer
-const fileFilter = (req, file, cb) => {
-    // Check if the file is an image
-    if (file.mimetype.startsWith('image/')) {
-        cb(null, true);
-    } else {
-        cb(new Error('Only images are allowed!'), false);
+      // Generate a unique filename
+      const filename = Date.now() + '-' + file.originalname;
+      cb(null, filename);
     }
-};
-
-// Init multer storage, file filter, and limits
-const upload = multer({
+  });
+  
+  // File filter for multer
+  const fileFilter = (req, file, cb) => {
+    // Check if the file is a PNG image
+    if (file.mimetype === 'image/png') {
+      cb(null, true);
+    } else {
+      cb(new Error('Only PNG images are allowed!'), false);
+    }
+  };
+  
+  // Init multer storage, file filter, and limits
+  const upload = multer({
     storage,
     fileFilter,
     limits: {
-        fileSize: 1024 * 1024 * 2, // 2 MB limit
+      fileSize: 1024 * 64, // 64 KB limit
     },
-});
+  });
 
 /**
  * @swagger
@@ -198,6 +192,12 @@ router.get('/hash', async (req, res) => {
  *           type: string
  *           format: uuid
  *         required: true
+ *       - in: query
+ *         name: server
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The server name. (2b2t, constantium, etc)
  *     requestBody:
  *       content:
  *         multipart/form-data:
@@ -223,8 +223,7 @@ router.get('/hash', async (req, res) => {
  */
 router.post('/create', upload.single('image'), async (req, res) => {
     const apiKey = req.get("X-API-Key")
-    console.log(req.file)
-    //TODO: figure out why req.file is undefined
+
     try {
         if(!apiKey) return res.status(401).json({error: 'Unauthorized'});
         const user = await userController.getUserByApiKey(apiKey);
@@ -239,29 +238,38 @@ router.post('/create', upload.single('image'), async (req, res) => {
         // Metadata from req.file
         const { filename, path, size, mimetype } = req.file;
 
+        // Generate the desired filename based on server
+        const server = req.query.server;
+
+        if (!server) {
+            // If no server is provided
+            return res.status(400).json({ error: 'No server was provided' });
+        }
+
+        const newFilename = await mapIdController.generateFilename(server);
+
+        // Construct the new filepath manually
+        const newFilepath = __dirname + '../../../public/uploads/' + newFilename;
+
+        // Rename the file
+        fs.renameSync(path, newFilepath);
+
         // Read the image file and convert it to base64
-        const base64 = fs.readFileSync(path, { encoding: 'base64' });
+        const base64 = fs.readFileSync(newFilepath, { encoding: 'base64' });
 
         // Calculate a hash of the base64 data
         const hash = crypto.createHash('md5').update(base64).digest('hex');
 
-        const duplicate = await mapIdController.getMapIdByHash(hash);
-
-        if(duplicate){
-            // Delete the file from the 'public/uploads' directory
-            const filePath = `public/uploads/${filename}`;
-            fs.unlinkSync(filePath);
-            return res.status(402).json({error: 'Duplicate encountered try uploading manually'});
-        }
-
         // Add metadata to the db
         const map = await mapIdController.createMapId({
             userId: user.id,
-            imgUrl: filename,
-            hash: hash
+            username: user.username,
+            imgUrl: newFilename,
+            hash: hash,
+            server: server,
         });
         // Send a response with information about the uploaded file
-        res.status(200).json({ message: 'Upload successful', permalink: "http://localhost:3000/mapart/" + map.id });
+        res.status(200).json({ message: 'Upload successful', data: map });
     } catch (error) {
         console.error('Error uploading file:', error);
         res.status(500).json({ error: 'Internal server error' });
