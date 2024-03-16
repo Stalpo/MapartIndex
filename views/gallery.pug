@@ -34,8 +34,192 @@ html
       div#loadingSpinner.text-center.mt-4
         i.fa.fa-spinner.fa-spin.fa-3x
         p Loading...
-        
-      script(src="/public/js/gallery.js")
+
+      script.
+        // Function to fetch data from the API
+        async function fetchData(url) {
+          const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        }
+
+        // Function to populate select element with options
+        function populateSelect(selectorId, data) {
+          const selector = document.getElementById(selectorId);
+          selector.innerHTML = ''; // Clear previous options
+          data.forEach(item => {
+            const option = document.createElement('option');
+            option.text = item;
+            selector.add(option);
+          });
+        }
+
+        // Function to populate user selector
+        async function populateUserSelector() {
+          try {
+            const uniqueUsernames = await fetchData('/mapId-info/uniqueUsernames');
+            uniqueUsernames.unshift("All Users");
+            populateSelect('userSelector', uniqueUsernames);
+          } catch (error) {
+            console.error('Error fetching user data:', error);
+          }
+        }
+
+        // Function to populate artist selector
+        async function populateArtistSelector() {
+          try {
+            const uniqueArtists = await fetchData('/mapId-info/uniqueArtists');
+            uniqueArtists.unshift("All Artists");
+            populateSelect('artistSelector', uniqueArtists);
+          } catch (error) {
+            console.error('Error fetching artist data:', error);
+          }
+        }
+
+        async function populateSortSelector() {
+          const sortSelector = document.getElementById('sortSelector');
+
+          const options = [
+            { value: 'nameAsc', label: 'Name (Ascending)' },
+            { value: 'nameDesc', label: 'Name (Descending)' },
+            { value: 'dateAsc', label: 'Date (Ascending)' },
+            { value: 'dateDesc', label: 'Date (Descending)', selected: true }
+          ];
+
+          options.forEach(option => {
+            const sortOption = document.createElement('option');
+            sortOption.value = option.value;
+            sortOption.textContent = option.label;
+            if (option.selected) {
+              sortOption.setAttribute('selected', true);
+            }
+            sortSelector.appendChild(sortOption);
+          });
+        }
+
+        // Function to handle API call with updated parameters
+        async function fetchMaps(page = 1, user = "", artist = "", sort = "dateDesc") {
+          const perPage = 25;
+          let url = `/api/mapId/maps?page=${page}&perPage=${perPage}&sort=${sort}`;
+          // Construct URL based on selected values
+          if (user && user !== "All Users") {
+            url += `&user=${user}`;
+          }
+          if (artist && artist !== "All Artists") {
+            url += `&artist=${artist}`;
+          }
+
+          // Show loading spinner
+          document.getElementById('loadingSpinner').style.display = 'block';
+
+          try {
+            const response = await fetch(url);
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            // Update the UI with the fetched maps
+            buildGrid(data);
+            // console.log(data);
+
+            // Start observing intersection once grid is populated
+            startObservingIntersection();
+          } catch (error) {
+            console.error('Error fetching map data:', error);
+          } finally {
+            // Hide loading spinner regardless of success or failure
+            document.getElementById('loadingSpinner').style.display = 'none';
+          }
+        }
+
+        // Function to handle input selector change events
+        function handleSelectorChange() {
+          const user = document.getElementById('userSelector').value;
+          const artist = document.getElementById('artistSelector').value;
+          const sort = document.getElementById('sortSelector').value;
+          
+          // Clear the grid before fetching new data
+          clearGrid();
+
+          // Call the fetchMaps function with the updated parameters
+          fetchMaps(1, user, artist, sort);
+        }
+
+        // Function to clear the grid
+        function clearGrid() {
+          const gridContainer = document.getElementById('gridContainer');
+          gridContainer.innerHTML = '';
+        }
+
+        // Attach event listeners to input selectors
+        document.getElementById('userSelector').addEventListener('change', handleSelectorChange);
+        document.getElementById('artistSelector').addEventListener('change', handleSelectorChange);
+        document.getElementById('sortSelector').addEventListener('change', handleSelectorChange);
+
+        // Function to build the grid
+        function buildGrid(maps) {
+          const gridContainer = document.getElementById('gridContainer');
+
+          // Build grid
+          maps.forEach(map => {
+            const card = document.createElement('div');
+            card.className = 'card mb-3 mx-auto';
+            card.style = 'width: 18rem;';
+            card.innerHTML = `
+              <img src="/public/uploads/${map.imgUrl}" class="pixelated-image card-img-top" alt="Map Image">
+              <div class="card-body">
+                <h5 class="card-title">...${map.id.slice(-12)}</h5>
+              </div>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">Artist: ${map.artist}</li>
+                <li class="list-group-item">Uploaded by: <a href="/profile/${map.username}">${map.username}</li>
+              </ul>
+              <div class="card-body">
+                <a href="/mapId/${map.id}" class="card-link">View Map</a>
+              </div>
+            `;
+            gridContainer.appendChild(card);
+          });
+        }
+
+        // Lazy loading
+        let observer;
+        let currentPage = 1;
+        let user = "";
+        let artist = "";
+        let sort = "dateDesc";
+
+        function startObservingIntersection() {
+          observer = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting) {
+              fetchNextPage();
+            }
+          }, {
+            root: null,
+            rootMargin: '0px',
+            threshold: 1.0
+          });
+
+          const lastGridElement = document.getElementById('gridContainer').lastElementChild;
+          observer.observe(lastGridElement);
+        }
+
+        async function fetchNextPage() {
+          currentPage++;
+          fetchMaps(currentPage, user, artist, sort);
+        }
+
+        // Call the function to populate selectors and fetch initial data when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+          populateUserSelector();
+          populateArtistSelector();
+          populateSortSelector();
+          // Initial API call on page load
+          fetchMaps();
+        });
+
 
       // Add grid container with added margin and mx-auto for centering
       div#gridContainer.row.mb-4
@@ -43,6 +227,6 @@ html
       style.
         .pixelated-image {
           image-rendering: pixelated;
-        }
+        };
 
       include includes/scripts.pug
