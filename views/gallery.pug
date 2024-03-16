@@ -1,6 +1,6 @@
 doctype html
 html
-  - const pageTitle = "Gallery"
+  - const pageTitle = "Maps"
   include includes/head.pug
   body
     include includes/navbar.pug
@@ -23,6 +23,7 @@ html
                 div.input-group-prepend
                   div.input-group-text Artist
                 select#artistSelector.form-control
+        div.row
           div.col
             div.form-group
               label.sr-only(for='sortSelector') Sort By:
@@ -30,6 +31,15 @@ html
                 div.input-group-prepend
                   div.input-group-text Sort
                 select#sortSelector.form-control
+          div.col
+            div.form-group
+              label.sr-only(for='viewSelector') View Type:
+              div.input-group.mb-2.mr-sm-2
+                div.input-group-prepend
+                  div.input-group-text View
+                select#viewSelector.form-control
+                  option(value='smallGrid') Thumbnails
+                  option(value='grid' selected='true') Cards
 
       script.
         // Function to fetch data from the API
@@ -95,8 +105,37 @@ html
           });
         }
 
+        let view;
+
+        // Function to handle view selector change events
+        function handleViewSelectorChange() {
+          const viewSelector = document.getElementById('viewSelector');
+          const viewType = viewSelector.value;
+
+          // Clear the grid before switching view
+          clearGrid();
+
+          // Based on the selected view type
+          switch (viewType) {
+            case 'smallGrid':
+              view = 'smallGrid';
+              break;
+            case 'grid':
+              view = 'grid';
+              break;
+            default:
+              view = 'grid';
+              break;
+          }
+
+          fetchMaps(1, user, artist, sort, view);
+        }
+
+        // Attach event listener to view selector
+        document.getElementById('viewSelector').addEventListener('change', handleViewSelectorChange);
+
         // Function to handle API call with updated parameters
-        async function fetchMaps(page = 1, user = "", artist = "", sort = "dateDesc") {
+        async function fetchMaps(page = 1, user = "", artist = "", sort = "dateDesc", view) {
           const perPage = 25;
           let url = `/api/mapId/maps?page=${page}&perPage=${perPage}&sort=${sort}`;
           // Construct URL based on selected values
@@ -116,9 +155,20 @@ html
               throw new Error('Network response was not ok');
             }
             const data = await response.json();
-            // Update the UI with the fetched maps
-            buildGrid(data);
-            console.log(data);
+            
+            // Based on the selected view type
+            // Update the grid from response
+            switch (view) {
+              case 'smallGrid':
+                buildSmallGrid(data);
+                break;
+              case 'grid':
+                buildGrid(data);
+                break;
+              default:
+                buildGrid(data);
+                break;
+            }
 
             // Start observing intersection once grid is populated
             startObservingIntersection();
@@ -135,11 +185,13 @@ html
           const user = document.getElementById('userSelector').value;
           const artist = document.getElementById('artistSelector').value;
           const sort = document.getElementById('sortSelector').value;
-          
+          const view = document.getElementById('viewSelector').value;
+
           // Clear the grid before fetching new data
           clearGrid();
 
-          fetchMaps(1, user, artist, sort);
+          // Pass selected view type to fetchMaps
+          fetchMaps(1, user, artist, sort, view);
         }
 
         // Function to clear the grid
@@ -152,6 +204,24 @@ html
         document.getElementById('userSelector').addEventListener('change', handleSelectorChange);
         document.getElementById('artistSelector').addEventListener('change', handleSelectorChange);
         document.getElementById('sortSelector').addEventListener('change', handleSelectorChange);
+
+        // Function to build the grid
+        function buildSmallGrid(maps) {
+          const gridContainer = document.getElementById('gridContainer');
+
+          // Build grid
+          maps.forEach(map => {
+            const card = document.createElement('div');
+            card.className = 'card mb-3 mx-auto';
+            card.innerHTML = `
+              <a href="/mapId/${map.id}">
+                <img src="/public/uploads/${map.imgUrl}" class="pixelated-image" alt="Map Image">
+              </a>
+            `;
+            gridContainer.appendChild(card);
+          });
+        
+        };
 
         // Function to build the grid
         function buildGrid(maps) {
@@ -206,7 +276,7 @@ html
           sort = document.getElementById('sortSelector').value;
           const lastGridElement = document.getElementById('gridContainer').lastElementChild;
           observer.unobserve(lastGridElement);
-          fetchMaps(currentPage, user, artist, sort);
+          fetchMaps(currentPage, user, artist, sort, view);
         }
 
         // Call the function to populate selectors and fetch initial data when the page loads
