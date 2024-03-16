@@ -331,7 +331,9 @@ app.get('/admin', async (req, res) => {
 app.get('/admin/download', (req, res) => {
   if (res.locals.admin) {
     const uploadDir = './public/uploads';
-    const zipFileName = 'uploads.zip';
+    const currentDate = new Date().toISOString().slice(0,10);
+    const currentTime = new Date().toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' }).replace(/:/g, '-');
+    const zipFileName = `uploads_${currentDate}_${currentTime}.zip`;
   
     const archive = archiver('zip', {
         zlib: { level: 9 } // Set compression level
@@ -346,6 +348,7 @@ app.get('/admin/download', (req, res) => {
     res.redirect('/admin');
   }
 });
+
 
 app.get('/mapId/:id', async (req, res) => {
   try {
