@@ -11,7 +11,7 @@ const validator = require('validator');
 const archiver = require('archiver');
 
 // Internal dependencies
-const { loggedInMiddleware, loggingMiddleware, checkAdminStatus } = require('./middleware');
+const { loggedInMiddleware, loggingMiddleware, checkAdminStatus, checkModStatus } = require('./middleware');
 
 // Init express
 const app = express();
@@ -37,6 +37,7 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use(loggedInMiddleware);
 app.use(loggingMiddleware);
 app.use(checkAdminStatus);
+app.use(checkModStatus);
 
 // Set up the storage for multer
 const storage = multer.diskStorage({
