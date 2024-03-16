@@ -27,11 +27,17 @@ html
               select#height.form-control
                 for i in [...Array(32).keys()]
                   option(value=`${i+1}`)= `${i+1}`
+      .row
+        .col
+          div.form-group
+            button#fetchImages.btn.btn-primary Fetch Images
+      #inputContainer
 
       script.
         // Get references to width and height selectors
         const widthSelector = document.getElementById('width');
         const heightSelector = document.getElementById('height');
+        const fetchButton = document.getElementById('fetchImages');
 
         // Add event listener to both selectors to handle changes
         widthSelector.addEventListener('change', generateInputs);
@@ -60,7 +66,63 @@ html
           }
         }
 
+        // Function to fetch images based on UUIDs
+        function fetchImages() {
+          return new Promise((resolve, reject) => {
+            const inputs = document.querySelectorAll('#inputContainer input');
+            const promises = []; // Array to store all fetch promises
+            
+            inputs.forEach(input => {
+              const uuid = input.value;
+              if (uuid) {
+                const promise = fetch(`/api/mapId/${uuid}`)
+                  .then(response => {
+                    if (!response.ok) {
+                      throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                  })
+                  .then(data => {
+                    // Handle the JSON data, e.g., collect image URLs
+                    return data.imgUrl ? `/public/uploads/${data.imgUrl}` : null; // Prepend '/public/uploads/' to each URL
+                  })
+                  .catch(error => {
+                    console.error('Error fetching data:', error.message);
+                    return null; // Return null if fetch fails
+                  });
+
+                promises.push(promise); // Push each fetch promise into the array
+              }
+            });
+
+            // Wait for all fetch promises to resolve
+            Promise.all(promises)
+              .then(imgUrls => {
+                resolve(imgUrls.filter(url => url !== null)); // Resolve with the array of image URLs
+              })
+              .catch(error => {
+                reject(error); // Reject with the error if any fetch fails
+              });
+          });
+        }
+
+        fetchButton.addEventListener('click', () => {
+          fetchImages()
+            .then(imgUrls => {
+              // imgUrls is an array containing all the image URLs
+              return joinImages(parseInt(widthSelector.value), parseInt(heightSelector.value), imgUrls.filter(url => url !== null));
+            })
+            .then(resultImageUrl => {
+              // Use the resulting image URL, for example, display it in an img tag
+              const resultImage = document.createElement('img');
+              resultImage.src = resultImageUrl;
+              document.body.appendChild(resultImage);
+            })
+            .catch(error => {
+              console.error('Error fetching images:', error);
+            });
+        });
+
+
         // Initial generation on page load
         generateInputs();
-
-      div#inputContainer
