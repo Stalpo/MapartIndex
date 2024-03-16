@@ -241,19 +241,31 @@ html
                 return response.json();
               })
               .then(data => {
-                console.log('Image added to database:', data);
-                const successDiv = document.createElement('div');
-                successDiv.classList.add('alert', 'alert-success');
-                successDiv.style.paddingTop = '10px';
-                successDiv.textContent = 'Image added to database successfully.';
-                document.getElementById('outputContainer').appendChild(successDiv);
-                document.getElementById('inputContainer').style.display = 'none';
-                document.querySelectorAll('button').forEach(button => {
-                  button.style.display = 'none';
-                });
-                document.querySelectorAll('.form-group').forEach(select => {
-                  select.style.display = 'none';
-                });
+                  console.log('Image added to database:', data);
+                  const successDiv = document.createElement('div');
+                  successDiv.classList.add('alert', 'alert-success');
+                  successDiv.style.paddingTop = '10px';
+                  
+                  const successText = document.createElement('span');
+                  successText.textContent = 'Image added to database successfully. Click ';
+
+                  const link = document.createElement('a');
+                  link.textContent = 'here';
+                  link.href = '/mapart/' + data.id;
+
+                  successText.appendChild(link);
+                  successText.appendChild(document.createTextNode(' to view.'));
+
+                  successDiv.appendChild(successText);
+                  document.getElementById('outputContainer').appendChild(successDiv);
+
+                  document.getElementById('inputContainer').style.display = 'none';
+                  document.querySelectorAll('button').forEach(button => {
+                      button.style.display = 'none';
+                  });
+                  document.querySelectorAll('.form-group').forEach(select => {
+                      select.style.display = 'none';
+                  });
               })
               .catch(error => {
                 console.error('Error adding image to database:', error);
