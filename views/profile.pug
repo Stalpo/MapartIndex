@@ -15,7 +15,10 @@ html
           h2 #{ profile.username }
           p.text-center #{ profile.bio }
           p.text-center Last seen: #{ profile.lastSeen ? profile.lastSeen.toLocaleString('en-US', {month:'2-digit',day:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit',hour12:true}) : 'Unknown' }
-          
+          if isAdmin
+            p.text-center Admin
+          else if isMod
+            p.text-center Mod
           if profile.username === username
             a.btn.btn-primary(href="/profile-edit") Edit Profile
           hr
