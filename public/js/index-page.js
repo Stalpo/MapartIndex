@@ -1,5 +1,5 @@
 // Fetch random images from /api/mapId/maps
-fetch('/api/mapId/maps')
+fetch('/api/mapId/maps?page=1&perPage=10')
   .then(response => response.json())
   .then(images => {
     // Shuffle the array of images
