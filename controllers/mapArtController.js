@@ -1,5 +1,14 @@
 const mapArtModel = require('../models/mapArtModel');
 
+const getAllMapArts = async () => {
+  try {
+    return await mapArtModel.getAllMapArts();
+  } catch (error) {
+    console.error('Error fetching map by ID:', error);
+    throw error;
+  }
+};
+
 const getMapById = async (mapId) => {
   try {
     return await mapArtModel.getMapIdById(mapId);
@@ -50,6 +59,7 @@ const generateFilename = async (server) => {
 };
 
 module.exports = {
+  getAllMapArts,
   getMapById,
   createMapId,
   countMapIdsByServer,

@@ -1,5 +1,25 @@
 const prisma = require('../util/db').prisma;
 
+const getAllMapArts = async () => {
+  try {
+    const maps = await prisma.mapArt.findMany({
+      where: {
+        userId: {
+          not: null,
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return maps;
+  } catch (error) {
+    console.error('Error fetching all maparts:', error);
+    throw error;
+  }
+};
+
 const getMapIdById = async (mapId) => {
   try {
     return await prisma.mapArt.findUnique({
@@ -50,6 +70,7 @@ const countMapIdsByServer = async (server) => {
 };
 
 module.exports = {
+  getAllMapArts,
   getMapIdById,
   createMapId,
   countMapIdsByServer,
