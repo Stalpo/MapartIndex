@@ -1,0 +1,66 @@
+doctype html
+html
+  - const pageTitle = "MapArt Stitching"
+  include includes/head.pug
+  body
+    include includes/navbar.pug
+    script(src="/public/js/joinImages.js")
+    div.container.text-center
+      h1= pageTitle
+      hr
+      .row
+        .col
+          div.form-group
+            label.sr-only(for='width') Width:
+            div.input-group.mb-2.mr-sm-2
+              div.input-group-prepend
+                div.input-group-text Width
+              select#width.form-control
+                for i in [...Array(32).keys()]
+                  option(value=`${i+1}`)= `${i+1}`
+        .col
+          div.form-group
+            label.sr-only(for='height') Height:
+            div.input-group.mb-2.mr-sm-2
+              div.input-group-prepend
+                div.input-group-text Height
+              select#height.form-control
+                for i in [...Array(32).keys()]
+                  option(value=`${i+1}`)= `${i+1}`
+
+      script.
+        // Get references to width and height selectors
+        const widthSelector = document.getElementById('width');
+        const heightSelector = document.getElementById('height');
+
+        // Add event listener to both selectors to handle changes
+        widthSelector.addEventListener('change', generateInputs);
+        heightSelector.addEventListener('change', generateInputs);
+
+        // Function to generate text input boxes based on selected dimensions
+        function generateInputs() {
+          const width = parseInt(widthSelector.value);
+          const height = parseInt(heightSelector.value);
+          const totalInputs = width * height;
+
+          const container = document.getElementById('inputContainer');
+          container.innerHTML = ''; // Clear previous inputs
+
+          for (let i = 0; i < totalInputs; i++) {
+            const inputGroup = document.createElement('div');
+            inputGroup.classList.add('form-group');
+            
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.classList.add('form-control');
+            input.placeholder = `mapId uuid ${i + 1}`;
+
+            inputGroup.appendChild(input);
+            container.appendChild(inputGroup);
+          }
+        }
+
+        // Initial generation on page load
+        generateInputs();
+
+      div#inputContainer

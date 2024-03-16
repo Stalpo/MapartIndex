@@ -432,6 +432,11 @@ app.get('/mapId-info/uniqueArtists', async (req, res) => {
   }
 });
 
+// MapArt route
+app.get('/mapArt', (req, res) => {
+  res.render('mapart');
+});
+
 // Delete user route
 app.get('/deleteUser', (req, res) => {
   res.render('deleteUser');
