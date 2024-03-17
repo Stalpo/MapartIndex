@@ -30,12 +30,15 @@ html
         h1.display-4 Welcome to the Mapart Index!
         p.lead
           | The #1 Minecraft mapart archive
-          a(href="https://discord.gg/4qKFjbUFuZ")
-            | Join our discord!
-          a.nav-link(href="/about")
-            | About
-          a.nav-link(href="/changelog")
-            | Changelog
+          span
+            a.nav-link(href="https://discord.gg/4qKFjbUFuZ")
+              | Join our discord!
+          span
+            a.nav-link(href="/about")
+              | About
+          span
+            a.nav-link(href="/changelog")
+              | Changelog
 
       // Stats Section
       if totalMaps && totalMaparts && totalUsers 
