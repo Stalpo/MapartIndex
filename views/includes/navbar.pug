@@ -25,26 +25,26 @@ nav.navbar.navbar-expand-lg.navbar-light
           a.nav-link(href="/mapart-create")
             i.fa.fa-paint-brush.mr-1
             | Stitch
-      li.nav-item
-        if !username
-          a.nav-link(href="/register")
-            i.fa.fa-user-plus.mr-1
-            | Register
-        else
-          a.nav-link(href="/profile")
-            i.fa.fa-user.mr-1
-            | Profile
-      li.nav-item
-        if !username
-          a.nav-link(href="/login")
-            i.fa.fa-sign-in-alt.mr-1
-            | Login
-        else
-          a.nav-link(href="/logout")
-            i.fa.fa-sign-out-alt.mr-1
-            | Logout
-      if admin
-        li.nav-item
-          a.nav-link(href="/admin")
-            i.fa.fa-cogs.mr-1
-            | Admin
+      li.nav-item.dropdown
+        a.nav-link.dropdown-toggle(href="#", id="navbarDropdownMenuLink", role="button", data-toggle="dropdown", aria-haspopup="true", aria-expanded="false")
+          i.fa.fa-user.mr-1
+          | #{username ? username : 'User'}
+        .dropdown-menu.dropdown-menu-right(aria-labelledby="navbarDropdownMenuLink")
+          if admin
+            a.dropdown-item(href="/admin")
+              i.fa.fa-cogs.mr-1
+              | Admin
+          if username
+            a.dropdown-item(href="/profile")
+              i.fa.fa-user.mr-1
+              | Profile
+            a.dropdown-item(href="/logout")
+              i.fa.fa-sign-out-alt.mr-1
+              | Logout
+          else
+            a.dropdown-item(href="/register")
+              i.fa.fa-user-plus.mr-1
+              | Register
+            a.dropdown-item(href="/login")
+              i.fa.fa-sign-in-alt.mr-1
+              | Login
