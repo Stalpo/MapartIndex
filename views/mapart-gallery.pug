@@ -1,6 +1,6 @@
 doctype html
 html
-  - const pageTitle = "Map Arts"
+  - const pageTitle = "Maps"
   include includes/head.pug
   body
     include includes/navbar.pug
@@ -105,35 +105,6 @@ html
           });
         }
 
-        let view;
-
-        // Function to handle view selector change events
-        function handleViewSelectorChange() {
-          const viewSelector = document.getElementById('viewSelector');
-          const viewType = viewSelector.value;
-
-          // Clear the grid before switching view
-          clearGrid();
-
-          // Based on the selected view type
-          switch (viewType) {
-            case 'smallGrid':
-              view = 'smallGrid';
-              break;
-            case 'grid':
-              view = 'grid';
-              break;
-            default:
-              view = 'grid';
-              break;
-          }
-
-          fetchMaps(1, user, artist, sort, view);
-        }
-
-        // Attach event listener to view selector
-        document.getElementById('viewSelector').addEventListener('change', handleViewSelectorChange);
-
         // Function to handle API call with updated parameters
         async function fetchMaps(page = 1, user = "", artist = "", sort = "dateDesc", view) {
           const perPage = 25;
@@ -184,8 +155,9 @@ html
           }
         }
 
-        // Function to handle input selector change events
-        function handleSelectorChange() {
+        // Function to handle selector and view selector change events
+        function handleSelectorsChange() {
+          currentPage = 1; // Reset currentPage to 1
           const user = document.getElementById('userSelector').value;
           const artist = document.getElementById('artistSelector').value;
           const sort = document.getElementById('sortSelector').value;
@@ -205,9 +177,10 @@ html
         }
 
         // Attach event listeners to input selectors
-        document.getElementById('userSelector').addEventListener('change', handleSelectorChange);
-        document.getElementById('artistSelector').addEventListener('change', handleSelectorChange);
-        document.getElementById('sortSelector').addEventListener('change', handleSelectorChange);
+        document.getElementById('userSelector').addEventListener('change', handleSelectorsChange);
+        document.getElementById('artistSelector').addEventListener('change', handleSelectorsChange);
+        document.getElementById('sortSelector').addEventListener('change', handleSelectorsChange);
+        document.getElementById('viewSelector').addEventListener('change', handleSelectorsChange);
 
         // Function to build the grid
         function buildSmallGrid(maps) {
@@ -219,7 +192,7 @@ html
             card.className = 'card mb-3 mx-auto';
             card.innerHTML = `
               <a href="/mapart/${map.id}">
-                <img src="/public/uploads/mapart/${map.imgUrl}" style="width: 130px; height: 130px;" class="pixelated-image" alt="Map Image">
+                <img src="/public/uploads/mapart/${map.imgUrl}" style="width: 130px; height=130px;" class="pixelated-image" alt="Map Image">
               </a>
             `;
             gridContainer.appendChild(card);
@@ -239,7 +212,7 @@ html
             card.innerHTML = `
               <img src="/public/uploads/mapart/${map.imgUrl}" class="pixelated-image card-img-top" alt="Map Image">
               <div class="card-body">
-                <h5 class="card-title">${ map.name || map.id.slice(-12) }</h5>
+                <h5 class="card-title">...${map.id.slice(-12)}</h5>
               </div>
               <ul class="list-group list-group-flush">
                 <li class="list-group-item">Artist: ${map.artist}</li>
