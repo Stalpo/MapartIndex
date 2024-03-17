@@ -1,0 +1,131 @@
+doctype html
+html
+  - const pageTitle = "MapArt Edit"
+  include includes/head.pug
+  body
+    include includes/navbar.pug
+
+    div.container
+      h1.text-center= pageTitle
+      hr
+      if !admin
+        div.alert.alert-danger(role="alert")
+          | You are not an administrator
+      else
+        div.row
+          div.col-md-8.offset-md-2.text-center
+            form(id='editForm', class='text-center')
+
+              div.mb-3.form-group
+                div.input-group
+                  div.input-group-prepend
+                    span.input-group-text.icon-prepend
+                      i.fas.fa-font
+                  input#name.form-control(type='text', name='name', value=map.name, placeholder='Name')
+
+              div.mb-3.form-group
+                div.input-group
+                  div.input-group-prepend
+                    span.input-group-text.icon-prepend
+                      i.fas.fa-font
+                  input#description.form-control(type='text', name='description', value=map.description, placeholder='Description')
+
+              div.mb-3.form-group
+                div.input-group
+                  div.input-group-prepend
+                    span.input-group-text.icon-prepend
+                      i.fas.fa-paint-brush
+                  input#artist.form-control(type='text', name='artist', value=map.artist, placeholder='Artist')
+
+              div.mb-3.form-group
+                div.input-group
+                  div.input-group-prepend
+                    span.input-group-text.icon-prepend
+                      i.fas.fa-upload
+                  input#user.form-control(type='text', name='user', value=map.username, readonly, placeholder='Uploaded By')
+
+              div.mb-3.form-group
+                div.input-group
+                  label.fancy-checkbox
+                    input#nsfw.form-check-input(type='checkbox', name='nsfw', checked=map.nsfw)
+                    i.fas.fa-fw.fa-check-square.checked
+                    i.fas.fa-fw.fa-square.unchecked
+                    | NSFW
+
+              // Submit button
+              button#saveBtn.btn.btn-primary(type='button') Save Changes
+
+            .alert.alert-success#successMessage(style='text-align: center; display: none; margin-top: 10px;')
+            .alert.alert-danger#errorMessage(style='text-align: center; display: none; margin-top: 10px;')
+
+      style.
+        .icon-prepend {
+          width: 40px;
+          text-align: center;
+        }
+        .mb-3 {
+          margin-bottom: 1rem;
+        }
+
+        .fancy-checkbox input[type="checkbox"],
+        .fancy-checkbox .checked {
+          display: none;
+        }
+
+        .fancy-checkbox input[type="checkbox"]:checked ~ .checked {
+          display: inline-block;
+        }
+
+        .fancy-checkbox input[type="checkbox"]:checked ~ .unchecked {
+          display: none;
+        }
+
+    script.
+      function saveChanges() {
+          var artist = document.getElementById('artist').value;
+          var nsfw = document.getElementById('nsfw').checked;
+          var user = document.getElementById('user').value;
+          var name = document.getElementById('name').value;
+          var description = document.getElementById('description').value;
+
+          var formData = new FormData();
+          formData.append('name', name);
+          formData.append('artist', artist);
+          formData.append('description', description);
+          formData.append('nsfw', nsfw);
+
+          // Get mapId from the current URL
+          var url = window.location.href;
+          var mapId = url.substring(url.lastIndexOf('/') + 1);
+
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', `/mapart-edit/${mapId}`, true);
+          xhr.onreadystatechange = function () {
+              if (xhr.readyState === XMLHttpRequest.DONE) {
+                  if (xhr.status === 200) {
+                      // Show success message
+                      var successMessage = document.getElementById('successMessage');
+                      successMessage.style.display = 'block';
+                      successMessage.innerText = 'Changes saved successfully';
+
+                      // Hide error message if it's shown
+                      var errorMessage = document.getElementById('errorMessage');
+                      errorMessage.style.display = 'none';
+                  } else {
+                      // Show error message
+                      var errorMessage = document.getElementById('errorMessage');
+                      errorMessage.style.display = 'block';
+                      errorMessage.innerText = 'Failed to save changes. Please try again.';
+
+                      // Hide success message if it's shown
+                      var successMessage = document.getElementById('successMessage');
+                      successMessage.style.display = 'none';
+                  }
+              }
+          };
+          xhr.send(formData);
+      }
+
+      document.getElementById('saveBtn').addEventListener('click', saveChanges);
+      
+    include includes/scripts.pug

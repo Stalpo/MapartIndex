@@ -85,6 +85,20 @@ const countMapIdsByServer = async (server) => {
   }
 };
 
+const updateMapById = async (mapId, { artist, name, description, nsfw }) => {
+  try {
+    return await mapArtModel.updateMapById(mapId, {
+      artist,
+      name,
+      description,
+      nsfw,
+    });
+  } catch (error) {
+    console.error('Error updating map by ID:', error);
+    throw error;
+  }
+};
+
 const generateFilename = async (server) => {
   try {
     const mapCount = await countMapIdsByServer(server) + 1;
@@ -107,5 +121,6 @@ module.exports = {
   getUniqueServers,
   createMapId,
   countMapIdsByServer,
+  updateMapById,
   generateFilename,
 }

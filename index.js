@@ -436,7 +436,7 @@ app.post('/mapId-edit/:id', upload.none(), async (req, res) => {
     const sanitizedNsfw = validator.toBoolean(nsfw);
 
     // Update map details, including MapArt data
-    await mapIdController.updateMapById(mapId, {
+    await mapArtController.updateMapById(mapId, {
       artist: sanitizedArtist,
       nsfw: sanitizedNsfw,
       mapArtData: {
@@ -540,6 +540,56 @@ app.get('/mapArt/:id', async (req, res) => {
     mapId = validator.escape(mapId);
 
     res.render('mapart', { pageTitle: 'MapArt', mapId });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+app.get('/mapArt-edit/:id', async (req, res) => {
+  try {
+    let mapId = req.params.id;
+
+    // Sanitize mapId
+    mapId = validator.trim(mapId);
+    mapId = validator.escape(mapId);
+
+    const map = await mapArtController.getMapById(mapId);
+
+    const user = await userController.getUserById(map.userId);
+
+    res.render('mapart-edit', { map, user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+app.post('/mapArt-edit/:id', upload.none(), async (req, res) => {
+  try {
+    // Check if user is an admin
+    if (!res.locals.admin) {
+      return res.status(403).send('Forbidden');
+    }
+
+    const mapId = req.params.id;
+    const { artist, nsfw, name, description,  /* other fields as needed */ } = req.body;
+
+    // Sanitize inputs
+    const sanitizedArtist = validator.trim(artist);
+    const sanitizedNsfw = validator.toBoolean(nsfw);
+    const sanitizedName = validator.trim(name);
+    const sanitizeDescription = validator.trim(description);
+
+    // Update map details, including MapArt data
+    await mapArtController.updateMapById(mapId, {
+      name: sanitizedName,
+      artist: sanitizedArtist,
+      nsfw: sanitizedNsfw,
+      description: sanitizeDescription,
+    });
+    
+    res.redirect(`/admin`);
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');

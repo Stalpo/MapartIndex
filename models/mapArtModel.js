@@ -158,6 +158,23 @@ const createMapId = async ({ userId, username, name, description, mapId, imgUrl,
   }
 };
 
+const updateMapById = async (mapId, { artist, name, description, nsfw }) => {
+  try {
+    return await prisma.mapArt.update({
+      where: { id: mapId },
+      data: {
+        artist,
+        name,
+        description,
+        nsfw,
+      },
+    });
+  } catch (error) {
+    console.error('Error in updateMapById:', error);
+    throw error;
+  }
+};
+
 const countMapIdsByServer = async (server) => {
   try {
     const count = await prisma.mapArt.count({
@@ -180,5 +197,6 @@ module.exports = {
   getUniqueUsernames,
   getUniqueServers,
   createMapId,
+  updateMapById,
   countMapIdsByServer,
 };
