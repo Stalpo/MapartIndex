@@ -41,7 +41,7 @@ html
               | Changelog
 
       // Stats Section
-      if totalMaps && totalMaparts && totalUsers 
+      if totalMaps
         .row.justify-content-center
           .col-md-3
             .card.border-primary.mb-3(style='max-width: 18rem;').text-center
@@ -53,6 +53,8 @@ html
               .card-header Total Maparts
               .card-body.text-primary
                 h5.card-title #{totalMaparts}
+      if totalUsers
+        .row.justify-content-center
           .col-md-3
             .card.border-success.mb-3(style='max-width: 18rem;').text-center
               .card-header Total Users
