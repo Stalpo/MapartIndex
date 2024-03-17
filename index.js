@@ -310,6 +310,9 @@ app.post('/upload', upload.array('images', 4000), async (req, res) => {
       const server = req.body.server;
       const newFilename = await mapIdController.generateFilename(server);
 
+      // Get current map count + 1
+      const serverId = await mapIdController.countMapIdsByServer(server) + 1;
+
       // Construct the new filepath manually
       const newFilepath = __dirname + '/public/uploads/' + newFilename;
 
@@ -328,7 +331,8 @@ app.post('/upload', upload.array('images', 4000), async (req, res) => {
         username: res.locals.username,
         imgUrl: newFilename,
         hash: hash,
-        server: req.body.server
+        server: req.body.server,
+        serverId: serverId,
       });
 
       uploadedFiles.push({
