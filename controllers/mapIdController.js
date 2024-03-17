@@ -67,12 +67,14 @@ const createMapId = async ({ userId, username, mapId, imgUrl, hash, server, serv
   }
 };
 
-const updateMapById = async (mapId, { artist, nsfw, mapArtData }) => {
+const updateMapById = async (mapId, { artist, nsfw, tags }) => {
   try {
+    const tagsArray = tags.split(',').map(tag => tag.trim());
+
     return await mapIdModel.updateMapById(mapId, {
       artist,
       nsfw,
-      mapArtData,
+      tags: tagsArray,
     });
   } catch (error) {
     console.error('Error updating map by ID:', error);

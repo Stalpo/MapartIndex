@@ -159,16 +159,19 @@ const createMapId = async ({ userId, username, mapId, imgUrl, hash, server, serv
   }
 };
 
-const updateMapById = async (mapId, { artist, nsfw, mapArtData }) => {
+const updateMapById = async (mapId, { artist, nsfw, tags }) => {
   try {
+    let uniqueTags = tags;
+    if (uniqueTags) {
+      uniqueTags = [...new Set(uniqueTags)];
+    }
+
     return await prisma.mapId.update({
       where: { id: mapId },
       data: {
         artist,
         nsfw,
-        Map: {
-          update: mapArtData,
-        },
+        tags: uniqueTags,
       },
     });
   } catch (error) {

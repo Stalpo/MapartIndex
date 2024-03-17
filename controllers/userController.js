@@ -161,9 +161,9 @@ const verifyToken = (token) => {
 
 const loginDiscordUser = async (discordId, username, avatar, email) => {
   try {
-    const user = await userModel.getUserByDiscordId(discordId);
+    let user = await userModel.getUserByDiscordId(discordId);
     if (!user) {
-      await userModel.createUserDiscord({ discordId, username, avatar, email });
+      user = await userModel.createUserDiscord({ discordId, username, avatar, email });
     }
     const token = jwt.sign({ username }, process.env.SECRET_KEY, { expiresIn: '24h' });
     return { token };

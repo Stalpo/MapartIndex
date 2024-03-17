@@ -127,8 +127,18 @@ const createUserDiscord = async ({ discordId, username, avatar, email }) => {
   try {
     const apiKey = generateApiKey();
     const user = await prisma.user.create({
-      data: { discordId, username, apiKey },
-      include: { Profile: true },
+      data: {
+        discordId,
+        username,
+        apiKey,
+        Profile: {
+          create: {
+            email,
+            username,
+            avatar
+          }
+        }
+      },
     });
     return user;
   } catch (error) {
@@ -140,7 +150,6 @@ const createUserDiscord = async ({ discordId, username, avatar, email }) => {
 const deleteUserById = async (userId) => {
   try {
     await prisma.user.delete({ where: { id: userId } });
-    // Consider deleting profiles too, if needed
     return { message: 'User deleted successfully' };
   } catch (error) {
     console.error('Error in deleteUserById:', error);

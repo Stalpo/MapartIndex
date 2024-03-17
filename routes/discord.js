@@ -44,12 +44,12 @@ router.get('/auth-callback', async (req, res) => {
 });
 
 async function handleUserData(data,res) {
-    const discordId = data.id;
-    const username = data.username;
-    const avatar = "https://cdn.discordapp.com/avatars/" + discordId + "/" + data.avatar + ".png";
-    const email = data.email;
+    let discordId = data.id;
+    let username = data.username;
+    let avatar = "https://cdn.discordapp.com/avatars/" + discordId + "/" + data.avatar + ".png";
+    let email = data.email;
 
-    const token = await userController.loginDiscordUser(discordId, username, avatar, email);
+    let token = await userController.loginDiscordUser(discordId, username, avatar, email);
     res.cookie("token",token.token)
 }
 
