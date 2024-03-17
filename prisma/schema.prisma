@@ -61,6 +61,7 @@ model MapArt {
   mapIds       MapId[]
   hash         String?
   nsfw         Boolean  @default(false)
+  tags         String[]?
 }
 
 model MapId {
@@ -78,4 +79,5 @@ model MapId {
   imgUrl       String
   hash         String
   nsfw         Boolean  @default(false)
+  tags         String[]?
 }
