@@ -1,3 +1,15 @@
+script.
+  document.addEventListener('DOMContentLoaded', function() {
+    const currentURL = window.location.pathname;
+    const navItems = document.querySelectorAll('.navbar-nav .nav-link');
+
+    navItems.forEach(item => {
+      if (item.getAttribute('href') === currentURL) {
+        item.parentNode.classList.add('active');
+      }
+    });
+  });
+
 nav.navbar.navbar-expand-lg.navbar-light
   a.h1.navbar-brand(href="/") MapartIndex
   button.navbar-toggler(type="button", data-toggle="collapse", data-target="#navbarNav", aria-controls="navbarNav", aria-expanded="false", aria-label="Toggle navigation")
