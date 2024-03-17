@@ -1,0 +1,27 @@
+doctype html
+html
+  - const pageTitle = "About"
+  include includes/head.pug
+  body
+    include includes/navbar.pug
+
+    div.container
+      h1.text-center= pageTitle
+      hr
+      p This site is an archive of known maparts built in a variety of different survival Minecraft servers. It not only stores maparts but also info about them. It was originally created for the mapart community of 2b2t. If you are part of a mapart community for a server please contact an admin to have your server of choice added to the database!
+      h3 Developers
+      ul 
+        li Stalpo
+        li superdoob 
+        li THCFree
+        li clink_clank
+      h3 Links
+      ul 
+        li
+          a(href="https://discord.gg/4qKFjbUFuZ") Mapart Index official discord
+        li 
+          a(href="https://github.com/Stalpo/MapartIndex") Mapart Index github page
+        li 
+          a(href="https://github.com/Stalpo/stalpomaparthelper") Mapart Helper minecraft mod
+
+      include includes/scripts.pug

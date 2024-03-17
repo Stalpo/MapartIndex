@@ -19,7 +19,7 @@ html
     div.container.mt-4(style='position: relative; z-index: 1;')
       if !username
         .alert.alert-success
-          p Registration is open! Join us now and be part of the awesomeness.
+          p Registration is open! Join us now and be part of the Minecraft mapart community.
       else
         .alert.alert-info
           p Welcome back, #{username}!
@@ -28,7 +28,13 @@ html
       .jumbotron.text-center
         h1.display-4 Welcome to the Mapart Index!
         p.lead
-          | Unleash Creativity, Explore Wonders: Discover the amazing maps in our Minecraft Map Art Archive.
+          | The #1 Minecraft mapart archive
+          a(href="https://discord.gg/4qKFjbUFuZ")
+            | Join our discord!
+          a.nav-link(href="/about")
+            | About
+          a.nav-link(href="/changelog")
+            | Changelog
 
       // Stats Section
       if totalMaps && totalMaparts && totalUsers 

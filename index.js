@@ -113,6 +113,16 @@ app.get('/', async (req, res) => {
   }
 });
 
+// About route
+app.get('/about', (req, res) => {
+  res.render('about');
+});
+
+// Changelog route
+app.get('/changelog', (req, res) => {
+  res.render('changelog');
+});
+
 // Register route
 app.get('/register', (req, res) => {
   if (res.locals.username) {
