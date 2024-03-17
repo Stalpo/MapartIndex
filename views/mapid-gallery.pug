@@ -7,7 +7,10 @@ html
     div.container
       h1.text-center= pageTitle
       hr
-      form
+      div.row.justify-content-center
+        div.col-auto
+          button#toggleSelectorsButton.btn.btn-primary.btn-sm.mb-3 Filtering and Sorting
+      form#selectorsForm(style={display: 'none'})
         div.row
           div.col
             div.form-group
@@ -320,6 +323,22 @@ html
         const container = document.querySelector('.container');
         const loadingSpinner = createLoadingSpinner();
         container.appendChild(loadingSpinner);
+
+        // Function to toggle visibility of selectors
+        function toggleSelectors() {
+          const selectorsForm = document.getElementById('selectorsForm');
+          const button = document.getElementById('toggleSelectorsButton');
+          if (selectorsForm.style.display === 'none') {
+            selectorsForm.style.display = 'block';
+            button.textContent = 'Hide Filtering and Sorting';
+          } else {
+            selectorsForm.style.display = 'none';
+            button.textContent = 'Show Filtering and Sorting';
+          }
+        }
+
+        // Attach event listener to the button
+        document.getElementById('toggleSelectorsButton').addEventListener('click', toggleSelectors);
 
       style.
         .pixelated-image {
