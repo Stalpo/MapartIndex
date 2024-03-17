@@ -501,6 +501,9 @@ app.post('/mapArt-create', mapArtUpload.single('file'), async (req, res) => {
     // Generate the desired filename based on server
     const newFilename = await mapArtController.generateFilename(server);
 
+    // Get current map count + 1
+    const serverId = await mapArtController.countMapIdsByServer(server) + 1;
+
     // Construct the new filepath manually
     const newFilepath = __dirname + '/public/uploads/mapart/' + newFilename;
 
@@ -522,6 +525,7 @@ app.post('/mapArt-create', mapArtUpload.single('file'), async (req, res) => {
       artist: artist,
       hash: hash,
       server: server,
+      serverId: serverId,
     });
 
     res.send(result);

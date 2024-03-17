@@ -54,6 +54,7 @@ model MapArt {
   username     String?
   artist       String?  @default("N/A")
   server       String?
+  serverId     Int?
   imgUrl       String
   name         String
   description  String

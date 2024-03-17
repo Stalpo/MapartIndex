@@ -58,7 +58,7 @@ const getUniqueServers = async () => {
   }
 };
 
-const createMapId = async ({ userId, username, name, description, mapId, imgUrl, hash, server }) => {
+const createMapId = async ({ userId, username, name, description, mapId, imgUrl, hash, server, serverId }) => {
   try {
     return await mapArtModel.createMapId({
       userId,
@@ -69,6 +69,7 @@ const createMapId = async ({ userId, username, name, description, mapId, imgUrl,
       imgUrl,
       hash,
       server,
+      serverId,
     });
   } catch (error) {
     console.error('Error creating map ID:', error);
