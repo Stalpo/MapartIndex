@@ -248,6 +248,8 @@ router.post('/create', upload.single('image'), async (req, res) => {
 
         const newFilename = await mapIdController.generateFilename(server);
 
+        const serverId = await mapIdController.countMapIdsByServer(server) + 1;
+
         // Construct the new filepath manually
         const newFilepath = __dirname + '../../../public/uploads/' + newFilename;
 
@@ -267,6 +269,7 @@ router.post('/create', upload.single('image'), async (req, res) => {
             imgUrl: newFilename,
             hash: hash,
             server: server,
+            serverId: serverId,
         });
         // Send a response with information about the uploaded file
         res.status(200).json({ message: 'Upload successful', data: map });
