@@ -152,7 +152,11 @@ html
           try {
             const response = await fetch(url);
             if (!response.ok) {
-              throw new Error('Network response was not ok');
+              if (response.status === 404) {
+                console.error('Likely last page of results');
+              } else {
+                throw new Error('Network response was not ok');
+              }
             }
             const data = await response.json();
             
@@ -273,7 +277,10 @@ html
 
         async function fetchNextPage() {
           currentPage++;
+          user = document.getElementById('userSelector').value;
+          artist = document.getElementById('artistSelector').value;
           sort = document.getElementById('sortSelector').value;
+          view = document.getElementById('viewSelector').value;
           const lastGridElement = document.getElementById('gridContainer').lastElementChild;
           observer.unobserve(lastGridElement);
           fetchMaps(currentPage, user, artist, sort, view);

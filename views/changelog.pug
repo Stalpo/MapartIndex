@@ -8,6 +8,11 @@ html
     div.container
       h1.text-center= pageTitle
       hr
-      p will fill this in on release lmao -Stalpo
 
-      include includes/scripts.pug
+      each commit in commits
+        .card.mt-3
+          .card-body
+            h5.card-title= commit.subject
+            p.card-text= `Commit: ${commit.abbrevHash} | Author: ${commit.authorName} | Date: ${commit.authorDateRel}`
+      
+    include includes/scripts.pug
