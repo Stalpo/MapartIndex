@@ -62,7 +62,7 @@ const getAllMapsForUserId = async (userId) => {
   }
 };
 
-const getMaps = async (page, perPage, user, artist, sort) => {
+const getMaps = async (page, perPage, user, artist, sort, server) => {
   try {
     const where = {};
 
@@ -72,6 +72,9 @@ const getMaps = async (page, perPage, user, artist, sort) => {
     }
     if (artist) {
       where.artist = artist;
+    }
+    if (server) {
+      where.server = server;
     }
 
     // Apply sorting criteria

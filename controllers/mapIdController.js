@@ -1,8 +1,8 @@
 const mapIdModel = require('../models/mapIdModel');
 
-const getMaps = async (page, perPage, user, artist, sort) => {
+const getMaps = async (page, perPage, user, artist, sort, server) => {
   try {
-    const maps = await mapIdModel.getMaps(page, perPage, user, artist, sort);
+    const maps = await mapIdModel.getMaps(page, perPage, user, artist, sort, server);
     return maps;
   } catch (error) {
     console.error('Error fetching maps:', error);

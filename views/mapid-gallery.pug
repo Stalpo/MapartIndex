@@ -26,6 +26,14 @@ html
         div.row
           div.col
             div.form-group
+              label.sr-only(for='serverSelector') Select Server:
+              div.input-group.mb-2.mr-sm-2
+                div.input-group-prepend
+                  div.input-group-text Server
+                select#serverSelector.form-control
+        div.row
+          div.col
+            div.form-group
               label.sr-only(for='sortSelector') Sort By:
               div.input-group.mb-2.mr-sm-2
                 div.input-group-prepend
@@ -84,6 +92,17 @@ html
           }
         }
 
+        // Function to populate server selector
+        async function populateServerSelector() {
+          try {
+            const uniqueServers = await fetchData('/mapId-info/uniqueServers');
+            uniqueServers.unshift("All Servers");
+            populateSelect('serverSelector', uniqueServers);
+          } catch (error) {
+            console.error('Error fetching server data:', error);
+          }
+        }
+
         async function populateSortSelector() {
           const sortSelector = document.getElementById('sortSelector');
 
@@ -106,7 +125,7 @@ html
         }
 
         // Function to handle API call with updated parameters
-        async function fetchMaps(page = 1, user = "", artist = "", sort = "dateDesc", view) {
+        async function fetchMaps(page = 1, user = "", artist = "", sort = "dateDesc", view, server) {
           const perPage = 25;
           let url = `/api/mapId/maps?page=${page}&perPage=${perPage}&sort=${sort}`;
           // Construct URL based on selected values
@@ -115,6 +134,9 @@ html
           }
           if (artist && artist !== "All Artists") {
             url += `&artist=${artist}`;
+          }
+          if (server && server !== "All Servers") {
+            url += `&server=${server}`;
           }
 
           // Show loading spinner
@@ -162,12 +184,13 @@ html
           const artist = document.getElementById('artistSelector').value;
           const sort = document.getElementById('sortSelector').value;
           const view = document.getElementById('viewSelector').value;
+          const server = document.getElementById('serverSelector').value;
 
           // Clear the grid before fetching new data
           clearGrid();
 
           // Pass selected view type to fetchMaps
-          fetchMaps(1, user, artist, sort, view);
+          fetchMaps(1, user, artist, sort, view, server);
         }
 
         // Function to clear the grid
@@ -181,6 +204,7 @@ html
         document.getElementById('artistSelector').addEventListener('change', handleSelectorsChange);
         document.getElementById('sortSelector').addEventListener('change', handleSelectorsChange);
         document.getElementById('viewSelector').addEventListener('change', handleSelectorsChange);
+        document.getElementById('serverSelector').addEventListener('change', handleSelectorsChange);
 
         // Function to build the grid
         function buildSmallGrid(maps) {
@@ -231,6 +255,7 @@ html
         let currentPage = 1;
         let user = "";
         let artist = "";
+        let server = "";
         let sort = "dateDesc";
 
         function startObservingIntersection() {
@@ -254,9 +279,10 @@ html
           artist = document.getElementById('artistSelector').value;
           sort = document.getElementById('sortSelector').value;
           view = document.getElementById('viewSelector').value;
+          server = document.getElementById('serverSelector').value;
           const lastGridElement = document.getElementById('gridContainer').lastElementChild;
           observer.unobserve(lastGridElement);
-          fetchMaps(currentPage, user, artist, sort, view);
+          fetchMaps(currentPage, user, artist, sort, view, server);
         }
 
         // Call the function to populate selectors and fetch initial data when the page loads
@@ -264,6 +290,7 @@ html
           populateUserSelector();
           populateArtistSelector();
           populateSortSelector();
+          populateServerSelector();
           // Initial API call on page load
           fetchMaps();
         });
