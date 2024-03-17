@@ -465,7 +465,7 @@ app.post('/mapId-edit/:id', upload.none(), async (req, res) => {
     const sanitizedNsfw = validator.toBoolean(nsfw);
 
     // Update map details, including MapArt data
-    await mapArtController.updateMapById(mapId, {
+    await mapIdController.updateMapById(mapId, {
       artist: sanitizedArtist,
       nsfw: sanitizedNsfw,
       mapArtData: {
