@@ -9,6 +9,7 @@ const crypto = require('crypto');
 const sanitize = require('sanitize-filename');
 const validator = require('validator');
 const archiver = require('archiver');
+const gitlog = require("gitlog").default;
 
 // Internal dependencies
 const { loggedInMiddleware, loggingMiddleware, checkAdminStatus, checkModStatus } = require('./middleware');
@@ -120,7 +121,21 @@ app.get('/about', (req, res) => {
 
 // Changelog route
 app.get('/changelog', (req, res) => {
-  res.render('changelog');
+  const options = {
+    repo: path.resolve(__dirname, '.git'),
+    number: 25, // Number of commits to fetch
+    fields: ['abbrevHash', 'subject', 'authorDateRel', 'authorName']
+  };
+
+  gitlog(options, (error, commits) => {
+    if (error) {
+      console.error(`Error fetching git log: ${error}`);
+      res.status(500).send('Error fetching changelog');
+      return;
+    }
+
+    res.render('changelog', { commits });
+  });
 });
 
 // Register route
