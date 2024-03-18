@@ -1,11 +1,11 @@
 doctype html
 html
-  - const pageTitle = "MapId: " + mapId
+  - const pageTitle = "MapArt: " + mapId
   include includes/head.pug
   body
     include includes/navbar.pug
     div.container
-      h1.text-center MapId
+      h1.text-center MapArt
       hr
 
       div#mapContainer.text-center
@@ -18,7 +18,7 @@ html
           const mapId = `#{mapId}`;
           const mapContainer = document.getElementById('mapContainer');
 
-          fetch(`/api/mapId/${mapId}`)
+          fetch(`/api/mapId/id/${mapId}`)
             .then(response => {
               if (!response.ok) {
                 throw new Error(response.statusText);
@@ -40,7 +40,7 @@ html
                 const mapContent = document.createElement('div');
                 const mapInfo = document.createElement('div');
                 mapInfo.innerHTML = `
-                  <p>Map ID: ${mapId} <button id="copyButton" class="btn btn-secondary btn-sm"><i class="fas fa-copy"></i></button></p>
+                  <p>Map ID: ${map.displayName}</p>
                   <div class="row">
                     <div class="col-md-12 text-center">
                       <img src="${imageUrl}" alt="${mapId}" class="pixelated-image img-fluid" style="width: 100%; max-width: none; height: auto; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); image-rendering: pixelated;">
@@ -58,20 +58,8 @@ html
                 mapContent.appendChild(mapInfo);
                 mapContainer.innerHTML = ''; // Clear existing.
                 mapContainer.appendChild(mapContent);
-
-                const copyButton = document.getElementById('copyButton');
-
-                copyButton.addEventListener('click', () => {
-                  navigator.clipboard.writeText(mapId)
-                    .then(() => {
-                      alert('MapId copied to clipboard!');
-                    })
-                    .catch(err => {
-                      console.error('Unable to copy MapId:', err);
-                    });
-                });
               } else {
-                mapContainer.innerHTML = '<div class="alert alert-danger" role="alert">MapId not found!</div>';
+                mapContainer.innerHTML = '<div class="alert alert-danger" role="alert">MapArt not found!</div>';
               }
             })
             .catch(error => {

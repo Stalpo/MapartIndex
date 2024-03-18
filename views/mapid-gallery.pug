@@ -218,7 +218,7 @@ html
             const card = document.createElement('div');
             card.className = 'card mb-3 mx-auto';
             card.innerHTML = `
-              <a href="/mapId/${map.id}">
+              <a href="/mapId/${map.displayName}">
                 <img src="/public/uploads/${map.imgUrl}" class="pixelated-image" alt="Map Image">
               </a>
             `;
@@ -239,7 +239,7 @@ html
             card.innerHTML = `
               <img src="/public/uploads/${map.imgUrl}" class="pixelated-image card-img-top" alt="Map Image">
               <div class="card-body">
-                <h5 class="card-title">...${map.id.slice(-12)}</h5>
+                <h5 class="card-title">${map.displayName}</h5>
               </div>
               <ul class="list-group list-group-flush">
                 <li class="list-group-item">Artist: ${map.artist}</li>
