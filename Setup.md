@@ -11,7 +11,23 @@ DISCORD_CLIENT_ID="clientid"
 DISCORD_CLIENT_SECRET="clientsecret"
 ```
 
-## Useful stuff
+### Useful stuff
 - [Prisma](https://www.prisma.io/docs/)
 - Push schema changes to the database: `npx prisma db push`
 - Live view of the database: `npx prisma studio`
+
+### Setting up MongoDB (Replica Set)
+Prisma requires MongoDB to be in replication mode to enable features such as fault tolerance, data redundancy, and high availability through replica sets.
+
+- Stop the mongodb service
+- Edit mongod.conf
+```
+# replica set options
+replication:
+  replSetName: myReplicaSet
+```
+- Start mongodb service
+- Run the following command in mongosh
+```rs.initiate()```
+- Check that replication is applied with this command
+```rs.status()```
