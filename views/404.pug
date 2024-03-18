@@ -1,0 +1,15 @@
+doctype html
+html
+  include includes/head.pug
+  body 
+    include includes/navbar.pug
+
+    // Main Content
+    div.container.mt-4(style='position: relative; z-index: 1;')
+      .jumbotron.text-center
+        h1.display-4 Not Found
+        p.lead
+          | The requested page could not be found. Please check the URL and try again.
+
+    // include includes/footer.pug
+    include includes/scripts.pug

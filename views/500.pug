@@ -1,0 +1,15 @@
+doctype html
+html
+  include includes/head.pug
+  body 
+    include includes/navbar.pug
+
+    // Main Content
+    div.container.mt-4(style='position: relative; z-index: 1;')
+      .jumbotron.text-center
+        h1.display-4 Internal Server Error
+        p.lead
+          | We encountered an internal server error. Please try again later.
+
+    // include includes/footer.pug
+    include includes/scripts.pug

@@ -715,6 +715,25 @@ app.post('/deleteMapId', async (req, res) => {
   }
 });
 
+// Define route for handling 404 errors
+app.use(function(req, res, next) {
+  res.status(404);
+  if (req.originalUrl.startsWith('/api')) {
+    return res.json({ error: 'Not found' });
+  }
+  res.render('404');
+});
+
+// Define route for handling 500 errors
+app.use(function(err, req, res, next) {
+  console.error(err.stack);
+  res.status(500);
+  if (req.originalUrl.startsWith('/api')) {
+    return res.json({ error: 'Internal server error' });
+  }
+  res.render('500');
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
