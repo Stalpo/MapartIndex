@@ -22,6 +22,18 @@ const getMapIdByHash = async (hash) => {
   }
 };
 
+const getMapByDisplayName = async (displayName) => {
+  console.log(displayName);
+  try {
+    return await prisma.mapId.findFirst({
+      where: { displayName }
+    });
+  } catch (error) {
+    console.error('Error in getMapIdByHash:', error);
+    throw error;
+  }
+};
+
 // Getting replaced by getMaps, still here until all references are removed
 const getAllMaps = async () => {
   try {
@@ -136,7 +148,7 @@ const countMapIdsByServer = async (server) => {
   }
 };
 
-const createMapId = async ({ userId, username, mapId, imgUrl, hash, server, serverId }) => {
+const createMapId = async ({ userId, username, mapId, imgUrl, displayName, hash, server, serverId }) => {
   try {
     return await prisma.mapId.create({
       data: {
@@ -148,6 +160,7 @@ const createMapId = async ({ userId, username, mapId, imgUrl, hash, server, serv
         username: username,
         mapId: mapId,
         imgUrl: imgUrl,
+        displayName: displayName,
         hash: hash,
         server: server,
         serverId: serverId,
@@ -238,6 +251,7 @@ const deleteMapById = async (mapId) => {
 module.exports = {
   getMapIdById,
   getMapIdByHash,
+  getMapByDisplayName,
   getAllMaps,
   getAllMapsForUserId,
   getMaps,

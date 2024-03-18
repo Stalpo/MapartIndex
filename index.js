@@ -341,6 +341,11 @@ app.post('/upload', upload.array('images', 4000), async (req, res) => {
       // Construct the new filepath manually
       const newFilepath = __dirname + '/public/uploads/' + newFilename;
 
+      let displayName;
+      if (newFilename.endsWith(".png")) {
+        displayName = newFilename.slice(0, -4);
+      }
+
       // Rename the file
       fs.renameSync(path, newFilepath);
 
@@ -355,6 +360,7 @@ app.post('/upload', upload.array('images', 4000), async (req, res) => {
         userId: res.locals.userId,
         username: res.locals.username,
         imgUrl: newFilename,
+        displayName: displayName,
         hash: hash,
         server: req.body.server,
         serverId: serverId,
@@ -536,6 +542,11 @@ app.post('/mapArt-create', mapArtUpload.single('file'), async (req, res) => {
     // Construct the new filepath manually
     const newFilepath = __dirname + '/public/uploads/mapart/' + newFilename;
 
+    let displayName;
+    if (newFilename.endsWith(".png")) {
+      displayName = newFilename.slice(0, -4);
+    }
+
     // Rename the file
     fs.renameSync(path, newFilepath);
 
@@ -552,6 +563,7 @@ app.post('/mapArt-create', mapArtUpload.single('file'), async (req, res) => {
       name: name,
       description: description,
       artist: artist,
+      displayName: displayName,
       hash: hash,
       server: server,
       serverId: serverId,

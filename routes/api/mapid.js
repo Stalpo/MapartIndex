@@ -109,80 +109,106 @@ router.get('/maps', async (req, res) => {
 
 /**
  * @swagger
- * /api/mapId/{id}:
+ * /api/mapId/id/{id}:
  *   get:
  *     description: Returns a map defined by the id provided.
  *     responses:
  *       200:
  *         description: Returns a map defined by the id provided.
  *       404:
- *          description: Map id not found.
+ *          description: Map not found.
  *     parameters:
- *         - in: path
- *           name: id
- *           schema:
- *             type: string
- *           description: The user id to search for
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         description: The map id to search for.
  *     tags:
  *     - Map ID
  */
-router.get('/:id', async (req, res) => {
+router.get('/id/:id', async (req, res) => {
     const id = req.params.id;
     const result = await mapIdController.getMapById(id)
     if(result) return res.status(result.error ? 400 : 200).json(result);
-    res.status(404).json({error: 'Map id not found'});
+    res.status(404).json({error: 'Map not found'});
 });
 
 /**
  * @swagger
- * /api/mapId/owner:
+ * /api/mapId/owner/{id}:
  *   get:
  *     description: Returns a list of maps owned by the user id provided.
  *     responses:
  *       200:
  *         description: Returns a list of maps owned by the user id provided.
  *       404:
- *         description: Owner id not found.
+ *         description: Owner not found.
  *     parameters:
- *       - in: query
+ *       - in: path
  *         name: id
  *         schema:
  *           type: string
- *         description: The owner id to search for
+ *         description: The owner id to search for.
  *     tags:
  *     - Map ID
  */
-router.get('/owner', async (req, res) => {
-    const id = req.query.id;
+router.get('/owner/:id', async (req, res) => {
+    const id = req.params.id;
     const result = await mapIdController.getMapsByOwnerId(id)
     if(result) return res.status(200).json(result);
-    res.status(404).json({error: 'Owner id not found'});
+    res.status(404).json({error: 'Owner not found'});
 });
 
 /**
  * @swagger
- * /api/mapId/hash:
+ * /api/mapId/hash/{hash}:
  *   get:
  *     description: Returns a map defined by the hash provided.
  *     responses:
  *       200:
  *         description: Returns a map defined by the hash provided.
  *       404:
- *         description: Map id not found.
+ *         description: Map not found.
  *     parameters:
- *       - in: query
+ *       - in: path
  *         name: hash
  *         schema:
  *           type: string
- *         description: The hash to search for
+ *         description: The hash to search for.
  *     tags:
  *     - Map ID
  */
-router.get('/hash', async (req, res) => {
-    const hash = req.query.hash;
+router.get('/hash/:hash', async (req, res) => {
+    const hash = req.params.hash;
     const result = await mapIdController.getMapIdByHash(hash);
     if (result) return res.status(200).json(result);
-    res.status(404).json({error: 'Map id not found'});
+    res.status(404).json({error: 'Map not found'});
+});
+
+/**
+ * @swagger
+ * /api/mapId/name/{name}:
+ *   get:
+ *     description: Returns a map defined by the name provided.
+ *     responses:
+ *       200:
+ *         description: Returns a map defined by the name provided.
+ *       404:
+ *         description: Map not found.
+ *     parameters:
+ *       - in: path
+ *         name: name
+ *         schema:
+ *           type: string
+ *         description: The name to search for.
+ *     tags:
+ *     - Map ID
+ */
+router.get('/name/:name', async (req, res) => {
+    const name = req.params.name; // Use req.params.name to get the parameter from the URL path
+    const result = await mapIdController.getMapByDisplayName(name);
+    if (result) return res.status(200).json(result);
+    res.status(404).json({error: 'Map not found'});
 });
 
 /**

@@ -137,7 +137,7 @@ const getUniqueServers = async () => {
   }
 };
 
-const createMapId = async ({ userId, username, name, description, mapId, imgUrl, hash, server, serverId }) => {
+const createMapId = async ({ userId, username, name, description, mapId, imgUrl, displayName, hash, server, serverId }) => {
   try {
     return await prisma.mapArt.create({
       data: {
@@ -151,6 +151,7 @@ const createMapId = async ({ userId, username, name, description, mapId, imgUrl,
         description: description,
         mapId: mapId,
         imgUrl: imgUrl,
+        displayName: displayName,
         hash: hash,
         server: server,
         serverId: serverId,

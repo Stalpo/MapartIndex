@@ -71,23 +71,23 @@ html
             const input = document.createElement('input');
             input.type = 'text';
             input.classList.add('form-control');
-            input.placeholder = `mapId uuid ${i + 1}`;
+            input.placeholder = `map name ${i + 1}`;
 
             inputGroup.appendChild(input);
             container.appendChild(inputGroup);
           }
         }
 
-        // Function to fetch images based on UUIDs
+        // Function to fetch images based on friendly names
         function fetchImages() {
           return new Promise((resolve, reject) => {
             const inputs = document.querySelectorAll('#inputContainer input');
-            const promises = []; // Array to store all fetch promises
+            const promises = [];
 
             inputs.forEach(input => {
-              const uuid = input.value;
-              if (uuid) {
-                const promise = fetch(`/api/mapId/${uuid}`)
+              const displayName = input.value;
+              if (displayName) {
+                const promise = fetch(`/api/mapId/name/${displayName}`)
                   .then(response => {
                     if (!response.ok) {
                       throw new Error('Network response was not ok');
@@ -95,25 +95,23 @@ html
                     return response.json();
                   })
                   .then(data => {
-                    // Handle the JSON data, e.g., collect image URLs
-                    return data.imgUrl ? `/public/uploads/${data.imgUrl}` : null; // Prepend '/public/uploads/' to each URL
+                    return data.imgUrl ? `/public/uploads/${data.imgUrl}` : null;
                   })
                   .catch(error => {
                     console.error('Error fetching data:', error.message);
-                    return null; // Return null if fetch fails
+                    return null;
                   });
 
-                promises.push(promise); // Push each fetch promise into the array
+                promises.push(promise);
               }
             });
 
-            // Wait for all fetch promises to resolve
             Promise.all(promises)
               .then(imgUrls => {
-                resolve(imgUrls.filter(url => url !== null)); // Resolve with the array of image URLs
+                resolve(imgUrls.filter(url => url !== null));
               })
               .catch(error => {
-                reject(error); // Reject with the error if any fetch fails
+                reject(error);
               });
           });
         }
@@ -121,22 +119,18 @@ html
         fetchButton.addEventListener('click', () => {
           fetchImages()
             .then(imgUrls => {
-              // imgUrls is an array containing all the image URLs
               return joinImages(parseInt(widthSelector.value), parseInt(heightSelector.value), imgUrls.filter(url => url !== null));
             })
             .then(resultImageUrl => {
-              // Use the resulting image URL, display it in an img tag
               const outputContainer = document.getElementById('outputContainer');
               outputContainer.innerHTML = ""; // Clear output
               const resultImage = document.createElement('img');
               resultImage.src = resultImageUrl;
               outputContainer.appendChild(resultImage);
 
-              // Add form for map name, description, and artist
               const formContainer = document.createElement('div');
               formContainer.classList.add('mt-3');
 
-              // Input for Map Name
               const nameInputGroup = document.createElement('div');
               nameInputGroup.classList.add('form-group');
               const nameInput = document.createElement('input');
@@ -145,7 +139,6 @@ html
               nameInput.placeholder = 'Map Name';
               nameInputGroup.appendChild(nameInput);
 
-              // Input for Description
               const descriptionInputGroup = document.createElement('div');
               descriptionInputGroup.classList.add('form-group');
               const descriptionInput = document.createElement('input');
@@ -154,7 +147,6 @@ html
               descriptionInput.placeholder = 'Description';
               descriptionInputGroup.appendChild(descriptionInput);
 
-              // Input for Artist
               const artistInputGroup = document.createElement('div');
               artistInputGroup.classList.add('form-group');
               const artistInput = document.createElement('input');
@@ -163,7 +155,6 @@ html
               artistInput.placeholder = 'Artist';
               artistInputGroup.appendChild(artistInput);
 
-              // Input selector for unique servers
               const serverInputGroup = document.createElement('div');
               serverInputGroup.classList.add('form-group');
               const serverSelect = document.createElement('select');
@@ -179,28 +170,24 @@ html
                   console.error('Error fetching blob:', error);
                 });
 
-              // Add file input
               const fileInput = document.createElement('input');
               fileInput.style.display = 'none';
               fileInput.type = 'file';
               fileInput.name = 'images';
               fileInput.accept = 'image/*';
 
-              // Add change event listener to handle file selection
               fileInput.addEventListener('change', () => {
                 const file = fileInput.files[0];
                 console.log('Selected file:', file);
               });
 
-              // Fetch data from endpoint
               fetch('/mapId-info/uniqueServers')
                 .then(response => response.json())
                 .then(data => {
-                  // Populate options with received data
                   data.forEach(server => {
                     const option = document.createElement('option');
-                    option.value = server; // assuming 'id' is the property containing unique server IDs
-                    option.textContent = server; // assuming 'name' is the property containing server names
+                    option.value = server;
+                    option.textContent = server;
                     serverSelect.appendChild(option);
                   });
                 })
@@ -210,30 +197,24 @@ html
 
               serverInputGroup.appendChild(serverSelect);
 
-              // Add the input groups to the form container
               formContainer.appendChild(nameInputGroup);
               formContainer.appendChild(descriptionInputGroup);
               formContainer.appendChild(artistInputGroup);
               formContainer.appendChild(serverInputGroup);
               formContainer.appendChild(fileInput);
 
-              // Add button to add image to the database
               const addButton = document.createElement('button');
               addButton.textContent = 'Add to Database';
               addButton.classList.add('btn', 'btn-primary', 'mt-2');
               addButton.addEventListener('click', () => {
 
-                // Create FormData object
                 const formData = new FormData();
-                // Append form data
                 formData.append('name', nameInput.value);
                 formData.append('description', descriptionInput.value);
                 formData.append('artist', artistInput.value);
                 formData.append('server', serverSelect.value);
-                // Append Blob
                 formData.append('file', blobObj);
 
-                // Send request to server to add image to database
                 return fetch('/mapart-create', {
                   method: 'POST',
                   body: formData
@@ -297,8 +278,6 @@ html
             });
         });
 
-        // Initial generation on page load
         generateInputs();
-
 
       include includes/scripts.pug

@@ -28,6 +28,15 @@ const getMapById = async (mapId) => {
   }
 };
 
+const getMapByDisplayName = async (displayName) => {
+  try {
+    return await mapIdModel.getMapByDisplayName(displayName);
+  } catch (error) {
+    console.error('Error fetching map by ID:', error);
+    throw error;
+  }
+};
+
 const countMapIdsByServer = async (server) => {
   try {
     return await mapIdModel.countMapIdsByServer(server);
@@ -50,13 +59,14 @@ const generateFilename = async (server) => {
   }
 };
 
-const createMapId = async ({ userId, username, mapId, imgUrl, hash, server, serverId }) => {
+const createMapId = async ({ userId, username, mapId, imgUrl, displayName, hash, server, serverId }) => {
   try {
     return await mapIdModel.createMapId({
       userId,
       username,
       mapId,
       imgUrl,
+      displayName,
       hash,
       server,
       serverId,
@@ -141,6 +151,7 @@ const getMapsByOwnerId = async (ownerId) => {
 
 module.exports = {
   getMapById,
+  getMapByDisplayName,
   getAllMaps,
   getMaps,
   countMapIdsByServer,
