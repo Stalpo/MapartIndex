@@ -719,8 +719,7 @@ app.post('/deleteMapId', async (req, res) => {
     mapId = validator.escape(mapId);
 
     // Delete the map
-    // This is currently not working as intended
-    // await mapIdController.deleteMapById(mapId);
+    await mapIdController.deleteMapById(mapId);
 
     res.redirect('/admin');
   } catch (error) {
@@ -761,8 +760,7 @@ app.post('/deleteMapArtId', async (req, res) => {
     mapId = validator.escape(mapId);
 
     // Delete the map
-    // This is currently not working as intended
-    // await mapArtController.deleteMapById(mapId);
+    await mapArtController.deleteMapById(mapId);
 
     res.redirect('/admin');
   } catch (error) {

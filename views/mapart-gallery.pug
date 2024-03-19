@@ -219,7 +219,7 @@ html
             card.className = 'card mb-3 mx-auto';
             card.innerHTML = `
               <a href="/mapart/${map.id}">
-                <img src="/public/uploads/mapart/${map.imgUrl}" class="pixelated-image" alt="Map Image">
+                <img src="/public/uploads/mapart/${map.imgUrl}" style="width:130px; height:130px;" class="pixelated-image" alt="Map Image">
               </a>
             `;
             gridContainer.appendChild(card);
@@ -237,7 +237,7 @@ html
             card.className = 'card mb-3 mx-auto';
             card.style = 'width: 18rem;';
             card.innerHTML = `
-              <img src="/public/uploads/mapart/${map.imgUrl}" class="pixelated-image card-img-top" alt="Map Image">
+              <img src="/public/uploads/mapart/${map.imgUrl}" style="width:286px; height:286px;" class="pixelated-image card-img-top" alt="Map Image">
               <div class="card-body">
                 <h5 class="card-title">${map.displayName}</h5>
               </div>
