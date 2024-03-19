@@ -196,18 +196,22 @@ const countMapIdsByServer = async (server) => {
 
 const getLatestServerIdByServer = async (server) => {
   try {
-    const latestServerId = await prisma.mapId.findFirst({
-      select: {
-        serverId: true,
-      },
+    const allServerIds = await prisma.mapArt.findMany({
       where: {
-        server: server,
+        server: server
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
+      select: {
+        serverId: true
+      }
     });
-    return latestServerId.serverId;
+
+    // Extract serverId values from the array of objects
+    const serverIds = allServerIds.map(entry => entry.serverId);
+
+    // Find the highest serverId value
+    const highestServerId = Math.max(...serverIds);
+
+    return highestServerId;
   } catch (error) {
     console.error('Error fetching latest serverId:', error);
     throw error;

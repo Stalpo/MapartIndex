@@ -125,7 +125,7 @@ const deleteMapById = async (mapId) => {
 
 const getLatestServerIdByServer = async (server) => {
   try {
-    return await mapIdModel.getLatestServerIdByServer(server);
+    return await mapArtModel.getLatestServerIdByServer(server);
   } catch (error) {
     console.error('Error counting map IDs by server:', error);
     throw error;
