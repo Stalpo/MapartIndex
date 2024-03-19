@@ -116,7 +116,7 @@ app.get('/', async (req, res) => {
 
 // About route
 app.get('/about', (req, res) => {
-  res.render('about');
+  res.render('page-about');
 });
 
 // Changelog route
@@ -134,7 +134,7 @@ app.get('/changelog', (req, res) => {
       return;
     }
 
-    res.render('changelog', { commits });
+    res.render('page-changelog', { commits });
   });
 });
 
@@ -143,7 +143,7 @@ app.get('/register', (req, res) => {
   if (res.locals.username) {
     res.redirect('/');
   } else {
-    res.render('register');
+    res.render('user-register');
   }
 });
 
@@ -172,7 +172,7 @@ app.get('/login', (req, res) => {
   if (res.locals.username) {
     res.redirect('/');
   } else {
-    res.render('login');
+    res.render('user-login');
   }
 });
 
@@ -307,7 +307,7 @@ app.post('/profile-edit', async (req, res) => {
 
 // Upload route
 app.get('/upload', async (req, res) => {
-  res.render('upload');
+  res.render('mapid-upload');
 });
 
 // POST endpoint for uploading files
@@ -670,7 +670,7 @@ app.get('/mapArt-info/uniqueServers', async (req, res) => {
 
 // Delete user route
 app.get('/deleteUser', (req, res) => {
-  res.render('deleteUser');
+  res.render('user-delete');
 });
 
 app.post('/deleteUser', async (req, res) => {
