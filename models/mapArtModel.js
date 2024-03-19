@@ -207,8 +207,10 @@ const getLatestServerIdByServer = async (server) => {
 
     const serverIds = allEntries.map(entry => entry.serverId);
     serverIds.sort((a, b) => b - a);
+    if (serverIds[0] === undefined) {
+      serverIds[0] = 0;
+    }
     return serverIds[0];
-    
   } catch (error) {
     console.error('Error fetching highest serverId:', error);
     throw error;
