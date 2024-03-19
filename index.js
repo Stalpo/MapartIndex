@@ -6,7 +6,6 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
-const sanitize = require('sanitize-filename');
 const validator = require('validator');
 const archiver = require('archiver');
 const gitlog = require("gitlog").default;
