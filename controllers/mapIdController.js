@@ -46,6 +46,24 @@ const countMapIdsByServer = async (server) => {
   }
 };
 
+const countMapIdsByUserId = async (userId) => {
+  try {
+    return await mapIdModel.countMapIdsByServer(userId);
+  } catch (error) {
+    console.error('Error counting map IDs by server:', error);
+    throw error;
+  }
+};
+
+const countMapIds = async () => {
+  try {
+    return await mapIdModel.countMapIds();
+  } catch (error) {
+    console.error('Error counting map IDs by server:', error);
+    throw error;
+  }
+};
+
 const generateFilename = async (server) => {
   try {
     const mapCount = await countMapIdsByServer(server) + 1;
@@ -155,6 +173,8 @@ module.exports = {
   getAllMaps,
   getMaps,
   countMapIdsByServer,
+  countMapIdsByUserId,
+  countMapIds,
   generateFilename,
   createMapId,
   updateMapById,
