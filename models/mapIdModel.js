@@ -263,20 +263,26 @@ const getUniqueServers = async () => {
   }
 };
 
-let highestServerId = 0; // Initialize highestServerId
-
-const getLatestServerIdByServer = async () => {
+const getLatestServerIdByServer = async (server) => {
   try {
-    const maxServerIdEntry = await prisma.mapId.findFirst({
-      orderBy: {
-        serverId: 'desc'
+    const allEntries = await prisma.mapId.findMany({
+      where: {
+        server: server
+      },
+      select: {
+        serverId: true
       }
     });
 
-    if (maxServerIdEntry) {
-      highestServerId = maxServerIdEntry.serverId; // Update highestServerId
-      return highestServerId + 1;
-    }
+    // Extracting serverIds from allEntries
+    const serverIds = allEntries.map(entry => entry.serverId);
+
+    // Sorting serverIds in descending order
+    serverIds.sort((a, b) => b - a);
+
+    // Returning the highest serverId
+    return serverIds[0];
+
   } catch (error) {
     console.error('Error fetching highest serverId:', error);
     throw error;

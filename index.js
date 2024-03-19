@@ -335,7 +335,7 @@ app.post('/upload', upload.array('images', 4000), async (req, res) => {
       const newFilename = await mapIdController.generateFilename(server);
 
       // Get current map count + 1
-      const serverId = await mapIdController.getLatestServerIdByServer(server) + 1;
+      let serverId = await mapIdController.getLatestServerIdByServer(server) + 1;
 
       // Construct the new filepath manually
       const newFilepath = __dirname + '/public/uploads/' + newFilename;

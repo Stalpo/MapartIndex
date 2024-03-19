@@ -103,7 +103,7 @@ const updateMapById = async (mapId, { artist, name, description, nsfw }) => {
 
 const generateFilename = async (server) => {
   try {
-    const mapCount = await countMapIdsByServer(server) + 1;
+    const mapCount = await getLatestServerIdByServer(server) + 1;
     // Construct the filename
     const filename = `${server}_MAPART_${mapCount}.png`;
 
