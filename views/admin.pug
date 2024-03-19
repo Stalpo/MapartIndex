@@ -37,7 +37,7 @@ html
         table.table.table-striped#mapsTable
           thead
             tr
-              th ID
+              th Display Name
               th Created At
               th Username
               th Image
@@ -61,19 +61,25 @@ html
           function populateSelect(selectorId, data) {
             const selector = document.getElementById(selectorId);
             selector.innerHTML = ''; // Clear previous options
-            data.forEach(item => {
-              const option = document.createElement('option');
-              option.text = item;
-              selector.add(option);
+            data.forEach(option => {
+              const optionElement = document.createElement('option');
+              optionElement.value = option.value; // Set the value of the option
+              optionElement.textContent = option.label; // Set the text content of the option
+              selector.appendChild(optionElement); // Append the option to the select element
             });
           }
 
           // Function to populate user selector
           async function populateUserSelector() {
             try {
-              const uniqueUsernames = await fetchData('/mapId-info/uniqueUsernames');
-              uniqueUsernames.unshift("All Users");
-              populateSelect('userSelector', uniqueUsernames);
+              const uniqueUsernamesMapId = await fetchData('/mapId-info/uniqueUsernames');
+              const uniqueUsernamesMapArt = await fetchData('/mapArt-info/uniqueUsernames');
+              
+              const combinedUniqueUsernames = [...new Set([...uniqueUsernamesMapId, ...uniqueUsernamesMapArt])];
+              const userOptions = combinedUniqueUsernames.map(user => ({ value: user, label: user }));
+              userOptions.unshift({ value: null, label: "All Users" });
+              
+              populateSelect('userSelector', userOptions);
             } catch (error) {
               console.error('Error fetching user data:', error);
             }
@@ -82,9 +88,14 @@ html
           // Function to populate artist selector
           async function populateArtistSelector() {
             try {
-              const uniqueArtists = await fetchData('/mapId-info/uniqueArtists');
-              uniqueArtists.unshift("All Artists");
-              populateSelect('artistSelector', uniqueArtists);
+              const uniqueArtistsMapId = await fetchData('/mapId-info/uniqueArtists');
+              const uniqueArtistsMapArt = await fetchData('/mapArt-info/uniqueArtists');
+
+              const combinedUniqueArtists = [...new Set([...uniqueArtistsMapId, ...uniqueArtistsMapArt])];
+              const artistOptions = combinedUniqueArtists.map(artist => ({ value: artist, label: artist }));
+              artistOptions.unshift({ value: null, label: "All Artists" });
+
+              populateSelect('artistSelector', artistOptions);
             } catch (error) {
               console.error('Error fetching artist data:', error);
             }
@@ -114,27 +125,42 @@ html
           // Function to handle API call with updated parameters
           async function fetchMaps(page = 1, user = "", artist = "", sort = "dateDesc") {
             const perPage = 25;
-            let url = `/api/mapId/maps?page=${page}&perPage=${perPage}&sort=${sort}`;
-            // Construct URL based on selected values
-            if (user && user !== "All Users") {
-              url += `&user=${user}`;
-            }
-            if (artist && artist !== "All Artists") {
-              url += `&artist=${artist}`;
-            }
+            let mapIdUrl = `/api/mapId/maps?page=${page}&perPage=${perPage}&sort=${sort}`;
+            let mapArtUrl = `/api/mapArt/maps?page=${page}&perPage=${perPage}&sort=${sort}`;
+
+            // Construct user and artist parameters conditionally
+            const userParam = (user && user !== "null") ? `&user=${user}` : "";
+            const artistParam = (artist && artist !== "null") ? `&artist=${artist}` : "";
+
+            // Append user and artist parameters to both URLs
+            mapIdUrl += userParam + artistParam;
+            mapArtUrl += userParam + artistParam;
 
             // Show loading spinner
             document.getElementById('loadingSpinner').style.display = 'block';
 
             try {
-              const response = await fetch(url);
-              if (!response.ok) {
-                throw new Error('Network response was not ok');
+              // Make two separate API requests
+              const [mapIdResponse, mapArtResponse] = await Promise.all([
+                fetch(mapIdUrl),
+                fetch(mapArtUrl)
+              ]);
+
+              // Check if both responses are OK
+              if (!mapIdResponse.ok || !mapArtResponse.ok) {
+                throw new Error('One or more network responses were not ok');
               }
-              const data = await response.json();
+
+              // Parse response data
+              const mapIdData = await mapIdResponse.json();
+              const mapArtData = await mapArtResponse.json();
+
+              // Combine data into a unique array
+              const combinedData = [...mapIdData, ...mapArtData];
+
               // Update the UI with the fetched maps
-              buildTable(data);
-              console.log(data);
+              buildTable(combinedData);
+              console.log(combinedData);
 
               // Start observing intersection once grid is populated
               startObservingIntersection();
@@ -177,18 +203,24 @@ html
             maps.forEach(map => {
               const newRow = document.createElement('tr');
               newRow.className = 'vertical-center';
+
+              const imgUrl = map.displayName.includes("MAPART") ? `/public/uploads/mapart/${map.imgUrl}` : `/public/uploads/${map.imgUrl}`;
+              const viewUrl = map.displayName.includes("MAPART") ? `/mapArt/${map.id}` : `/mapId/${map.id}`;
+              const editUrl = map.displayName.includes("MAPART") ? `/mapArt-edit/${map.id}` : `/mapId-edit/${map.id}`;
+              const deleteUrl = map.displayName.includes("MAPART") ? `/deleteMapArt?mapId=${map.id}` : `/deleteMapId?mapId=${map.id}`;
+
               newRow.innerHTML = `
-                <td>...${map.id.slice(-12)}</td>
+                <td>${map.displayName}</td>
                 <td>${new Date(map.createdAt).toLocaleString('en-US')}</td>
                 <td>${map.username}</td>
-                <td><img src="/public/uploads/${map.imgUrl}" alt="Map Image" style="max-width: 100px; max-height: 100px;"></td>
+                <td><img src="${imgUrl}" alt="Map Image" style="max-width: 100px; max-height: 100px;"></td>
                 <td>${map.artist}</td>
                 <td>${map.nsfw}</td>
                 <td>
                   <div class='btn-group' role='group' aria-label='Buttons'>
-                    <button class='btn btn-primary' type='button' onclick="location.href='/mapId/${map.id}'"><i class='fa fa-eye'></i></button>
-                    <button class='btn btn-primary' type='button' onclick="location.href='/mapId-edit/${map.id}'"><i class='fa fa-pencil-alt'></i></button>
-                    <button class='btn btn-danger' type='button' onclick="location.href='/deleteMapId?mapId=${map.id}'"><i class='fa fa-trash'></i></button>
+                    <button class='btn btn-primary' type='button' onclick="location.href='${viewUrl}'"><i class='fa fa-eye'></i></button>
+                    <button class='btn btn-primary' type='button' onclick="location.href='${editUrl}'"><i class='fa fa-pencil-alt'></i></button>
+                    <button class='btn btn-danger' type='button' onclick="location.href='${deleteUrl}'"><i class='fa fa-trash'></i></button>
                   </div>
                 </td>
               `;
