@@ -48,15 +48,6 @@ html
           tbody(id='mapsTableBody')
 
         script.
-          // Function to fetch data from the API
-          async function fetchData(url) {
-            const response = await fetch(url);
-            if (!response.ok) {
-              throw new Error('Network response was not ok');
-            }
-            return response.json();
-          }
-
           // Function to populate select element with options
           function populateSelect(selectorId, data) {
             const selector = document.getElementById(selectorId);
@@ -122,65 +113,82 @@ html
             });
           }
 
-          // Function to handle API call with updated parameters
-          async function fetchMaps(page = 1, user = "", artist = "", sort = "dateDesc") {
-            const perPage = 25;
-            let mapIdUrl = `/api/mapId/maps?page=${page}&perPage=${perPage}&sort=${sort}`;
-            let mapArtUrl = `/api/mapArt/maps?page=${page}&perPage=${perPage}&sort=${sort}`;
-
-            // Construct user and artist parameters conditionally
-            const userParam = (user && user !== "null") ? `&user=${user}` : "";
-            const artistParam = (artist && artist !== "null") ? `&artist=${artist}` : "";
-
-            // Append user and artist parameters to both URLs
-            mapIdUrl += userParam + artistParam;
-            mapArtUrl += userParam + artistParam;
-
-            // Show loading spinner
-            document.getElementById('loadingSpinner').style.display = 'block';
-
+          // Function to fetch data from the API
+          async function fetchData(url) {
             try {
-              // Make two separate API requests
-              const [mapIdResponse, mapArtResponse] = await Promise.all([
-                fetch(mapIdUrl),
-                fetch(mapArtUrl)
-              ]);
-
-              // Check if both responses are OK
-              if (!mapIdResponse.ok || !mapArtResponse.ok) {
-                throw new Error('One or more network responses were not ok');
+              const response = await fetch(url);
+              if (!response.ok) {
+                if (response.status === 404) {
+                  // Set the corresponding flag if 404 status is encountered
+                  if (url.includes('/mapId/')) {
+                    mapId404 = true;
+                  } else if (url.includes('/mapArt/')) {
+                    mapArt404 = true;
+                  }
+                  console.error('Likely last page of results');
+                  return null; // Return null when 404 status is encountered
+                } else {
+                  throw new Error('Network response was not ok');
+                }
               }
-
-              // Parse response data
-              const mapIdData = await mapIdResponse.json();
-              const mapArtData = await mapArtResponse.json();
-
-              // Combine data into a unique array
-              const combinedData = [...mapIdData, ...mapArtData];
-
-              // Update the UI with the fetched maps
-              buildTable(combinedData);
-              console.log(combinedData);
-
-              // Start observing intersection once grid is populated
-              startObservingIntersection();
+              return await response.json();
             } catch (error) {
               console.error('Error fetching map data:', error);
-            } finally {
-              // Hide loading spinner regardless of success or failure
-              document.getElementById('loadingSpinner').style.display = 'none';
+              return null;
             }
           }
 
-          // Function to handle input selector change events
+          // Function to handle API call with updated parameters
+          async function fetchMaps(page = 1, user = "", artist = "", sort = "dateDesc") {
+            const perPage = 25;
+            let mapIdData = [];
+            let mapArtData = [];
+
+            // Fetch data for mapId endpoint if not encountered 404 status
+            if (!mapId404) {
+              const mapIdUrl = `/api/mapId/maps?page=${page}&perPage=${perPage}&sort=${sort}`;
+              const mapIdResponse = await fetchData(mapIdUrl);
+              if (mapIdResponse !== null) {
+                mapIdData = mapIdResponse;
+              }
+            }
+
+            // Fetch data for mapArt endpoint if not encountered 404 status
+            if (!mapArt404) {
+              const mapArtUrl = `/api/mapArt/maps?page=${page}&perPage=${perPage}&sort=${sort}`;
+              const mapArtResponse = await fetchData(mapArtUrl);
+              if (mapArtResponse !== null) {
+                mapArtData = mapArtResponse;
+              }
+            }
+
+            // Combine data into a unique array
+            const combinedData = [...mapIdData, ...mapArtData];
+            buildTable(combinedData);
+
+            // Start observing intersection once grid is populated
+            startObservingIntersection();
+          }
+
+          // Flags to track if each API endpoint has encountered a 404 status
+          let mapId404 = false;
+          let mapArt404 = false;
+
+          // Function to handle selector and view selector change events
           function handleSelectorChange() {
+            currentPage = 1; // Reset currentPage to 1
             const user = document.getElementById('userSelector').value;
             const artist = document.getElementById('artistSelector').value;
             const sort = document.getElementById('sortSelector').value;
-            
+
+            // Reset flags for API endpoints
+            mapId404 = false;
+            mapArt404 = false;
+
             // Clear the grid before fetching new data
             clearGrid();
 
+            // Pass selected view type to fetchMaps
             fetchMaps(1, user, artist, sort);
           }
 
