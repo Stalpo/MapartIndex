@@ -205,15 +205,10 @@ const getLatestServerIdByServer = async (server) => {
       }
     });
 
-    // Extracting serverIds from allEntries
     const serverIds = allEntries.map(entry => entry.serverId);
-
-    // Sorting serverIds in descending order
     serverIds.sort((a, b) => b - a);
-    console.log(serverIds[0]);
-    // Returning the highest serverId
     return serverIds[0];
-
+    
   } catch (error) {
     console.error('Error fetching highest serverId:', error);
     throw error;
