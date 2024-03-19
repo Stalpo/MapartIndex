@@ -167,6 +167,15 @@ const getMapsByOwnerId = async (ownerId) => {
   }
 };
 
+const getLatestServerIdByServer = async (server) => {
+  try {
+    return await mapIdModel.getLatestServerIdByServer(server);
+  } catch (error) {
+    console.error('Error counting map IDs by server:', error);
+    throw error;
+  }
+};
+
 module.exports = {
   getMapById,
   getMapByDisplayName,
@@ -184,4 +193,5 @@ module.exports = {
   getUniqueServers,
   getMapIdByHash,
   getMapsByOwnerId,
+  getLatestServerIdByServer,
 };

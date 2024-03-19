@@ -263,6 +263,26 @@ const getUniqueServers = async () => {
   }
 };
 
+const getLatestServerIdByServer = async (server) => {
+  try {
+    const latestServerId = await prisma.mapId.findFirst({
+      select: {
+        serverId: true,
+      },
+      where: {
+        server: server,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+    return latestServerId.serverId;
+  } catch (error) {
+    console.error('Error fetching latest serverId:', error);
+    throw error;
+  }
+};
+
 const deleteMapById = async (mapId) => {
   try {
     return await prisma.mapId.delete({ where: { id: mapId } });
@@ -287,5 +307,6 @@ module.exports = {
   getUniqueUsernames,
   getUniqueArtists,
   getUniqueServers,
+  getLatestServerIdByServer,
   deleteMapById,
 };

@@ -279,7 +279,7 @@ router.post('/create', upload.single('image'), async (req, res) => {
 
         const newFilename = await mapIdController.generateFilename(server);
 
-        const serverId = await mapIdController.countMapIdsByServer(server) + 1;
+        const serverId = await mapIdController.getLatestServerIdByServer(server) + 1;
 
         // Construct the new filepath manually
         const newFilepath = __dirname + '../../../public/uploads/' + newFilename;
