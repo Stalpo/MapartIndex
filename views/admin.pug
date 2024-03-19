@@ -146,8 +146,14 @@ html
 
             // Fetch data for mapId endpoint if not encountered 404 status
             if (!mapId404) {
-              const mapIdUrl = `/api/mapId/maps?page=${page}&perPage=${perPage}&sort=${sort}`;
+              let mapIdUrl = `/api/mapId/maps?page=${page}&perPage=${perPage}&sort=${sort}`;
+              // Construct user and artist parameters conditionally
+              const userParam = (user && user !== "null") ? `&user=${user}` : "";
+              const artistParam = (artist && artist !== "null") ? `&artist=${artist}` : "";
+              mapIdUrl += userParam + artistParam;
+              // Fetch data
               const mapIdResponse = await fetchData(mapIdUrl);
+
               if (mapIdResponse !== null) {
                 mapIdData = mapIdResponse;
               }
@@ -155,7 +161,12 @@ html
 
             // Fetch data for mapArt endpoint if not encountered 404 status
             if (!mapArt404) {
-              const mapArtUrl = `/api/mapArt/maps?page=${page}&perPage=${perPage}&sort=${sort}`;
+              let mapArtUrl = `/api/mapArt/maps?page=${page}&perPage=${perPage}&sort=${sort}`;
+              // Construct user and artist parameters conditionally
+              const userParam = (user && user !== "null") ? `&user=${user}` : "";
+              const artistParam = (artist && artist !== "null") ? `&artist=${artist}` : "";
+              mapArtUrl += userParam + artistParam;
+              // Fetch data
               const mapArtResponse = await fetchData(mapArtUrl);
               if (mapArtResponse !== null) {
                 mapArtData = mapArtResponse;
