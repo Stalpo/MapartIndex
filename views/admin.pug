@@ -161,10 +161,13 @@ html
                 mapArtData = mapArtResponse;
               }
             }
-
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            loadingSpinner.style.display = 'none';
             // Combine data into a unique array
             const combinedData = [...mapIdData, ...mapArtData];
             buildTable(combinedData);
+
+
 
             // Start observing intersection once grid is populated
             startObservingIntersection();
