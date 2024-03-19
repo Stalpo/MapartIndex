@@ -194,6 +194,15 @@ const countMapIdsByServer = async (server) => {
   }
 };
 
+const deleteMapById = async (mapId) => {
+  try {
+    return await prisma.mapArt.delete({ where: { id: mapId } });
+  } catch (error) {
+    console.error('Error in deleteMapId:', error);
+    throw error;
+  }
+};
+
 module.exports = {
   getAllMapArts,
   getMaps,
@@ -204,4 +213,5 @@ module.exports = {
   createMapId,
   updateMapById,
   countMapIdsByServer,
+  deleteMapById,
 };

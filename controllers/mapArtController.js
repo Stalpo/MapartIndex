@@ -114,6 +114,15 @@ const generateFilename = async (server) => {
   }
 };
 
+const deleteMapById = async (mapId) => {
+  try {
+    return await mapArtModel.deleteMapById(mapId);
+  } catch (error) {
+    console.error('Error deleting map by ID:', error);
+    throw error;
+  }
+};
+
 module.exports = {
   getAllMapArts,
   getMaps,
@@ -125,4 +134,5 @@ module.exports = {
   countMapIdsByServer,
   updateMapById,
   generateFilename,
+  deleteMapById,
 }

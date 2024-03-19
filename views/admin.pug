@@ -207,7 +207,7 @@ html
               const imgUrl = map.displayName.includes("MAPART") ? `/public/uploads/mapart/${map.imgUrl}` : `/public/uploads/${map.imgUrl}`;
               const viewUrl = map.displayName.includes("MAPART") ? `/mapArt/${map.id}` : `/mapId/${map.id}`;
               const editUrl = map.displayName.includes("MAPART") ? `/mapArt-edit/${map.id}` : `/mapId-edit/${map.id}`;
-              const deleteUrl = map.displayName.includes("MAPART") ? `/deleteMapArt?mapId=${map.id}` : `/deleteMapId?mapId=${map.id}`;
+              const deleteUrl = map.displayName.includes("MAPART") ? `/deleteMapArtId?mapId=${map.id}` : `/deleteMapId?mapId=${map.id}`;
 
               newRow.innerHTML = `
                 <td>${map.displayName}</td>

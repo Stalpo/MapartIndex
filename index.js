@@ -688,16 +688,18 @@ app.post('/deleteUser', async (req, res) => {
   }
 });
 
-// Delete user route
-app.get('/deleteMapId', (req, res) => {
+// Delete mapId route
+app.get('/deleteMapId', async (req, res) => {
   try {
-    let mapId = req.query.mapId;
+    let mapId = req.query.mapId || req.body.mapId;
 
     // Sanitize mapId
     mapId = validator.trim(mapId);
     mapId = validator.escape(mapId);
 
-    res.render('deleteMapId', { mapId: mapId });
+    const map = await mapIdController.getMapById(mapId);
+
+    res.render('mapid-delete', { mapId, map });
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
@@ -718,7 +720,50 @@ app.post('/deleteMapId', async (req, res) => {
     mapId = validator.escape(mapId);
 
     // Delete the map
-    await mapIdController.deleteMapById(mapId);
+    // This is currently not working as intended
+    // await mapIdController.deleteMapById(mapId);
+
+    res.redirect('/admin');
+  } catch (error) {
+    console.error('Error deleting mapId:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+// Delete mapArt route
+app.get('/deleteMapArtId', async (req, res) => {
+  try {
+    let mapId = req.query.mapId || req.body.mapId;
+
+    // Sanitize mapId
+    mapId = validator.trim(mapId);
+    mapId = validator.escape(mapId);
+
+    const map = await mapArtController.getMapById(mapId);
+
+    res.render('mapart-delete', { mapId, map });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+app.post('/deleteMapArtId', async (req, res) => {
+  try {
+    // Check if user is an admin
+    if (!res.locals.admin) {
+      return res.status(403).send('Forbidden');
+    }
+
+    let mapId = req.query.mapId || req.body.mapId;
+
+    // Sanitize mapId
+    mapId = validator.trim(mapId);
+    mapId = validator.escape(mapId);
+
+    // Delete the map
+    // This is currently not working as intended
+    // await mapArtController.deleteMapById(mapId);
 
     res.redirect('/admin');
   } catch (error) {
