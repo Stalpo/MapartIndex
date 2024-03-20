@@ -7,9 +7,9 @@ html
     div.container
       h1.text-center= pageTitle
       hr
-      if !admin
+      if !admin && !mod
         div.alert.alert-danger(role="alert")
-          | You are not an administrator
+          | You are not an administrator or a moderator
       else
         div.row
           div.col-md-8.offset-md-2.text-center

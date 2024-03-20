@@ -8,9 +8,9 @@ html
     div.container.text-center
       h1= pageTitle
       hr 
-      if !admin
+      if !admin && !mod
         div.alert.alert-danger(role="alert")
-          | You are not an administrator
+          | You are not an administrator or a moderator
       else
         div#container
           .row

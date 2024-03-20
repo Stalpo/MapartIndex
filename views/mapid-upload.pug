@@ -8,9 +8,9 @@ html
     div.container
       h1.text-center= pageTitle
       hr
-      if !username
+      if !admin && !mod
         div.alert.alert-danger(role="alert")
-          | You are not logged in!
+          | You are not an administrator or a moderator
       else
         .container.mt-5
           form#uploadForm(action='/upload', method='post', enctype='multipart/form-data')

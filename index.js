@@ -312,8 +312,8 @@ app.get('/upload', async (req, res) => {
 // POST endpoint for uploading files
 app.post('/upload', upload.array('images', 4000), async (req, res) => {
   try {
-    // Check if user is an admin
-    if (!res.locals.admin) {
+    // Check if user is an admin and a moderator
+    if (!res.locals.admin && !res.locals.mod) {
       return res.status(403).send('Forbidden');
     }
 
@@ -457,8 +457,8 @@ app.get('/mapId-edit/:id', async (req, res) => {
 
 app.post('/mapId-edit/:id', upload.none(), async (req, res) => {
   try {
-    // Check if user is an admin
-    if (!res.locals.admin) {
+    // Check if user is an admin and a moderator
+    if (!res.locals.admin && !res.locals.mod) {
       return res.status(403).send('Forbidden');
     }
 
@@ -519,8 +519,8 @@ app.get('/mapArt-create', (req, res) => {
 
 app.post('/mapArt-create', mapArtUpload.single('file'), async (req, res) => {
   try {
-    // Check if user is an admin
-    if (!res.locals.admin) {
+    // Check if user is an admin and a moderator
+    if (!res.locals.admin && !res.locals.mod) {
       return res.status(403).send('Forbidden');
     }
 
@@ -611,8 +611,8 @@ app.get('/mapArt-edit/:id', async (req, res) => {
 
 app.post('/mapArt-edit/:id', upload.none(), async (req, res) => {
   try {
-    // Check if user is an admin
-    if (!res.locals.admin) {
+    // Check if user is an admin and a moderator
+    if (!res.locals.admin && !res.locals.mod) {
       return res.status(403).send('Forbidden');
     }
 
@@ -707,8 +707,8 @@ app.get('/deleteMapId', async (req, res) => {
 
 app.post('/deleteMapId', async (req, res) => {
   try {
-    // Check if user is an admin
-    if (!res.locals.admin) {
+    // Check if user is an admin and a moderator
+    if (!res.locals.admin && !res.locals.mod) {
       return res.status(403).send('Forbidden');
     }
 
@@ -748,8 +748,8 @@ app.get('/deleteMapArtId', async (req, res) => {
 
 app.post('/deleteMapArtId', async (req, res) => {
   try {
-    // Check if user is an admin
-    if (!res.locals.admin) {
+    // Check if user is an admin and a moderator
+    if (!res.locals.admin && !res.locals.mod) {
       return res.status(403).send('Forbidden');
     }
 
