@@ -18,9 +18,9 @@ const getMapById = async (mapId) => {
   }
 };
 
-const getMaps = async (page, perPage, user, artist, sort, server) => {
+const getMaps = async (page, perPage, user, artist, sort, server, tag) => {
   try {
-    const maps = await mapArtModel.getMaps(page, perPage, user, artist, sort, server);
+    const maps = await mapArtModel.getMaps(page, perPage, user, artist, sort, server, tag);
     return maps;
   } catch (error) {
     console.error('Error fetching maps:', error);
@@ -52,6 +52,16 @@ const getUniqueServers = async () => {
   try {
     const uniqueServers = await mapArtModel.getUniqueServers();
     return uniqueServers;
+  } catch (error) {
+    console.error('Error fetching unique servers:', error);
+    throw error;
+  }
+};
+
+const getUniqueTags = async () => {
+  try {
+    const uniqueTags = await mapArtModel.getUniqueTags();
+    return uniqueTags;
   } catch (error) {
     console.error('Error fetching unique servers:', error);
     throw error;
@@ -141,6 +151,7 @@ module.exports = {
   getUniqueArtists,
   getUniqueUsernames,
   getUniqueServers,
+  getUniqueTags,
   createMapId,
   countMapIdsByServer,
   updateMapById,

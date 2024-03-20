@@ -707,6 +707,15 @@ app.get('/mapArt-info/uniqueServers', async (req, res) => {
   }
 });
 
+app.get('/mapArt-info/uniqueTags', async (req, res) => {
+  try {
+    const uniqueTags = await mapArtController.getUniqueTags();
+    res.json(uniqueTags);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 // Delete user route
 app.get('/deleteUser', (req, res) => {
   res.render('user-delete');

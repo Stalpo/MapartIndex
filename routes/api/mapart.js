@@ -56,14 +56,14 @@ const multer = require('multer');
 router.get('/maps', async (req, res) => {
   try {
       // Extract query parameters
-      const { page, perPage, user, artist, sort, server } = req.query;
+      const { page, perPage, user, artist, sort, server, tag } = req.query;
 
       // Convert page and perPage to integers (if provided)
       const pageNumber = page ? parseInt(page) : undefined;
       const mapsPerPage = perPage ? parseInt(perPage) : undefined;
 
       // Fetch maps based on pagination, filtering, and sorting criteria
-      const maps = await mapArtController.getMaps(pageNumber, mapsPerPage, user, artist, sort, server);
+      const maps = await mapArtController.getMaps(pageNumber, mapsPerPage, user, artist, sort, server, tag);
 
       if (maps.length > 0) {
           return res.status(200).json(maps);
