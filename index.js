@@ -203,6 +203,29 @@ app.get('/logout', (req, res) => {
   res.redirect('/');
 });
 
+app.get('/update-password', async (req, res) => {
+  if (!res.locals.username) {
+    res.redirect('/');
+  } else {
+    res.render('user-update-password');
+  }
+});
+
+app.post('/update-password', async (req, res) => {
+  let { password } = req.body;
+  let userId = res.locals.userId;
+
+  console.log(userId);
+
+  // Sanitize password
+  password = validator.trim(password);
+  password = validator.escape(password);
+
+  const result = await userController.updateUserPassword(userId, password);
+
+  return res.status(result.error ? 401 : 201).json(result);
+});
+
 // Profile route
 app.get('/profile', async (req, res) => {
   const userId = res.locals.userId;
