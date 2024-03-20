@@ -1,5 +1,3 @@
-const imgs = [];
-
 // send images as array of urls
 const joinImages = (width, height, imgUrls, rotations) => {
   const canvas = document.createElement("canvas");
@@ -10,7 +8,8 @@ const joinImages = (width, height, imgUrls, rotations) => {
 
   return new Promise((resolve, reject) => {
     Promise.all(imgUrls.map(downloadAsset))
-      .then(() => {
+      .then(results => {
+        const imgs = results.filter(result => result !== null).map(result => result.img);
         for (let i = 0; i < imgs.length; i++) {
           const rotation = rotations[i];
           const rotatedImage = rotateImage(imgs[i], rotation);
@@ -47,11 +46,10 @@ function rotateImage(image, rotation) {
 // promise to load needed image
 function downloadAsset(assetName) {
   return new Promise(resolve => {
-    const asset = new Image();
-    asset.onload = () => {
-      imgs.push(asset);
-      resolve();
+    const img = new Image();
+    img.onload = () => {
+      resolve({img});
     };
-    asset.src = assetName;
+    img.src = assetName;
   });
 }
