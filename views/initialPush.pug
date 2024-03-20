@@ -1,0 +1,36 @@
+doctype html
+html
+  - const pageTitle = "Initial Push"
+  include includes/head.pug
+  body
+    include includes/navbar.pug
+
+    div.container
+      h1.text-center= pageTitle
+      hr
+      if !username
+        div.alert.alert-danger(role="alert")
+          | You are not logged in!
+      else
+        .container.mt-5
+          form#uploadForm(action='/upload', method='post', enctype='multipart/form-data')
+            .form-group
+              label(for='image', class='mb-2') Choose a map:
+              input(type='file', name='images', id='images', class='form-control-file', multiple)
+            .form-group
+              label(for='server', class='mb-2') Select a server:
+              select(name='server', id='server', class='form-control')
+                option(value='2b2t') 2b2t
+
+            button.btn.btn-primary(type='submit')
+              i.fas.fa-cloud-upload-alt
+              |  Upload Image
+
+          .progress.mt-3(style='display: none;')
+            .progress-bar(role='progressbar', id='uploadProgressBar', style='width: 0%', aria-valuenow='0', aria-valuemin='0', aria-valuemax='100')
+          .alert.alert-success#successMessage(style='text-align: center; display: none; margin-top: 10px;')
+          .alert.alert-danger#errorMessage(style='text-align: center; display: none; margin-top: 10px;')
+
+      script(src="./public/js/joinImages.js")
+      script(src="./public/js/initialPush.js")
+    include includes/scripts.pug
