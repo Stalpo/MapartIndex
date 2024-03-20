@@ -68,27 +68,29 @@ html
             const inputGroup = document.createElement('div');
             inputGroup.classList.add('form-group', 'row');
 
-            // Create number selector
-            const numberSelector = document.createElement('select');
-            numberSelector.classList.add('form-control', 'col');
+            // Create rotation selector
+            const rotationSelectorContainer = document.createElement('div');
+            rotationSelectorContainer.classList.add('col-2'); // Adjusted width to 20%
+            const rotationSelector = document.createElement('select');
+            rotationSelector.classList.add('form-control');
             for (let j = 0; j < 4; j++) {
               const option = document.createElement('option');
               option.value = j;
               option.textContent = j;
-              numberSelector.appendChild(option);
+              rotationSelector.appendChild(option);
             }
-            inputGroup.appendChild(numberSelector);
-
+            rotationSelectorContainer.appendChild(rotationSelector);
+            inputGroup.appendChild(rotationSelectorContainer);
 
             // Create map name input
-            const inputContainer = document.createElement('div');
-            inputContainer.classList.add('col');
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.classList.add('form-control');
-            input.placeholder = `map name ${i + 1}`;
-            inputContainer.appendChild(input);
-            inputGroup.appendChild(inputContainer);
+            const nameInputContainer = document.createElement('div');
+            nameInputContainer.classList.add('col-10'); // Adjusted width to 80%
+            const nameInput = document.createElement('input');
+            nameInput.type = 'text';
+            nameInput.classList.add('form-control');
+            nameInput.placeholder = `map name ${i + 1}`;
+            nameInputContainer.appendChild(nameInput);
+            inputGroup.appendChild(nameInputContainer);
 
             container.appendChild(inputGroup);
           }
