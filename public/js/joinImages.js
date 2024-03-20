@@ -1,7 +1,7 @@
 const imgs = [];
 
 // send images as array of urls
-const joinImages = (width, height, imgurls) => {
+const joinImages = (width, height, imgUrls, rotations) => {
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
 
@@ -9,22 +9,40 @@ const joinImages = (width, height, imgurls) => {
   canvas.height = 128 * height;
 
   return new Promise((resolve, reject) => {
-    Promise.all(imgurls.map(downloadAsset))
+    Promise.all(imgUrls.map(downloadAsset))
       .then(() => {
         for (let i = 0; i < imgs.length; i++) {
-          ctx.drawImage(imgs[i], (i % width) * 128, Math.floor(i / width) * 128);
+          const rotation = rotations[i];
+          const rotatedImage = rotateImage(imgs[i], rotation);
+          ctx.drawImage(rotatedImage, (i % width) * 128, Math.floor(i / width) * 128);
         }
-
         const url = canvas.toDataURL();
-        resolve(url); // Resolve with the data URL of the merged image
+        resolve(url);
       })
       .catch(error => {
         console.error('Error merging images:', error);
-        reject(error); // Reject with the error message
+        reject(error);
       });
   });
 };
 
+// Rotate image by angle (in radians)
+function rotateImage(image, rotation) {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  
+  // Set canvas size to hold rotated image
+  canvas.width = image.height;
+  canvas.height = image.width;
+  
+  // Translate origin to center of canvas
+  ctx.translate(canvas.width / 2, canvas.height / 2);
+  ctx.rotate(rotation * Math.PI / 2);
+  ctx.drawImage(image, -image.width / 2, -image.height / 2);
+  
+  // Return rotated image
+  return canvas;
+}
 
 // promise to load needed image
 function downloadAsset(assetName) {
@@ -32,8 +50,8 @@ function downloadAsset(assetName) {
     const asset = new Image();
     asset.onload = () => {
       imgs.push(asset);
-    resolve();
-  };
-  asset.src = assetName;
+      resolve();
+    };
+    asset.src = assetName;
   });
 }

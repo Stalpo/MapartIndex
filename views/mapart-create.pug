@@ -66,14 +66,30 @@ html
 
           for (let i = 0; i < totalInputs; i++) {
             const inputGroup = document.createElement('div');
-            inputGroup.classList.add('form-group');
+            inputGroup.classList.add('form-group', 'row');
 
+            // Create number selector
+            const numberSelector = document.createElement('select');
+            numberSelector.classList.add('form-control', 'col');
+            for (let j = 0; j < 4; j++) {
+              const option = document.createElement('option');
+              option.value = j;
+              option.textContent = j;
+              numberSelector.appendChild(option);
+            }
+            inputGroup.appendChild(numberSelector);
+
+
+            // Create map name input
+            const inputContainer = document.createElement('div');
+            inputContainer.classList.add('col');
             const input = document.createElement('input');
             input.type = 'text';
             input.classList.add('form-control');
             input.placeholder = `map name ${i + 1}`;
+            inputContainer.appendChild(input);
+            inputGroup.appendChild(inputContainer);
 
-            inputGroup.appendChild(input);
             container.appendChild(inputGroup);
           }
         }
@@ -82,10 +98,13 @@ html
         function fetchImages() {
           return new Promise((resolve, reject) => {
             const inputs = document.querySelectorAll('#inputContainer input');
+            const rotations = document.querySelectorAll('#inputContainer select');
+
             const promises = [];
 
-            inputs.forEach(input => {
+            inputs.forEach((input, index) => {
               const displayName = input.value;
+              const rotation = rotations[index].value; // Get rotation value for the corresponding image
               if (displayName) {
                 const promise = fetch(`/api/mapId/name/${displayName}`)
                   .then(response => {
@@ -95,7 +114,7 @@ html
                     return response.json();
                   })
                   .then(data => {
-                    return data.imgUrl ? `/public/uploads/${data.imgUrl}` : null;
+                    return { imgUrl: data.imgUrl ? `/public/uploads/${data.imgUrl}` : null, rotation }; // Include rotation in the returned object
                   })
                   .catch(error => {
                     console.error('Error fetching data:', error.message);
@@ -107,8 +126,11 @@ html
             });
 
             Promise.all(promises)
-              .then(imgUrls => {
-                resolve(imgUrls.filter(url => url !== null));
+              .then(results => {
+                // Filter out null results and extract imgUrls and rotations
+                const imgUrls = results.filter(result => result !== null).map(result => result.imgUrl);
+                const rotations = results.filter(result => result !== null).map(result => result.rotation);
+                resolve({ imgUrls, rotations });
               })
               .catch(error => {
                 reject(error);
@@ -116,10 +138,14 @@ html
           });
         }
 
+
         fetchButton.addEventListener('click', () => {
           fetchImages()
-            .then(imgUrls => {
-              return joinImages(parseInt(widthSelector.value), parseInt(heightSelector.value), imgUrls.filter(url => url !== null));
+            .then(({ imgUrls, rotations }) => {
+              if (!Array.isArray(imgUrls)) {
+                throw new Error('Image URLs are not available or are not in the expected format');
+              }
+              return joinImages(parseInt(widthSelector.value), parseInt(heightSelector.value), imgUrls, rotations);
             })
             .then(resultImageUrl => {
               const outputContainer = document.getElementById('outputContainer');
