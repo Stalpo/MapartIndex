@@ -7,10 +7,15 @@ html
     div.container
       h1.text-center MapArt
       hr
+      if admin || mod
+        div.text-center
+          a.btn.btn-primary(href=`/mapid-edit/${mapId}`) Visit Map Edit Page
 
       div#mapContainer.text-center
         i#loadingSpinner.fa.fa-spinner.fa-spin.fa-3x
         p Loading map data...
+
+
 
       script(src="https://code.jquery.com/jquery-3.6.0.min.js")
       script.

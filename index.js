@@ -473,9 +473,6 @@ app.post('/mapId-edit/:id', upload.none(), async (req, res) => {
     await mapIdController.updateMapById(mapId, {
       artist: sanitizedArtist,
       nsfw: sanitizedNsfw,
-      mapArtData: {
-        // Add other MapArt data fields here
-      },
     });
     
     res.redirect(`/admin`);
