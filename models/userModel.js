@@ -147,6 +147,28 @@ const createUserDiscord = async ({ discordId, username, avatar, email }) => {
   }
 };
 
+const updateUserPassword = async (userId, hashedPassword) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { hashedPw: hashedPassword },
+    });
+
+    return updatedUser;
+  } catch (error) {
+    console.error('Error in updateUserPassword:', error);
+    return null;
+  }
+};
+
 const deleteUserById = async (userId) => {
   try {
     await prisma.user.delete({ where: { id: userId } });
@@ -170,5 +192,6 @@ module.exports = {
   getAllUsers,
   createUser,
   createUserDiscord,
+  updateUserPassword,
   deleteUserById,
 };

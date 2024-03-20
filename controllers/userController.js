@@ -173,6 +173,22 @@ const loginDiscordUser = async (discordId, username, avatar, email) => {
   }
 };
 
+const updateUserPassword = async (userId, password) => {
+  try {
+    const newHashedPw = await bcrypt.hash(password, 10);
+
+    const user = await getUserById(userId);
+    if (user.discordId != null) {
+      return { error: 'Skipping password update for Discord user!' };
+    } else {
+      return await userModel.updateUserPassword(userId, newHashedPw);
+    }
+  } catch (error) {
+    console.error('Error in updateUserPassword:', error);
+    throw error;
+  }
+};
+
 const getUserByApiKey = async (apiKey) => {
   try {
     return await userModel.getUserByApiKey(apiKey);
@@ -220,6 +236,7 @@ module.exports = {
   getAllUsers,
   registerUser,
   loginUser,
+  updateUserPassword,
   verifyToken,
   loginDiscordUser,
   getUserByApiKey,
