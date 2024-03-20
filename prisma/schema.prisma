@@ -76,7 +76,7 @@ model MapId {
   server       String?
   serverId     Int?
   displayName  String?
-  Map          MapArt?  @relation(fields: [mapIds], references: [id])
+  map          MapArt?  @relation(fields: [mapId], references: [id])
   mapId        String?
   imgUrl       String
   hash         String

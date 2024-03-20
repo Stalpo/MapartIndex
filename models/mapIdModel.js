@@ -64,7 +64,7 @@ const getAllMapsForUserId = async (userId) => {
         userId: userId,
       },
       include: {
-        Map: true,
+        map: true,
       },
     });
   } catch (error) {
