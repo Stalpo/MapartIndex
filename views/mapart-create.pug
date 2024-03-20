@@ -96,7 +96,6 @@ html
           }
         }
 
-        // Function to fetch images based on friendly names
         function fetchImages() {
           return new Promise((resolve, reject) => {
             const inputs = document.querySelectorAll('#inputContainer input');
@@ -106,7 +105,7 @@ html
 
             inputs.forEach((input, index) => {
               const displayName = input.value;
-              const rotation = rotations[index].value; // Get rotation value for the corresponding image
+              const rotation = rotations[index].value;
               if (displayName) {
                 const promise = fetch(`/api/mapId/name/${displayName}`)
                   .then(response => {
@@ -116,7 +115,11 @@ html
                     return response.json();
                   })
                   .then(data => {
-                    return { imgUrl: data.imgUrl ? `/public/uploads/${data.imgUrl}` : null, rotation }; // Include rotation in the returned object
+                    if (data && data.id && data.imgUrl) {
+                      return { id: data.id, imgUrl: `/public/uploads/${data.imgUrl}`, rotation };
+                    } else {
+                      throw new Error('Invalid data received');
+                    }
                   })
                   .catch(error => {
                     console.error('Error fetching data:', error.message);
@@ -129,10 +132,13 @@ html
 
             Promise.all(promises)
               .then(results => {
-                // Filter out null results and extract imgUrls and rotations
-                const imgUrls = results.filter(result => result !== null).map(result => result.imgUrl);
-                const rotations = results.filter(result => result !== null).map(result => result.rotation);
-                resolve({ imgUrls, rotations });
+                // Filter out null results
+                const validResults = results.filter(result => result !== null);
+                if (validResults.length > 0) {
+                  resolve(validResults); // Resolve with array of map objects
+                } else {
+                  reject(new Error('No valid map data fetched'));
+                }
               })
               .catch(error => {
                 reject(error);
@@ -142,12 +148,29 @@ html
 
 
         fetchButton.addEventListener('click', () => {
+          const mapIds = []; // Array to store map IDs
+          
           fetchImages()
-            .then(({ imgUrls, rotations }) => {
-              if (!Array.isArray(imgUrls)) {
-                throw new Error('Image URLs are not available or are not in the expected format');
+            .then(mapData => {
+              // Ensure mapData is an array
+              if (!Array.isArray(mapData)) {
+                throw new Error('Map data is not in expected format');
               }
-              return joinImages(parseInt(widthSelector.value), parseInt(heightSelector.value), imgUrls, rotations);
+
+              // Extract map IDs and push them into the array
+              mapData.forEach(map => {
+                if (map && map.id) {
+                  mapIds.push(map.id);
+                }
+              });
+
+              // console.log(mapIds);
+
+              if (mapIds.length === 0) {
+                throw new Error('No map data fetched or map IDs found');
+              }
+              
+              return joinImages(parseInt(widthSelector.value), parseInt(heightSelector.value), mapData.map(map => map.imgUrl), mapData.map(map => map.rotation));
             })
             .then(resultImageUrl => {
               const outputContainer = document.getElementById('outputContainer');
@@ -242,6 +265,7 @@ html
                 formData.append('artist', artistInput.value);
                 formData.append('server', serverSelect.value);
                 formData.append('file', blobObj);
+                formData.append('mapIds', JSON.stringify(mapIds));
 
                 return fetch('/mapart-create', {
                   method: 'POST',

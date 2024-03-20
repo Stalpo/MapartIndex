@@ -558,8 +558,8 @@ app.post('/mapArt-create', mapArtUpload.single('file'), async (req, res) => {
       return res.status(403).send('Forbidden');
     }
 
-    const { name, description, artist, server } = req.body;
-    const { filename, path, originalname } = req.file;
+    let { name, description, artist, server, mapIds } = req.body;
+    let { filename, path, originalname } = req.file;
 
     if (!req.file) {
       // If no files are provided
@@ -589,12 +589,15 @@ app.post('/mapArt-create', mapArtUpload.single('file'), async (req, res) => {
     // Calculate a hash of the base64 data
     const hash = crypto.createHash('md5').update(base64).digest('hex');
 
+    mapIds = JSON.parse(mapIds);
+
     const result = await mapArtController.createMapId({
       userId: res.locals.userId,
       username: res.locals.username,
       imgUrl: newFilename,
       name: name,
       description: description,
+      mapIds: mapIds,
       artist: artist,
       displayName: displayName,
       hash: hash,
