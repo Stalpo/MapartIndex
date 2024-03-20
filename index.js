@@ -558,7 +558,7 @@ app.post('/mapArt-create', mapArtUpload.single('file'), async (req, res) => {
       return res.status(403).send('Forbidden');
     }
 
-    let { name, description, artist, server, mapIds } = req.body;
+    let { name, description, artist, server, mapIds, tags } = req.body;
     let { filename, path, originalname } = req.file;
 
     if (!req.file) {
@@ -591,6 +591,8 @@ app.post('/mapArt-create', mapArtUpload.single('file'), async (req, res) => {
 
     mapIds = JSON.parse(mapIds);
 
+    tags = JSON.parse(tags);
+
     const result = await mapArtController.createMapId({
       userId: res.locals.userId,
       username: res.locals.username,
@@ -598,6 +600,7 @@ app.post('/mapArt-create', mapArtUpload.single('file'), async (req, res) => {
       name: name,
       description: description,
       mapIds: mapIds,
+      tags: tags,
       artist: artist,
       displayName: displayName,
       hash: hash,
