@@ -656,8 +656,8 @@ app.post('/mapArt-edit/:id', upload.none(), async (req, res) => {
       return res.status(403).send('Forbidden');
     }
 
-    const mapId = req.params.id;
-    const { artist, nsfw, name, description,  /* other fields as needed */ } = req.body;
+    let mapId = req.params.id;
+    let { artist, nsfw, name, description, tags  /* other fields as needed */ } = req.body;
 
     // Sanitize inputs
     const sanitizedArtist = validator.trim(artist);
@@ -665,12 +665,17 @@ app.post('/mapArt-edit/:id', upload.none(), async (req, res) => {
     const sanitizedName = validator.trim(name);
     const sanitizeDescription = validator.trim(description);
 
+    tags = JSON.parse(tags);
+
+    console.log(tags);
+
     // Update map details, including MapArt data
     await mapArtController.updateMapById(mapId, {
       name: sanitizedName,
       artist: sanitizedArtist,
       nsfw: sanitizedNsfw,
       description: sanitizeDescription,
+      tags: tags,
     });
     
     res.redirect(`/admin`);

@@ -41,6 +41,13 @@ html
                 div.input-group
                   div.input-group-prepend
                     span.input-group-text.icon-prepend
+                      i.fas.fa-font
+                  input#tags.form-control(type='text', name='tags', value=map.tags, placeholder='Tags (comma-seperated)')
+
+              div.mb-3.form-group
+                div.input-group
+                  div.input-group-prepend
+                    span.input-group-text.icon-prepend
                       i.fas.fa-upload
                   input#user.form-control(type='text', name='user', value=map.username, readonly, placeholder='Uploaded By')
 
@@ -81,6 +88,15 @@ html
         }
 
     script.
+      document.addEventListener("DOMContentLoaded", function() {
+          // Load tags into the tags input field
+          var tagsInput = document.getElementById('tags');
+          if (tagsInput.value) {
+              var tagsArray = JSON.parse(tagsInput.value);
+              tagsInput.value = tagsArray.join(', ');
+          }
+      });
+
       function saveChanges() {
           var artist = document.getElementById('artist').value;
           var nsfw = document.getElementById('nsfw').checked;
@@ -88,11 +104,18 @@ html
           var name = document.getElementById('name').value;
           var description = document.getElementById('description').value;
 
+          // Parse comma-separated tags into an array
+          var tagsInput = document.getElementById('tags').value;
+          var tagsArray = tagsInput.split(',').map(tag => tag.trim());
+
           var formData = new FormData();
           formData.append('name', name);
           formData.append('artist', artist);
           formData.append('description', description);
           formData.append('nsfw', nsfw);
+
+          // Append tags as JSON array to FormData
+          formData.append('tags', JSON.stringify(tagsArray));
 
           // Get mapId from the current URL
           var url = window.location.href;

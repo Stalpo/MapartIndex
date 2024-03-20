@@ -88,13 +88,14 @@ const countMapIdsByServer = async (server) => {
   }
 };
 
-const updateMapById = async (mapId, { artist, name, description, nsfw }) => {
+const updateMapById = async (mapId, { artist, name, description, nsfw, tags }) => {
   try {
     return await mapArtModel.updateMapById(mapId, {
       artist,
       name,
       description,
       nsfw,
+      tags,
     });
   } catch (error) {
     console.error('Error updating map by ID:', error);

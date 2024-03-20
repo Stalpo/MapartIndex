@@ -167,7 +167,7 @@ const createMapId = async ({ userId, username, name, description, mapIds, tags, 
 };
 
 
-const updateMapById = async (mapId, { artist, name, description, nsfw }) => {
+const updateMapById = async (mapId, { artist, name, description, nsfw, tags }) => {
   try {
     return await prisma.mapArt.update({
       where: { id: mapId },
@@ -176,6 +176,7 @@ const updateMapById = async (mapId, { artist, name, description, nsfw }) => {
         name,
         description,
         nsfw,
+        tags,
       },
     });
   } catch (error) {
