@@ -23,7 +23,6 @@ const getMapIdByHash = async (hash) => {
 };
 
 const getMapByDisplayName = async (displayName) => {
-  console.log(displayName);
   try {
     return await prisma.mapId.findFirst({
       where: { displayName }
