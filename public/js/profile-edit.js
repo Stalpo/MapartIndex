@@ -57,8 +57,6 @@ document.addEventListener("DOMContentLoaded", function() {
         // Add other fields as needed
       });
 
-      console.log(jsonData);
-
       // Send the request
       xhr.send(jsonData);
     } else {

@@ -37,7 +37,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Display the uploaded images in the success alert
         if (response.files && response.files.length > 0) {
-          console.log(response.files);
           response.files.forEach((filename) => {
             // const img = document.createElement("img");
             // img.src = "./public/uploads/" + filename;

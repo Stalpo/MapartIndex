@@ -229,8 +229,6 @@ app.post('/update-password', async (req, res) => {
   let { password } = req.body;
   let userId = res.locals.userId;
 
-  console.log(userId);
-
   // Sanitize password
   password = validator.trim(password);
   password = validator.escape(password);
@@ -664,10 +662,7 @@ app.post('/mapArt-edit/:id', upload.none(), async (req, res) => {
     const sanitizedNsfw = validator.toBoolean(nsfw);
     const sanitizedName = validator.trim(name);
     const sanitizeDescription = validator.trim(description);
-
     tags = JSON.parse(tags);
-
-    console.log(tags);
 
     // Update map details, including MapArt data
     await mapArtController.updateMapById(mapId, {
