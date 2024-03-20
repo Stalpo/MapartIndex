@@ -64,6 +64,16 @@ const getUserById = async (userId) => {
   }
 };
 
+const getUsernameById = async (userId) => {
+  try {
+    const user = await userModel.getUsernameById(userId);
+    return user;
+  } catch (error) {
+    console.error('Error in getUserById:', error);
+    return null;
+  }
+};
+
 const getUserByUsername = async (username) => {
   try {
     const user = await userModel.getUserByUsername(username);
@@ -159,13 +169,26 @@ const verifyToken = (token) => {
   }
 };
 
-const loginDiscordUser = async (discordId, username, avatar, email) => {
+const loginDiscordUser = async (userId, discordId, username, avatar, email) => {
   try {
-    let user = await userModel.getUserByDiscordId(discordId);
+    // Get the user by ID
+    let user = await userModel.getUserById(userId);
+
+    // If the user doesn't exist, create a new user with Discord data
     if (!user) {
-      user = await userModel.createUserDiscord({ discordId, username, avatar, email });
+      user = await userModel.createUserDiscord({ userId, discordId, username, avatar, email });
+    } else {
+      // If the user exists, check if it's already linked to a Discord account
+      let discordUser = await userModel.getUserByDiscordId(discordId);
+      if (discordUser) {
+        return { error: 'User has already linked a discord account!' };
+      }
+      await userModel.updateUserDiscordInfo(userId, { discordId, username, avatar, email });
     }
+
+    // Generate JWT token for the user
     const token = jwt.sign({ username }, process.env.SECRET_KEY, { expiresIn: '24h' });
+    
     return { token };
   } catch (error) {
     console.error('Error in loginDiscordUser:', error);
@@ -178,7 +201,7 @@ const updateUserPassword = async (userId, password) => {
     const newHashedPw = await bcrypt.hash(password, 10);
 
     const user = await getUserById(userId);
-    if (user.discordId != null) {
+    if (user.discordId !== null) {
       return { error: 'Skipping password update for Discord user!' };
     } else {
       return await userModel.updateUserPassword(userId, newHashedPw);
@@ -232,6 +255,7 @@ module.exports = {
   verifyApiKey,
   newApiKey,
   getUserById,
+  getUsernameById,
   getUserByUsername,
   getAllUsers,
   registerUser,

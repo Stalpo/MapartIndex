@@ -80,12 +80,39 @@ const getUserByUsername = async (username) => {
   }
 };
 
+const getUsernameById = async (id) => {
+  try {
+    if (!id) {
+      return null;
+    }
+    const user = await prisma.user.findUnique({
+      where: {
+        id: String(id)
+      }
+    });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return user.username;
+  } catch (error) {
+    console.error('Error in getUsernameById:', error);
+    throw error;
+  }
+};
+
 const getUserById = async (id) => {
   try {
-    return await prisma.user.findUnique({ where: { id: id }});
+    if (!id) {
+      return null;
+    }
+    return await prisma.user.findUnique({
+      where: {
+        id: String(id)
+      }
+    });
   } catch (error) {
     console.error('Error in getUserById:', error);
-    return null;
+    throw error;
   }
 };
 
@@ -147,6 +174,31 @@ const createUserDiscord = async ({ discordId, username, avatar, email }) => {
   }
 };
 
+const updateUserDiscordInfo = async (userId, { discordId, username, avatar, email }) => {
+  try {
+    // Update user information with Discord data
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        discordId: discordId,
+        username: username,
+        hashedPw: null,
+        Profile: {
+          update: {
+            username,
+            avatar,
+            email
+          }
+        }
+      },
+    });
+    return updatedUser;
+  } catch (error) {
+    console.error('Error in updateUserDiscordInfo:', error);
+    throw error;
+  }
+};
+
 const updateUserPassword = async (userId, hashedPassword) => {
   try {
     const user = await prisma.user.findUnique({
@@ -187,11 +239,13 @@ module.exports = {
   getUserByApiKey,
   newApiKey,
   getUserByUsername,
+  getUsernameById,
   getUserById,
   getUserByDiscordId,
   getAllUsers,
   createUser,
   createUserDiscord,
+  updateUserDiscordInfo,
   updateUserPassword,
   deleteUserById,
 };
