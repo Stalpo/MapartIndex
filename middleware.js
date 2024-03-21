@@ -2,6 +2,15 @@ const moment = require('moment');
 const userController = require('./controllers/userController');
 const profileController = require('./controllers/profileController');
 
+// File path middleware
+const setFilePathMiddleware = () => {
+  return (req, res, next) => {
+    const currentPath = path.resolve(__dirname);
+    res.locals.filepath = currentPath;
+    next();
+  };
+};
+
 // Check admin status middleware
 const checkAdminStatus = async (req, res, next) => {
   try {
