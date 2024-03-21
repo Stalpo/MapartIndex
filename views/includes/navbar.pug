@@ -21,11 +21,11 @@ nav.navbar.navbar-expand-lg.navbar-custom
           i.fa.fa-home.mr-1
           | Home
       li.nav-item 
-        a.nav-link(href="/map-gallery")
+        a.nav-link(href="/mapid/gallery")
           i.fa.fa-map.mr-1 
           | Maps
       li.nav-item 
-        a.nav-link(href="/mapart-gallery")
+        a.nav-link(href="/mapart/gallery")
           i.fa.fa-th.mr-1 
           | Map Arts
       if admin || mod
@@ -34,7 +34,7 @@ nav.navbar.navbar-expand-lg.navbar-custom
             i.fa.fa-upload.mr-1
             | Upload
         li.nav-item
-          a.nav-link(href="/mapart-create")
+          a.nav-link(href="/mapart/create")
             i.fa.fa-paint-brush.mr-1
             | Stitch
       li.nav-item.dropdown
@@ -50,14 +50,14 @@ nav.navbar.navbar-expand-lg.navbar-custom
             a.dropdown-item(href="/profile")
               i.fa.fa-user.mr-1
               | Profile
-            a.dropdown-item(href="/logout")
+            a.dropdown-item(href="/user/logout")
               i.fa.fa-sign-out-alt.mr-1
               | Logout
           else
-            a.dropdown-item(href="/register")
+            a.dropdown-item(href="/user/register")
               i.fa.fa-user-plus.mr-1
               | Register
-            a.dropdown-item(href="/login")
+            a.dropdown-item(href="/user/login")
               i.fa.fa-sign-in-alt.mr-1
               | Login
 

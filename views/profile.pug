@@ -21,7 +21,7 @@ html
             p.text-center #{ profile.bio }
             p.text-center Last seen: #{ profile.lastSeen ? profile.lastSeen.toLocaleString('en-US', {month:'2-digit',day:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit',hour12:true}) : 'Unknown' }
             if profile.username === username
-              a.btn.btn-primary(href="/profile-edit") Edit Profile
+              a.btn.btn-primary(href="/profile/edit") Edit Profile
             hr
             h3 Details
             p Email: #{ profile.email || 'Unknown' }
@@ -62,7 +62,7 @@ html
                 if mod
                   button.btn.btn-primary(type="button", id="toggleApiKey", onclick="toggleApiKeyVisibility()") Show API Key
                   p#apiKey(style="display: none;") API Key: #{ apiKey }
-                a.btn.btn-danger(href="/deleteUser") Delete My Account
+                a.btn.btn-danger(href="/user/deleteUser") Delete My Account
         
         else
           div.container

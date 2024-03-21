@@ -63,8 +63,8 @@ html
           // Function to populate user selector
           async function populateUserSelector() {
             try {
-              const uniqueUsernamesMapId = await fetchData('/mapId-info/uniqueUsernames');
-              const uniqueUsernamesMapArt = await fetchData('/mapArt-info/uniqueUsernames');
+              const uniqueUsernamesMapId = await fetchData('/mapid/uniqueUsernames');
+              const uniqueUsernamesMapArt = await fetchData('/mapart/uniqueUsernames');
               
               const combinedUniqueUsernames = [...new Set([...uniqueUsernamesMapId, ...uniqueUsernamesMapArt])];
               const userOptions = combinedUniqueUsernames.map(user => ({ value: user, label: user }));
@@ -79,8 +79,8 @@ html
           // Function to populate artist selector
           async function populateArtistSelector() {
             try {
-              const uniqueArtistsMapId = await fetchData('/mapId-info/uniqueArtists');
-              const uniqueArtistsMapArt = await fetchData('/mapArt-info/uniqueArtists');
+              const uniqueArtistsMapId = await fetchData('/mapid/uniqueArtists');
+              const uniqueArtistsMapArt = await fetchData('/mapart/uniqueArtists');
 
               const combinedUniqueArtists = [...new Set([...uniqueArtistsMapId, ...uniqueArtistsMapArt])];
               const artistOptions = combinedUniqueArtists.map(artist => ({ value: artist, label: artist }));
@@ -120,9 +120,9 @@ html
               if (!response.ok) {
                 if (response.status === 404) {
                   // Set the corresponding flag if 404 status is encountered
-                  if (url.includes('/mapId/')) {
+                  if (url.includes('/mapid/')) {
                     mapId404 = true;
-                  } else if (url.includes('/mapArt/')) {
+                  } else if (url.includes('/mapart/')) {
                     mapArt404 = true;
                   }
                   console.error('Likely last page of results');
@@ -227,9 +227,9 @@ html
               newRow.className = 'vertical-center';
 
               const imgUrl = map.displayName.includes("MAPART") ? `/public/uploads/mapart/${map.imgUrl}` : `/public/uploads/${map.imgUrl}`;
-              const viewUrl = map.displayName.includes("MAPART") ? `/mapArt/${map.id}` : `/mapId/${map.id}`;
-              const editUrl = map.displayName.includes("MAPART") ? `/mapArt-edit/${map.id}` : `/mapId-edit/${map.id}`;
-              const deleteUrl = map.displayName.includes("MAPART") ? `/deleteMapArtId?mapId=${map.id}` : `/deleteMapId?mapId=${map.id}`;
+              const viewUrl = map.displayName.includes("MAPART") ? `/mapart/id/${map.id}` : `/mapid/id/${map.id}`;
+              const editUrl = map.displayName.includes("MAPART") ? `/mapart/edit/${map.id}` : `/mapid/edit/${map.id}`;
+              const deleteUrl = map.displayName.includes("MAPART") ? `/mapart/delete?mapId=${map.id}` : `/mapid/delete?mapId=${map.id}`;
 
               newRow.innerHTML = `
                 <td>${map.displayName}</td>

@@ -83,7 +83,7 @@ html
         // Function to populate user selector
         async function populateUserSelector() {
           try {
-            const uniqueUsernames = await fetchData('/mapArt-info/uniqueUsernames');
+            const uniqueUsernames = await fetchData('/mapart/uniqueUsernames');
             uniqueUsernames.unshift("All Users");
             populateSelect('userSelector', uniqueUsernames);
           } catch (error) {
@@ -94,7 +94,7 @@ html
         // Function to populate artist selector
         async function populateArtistSelector() {
           try {
-            const uniqueArtists = await fetchData('/mapArt-info/uniqueArtists');
+            const uniqueArtists = await fetchData('/mapart/uniqueArtists');
             uniqueArtists.unshift("All Artists");
             populateSelect('artistSelector', uniqueArtists);
           } catch (error) {
@@ -105,7 +105,7 @@ html
         // Function to populate server selector
         async function populateServerSelector() {
           try {
-            const uniqueServers = await fetchData('/mapArt-info/uniqueServers');
+            const uniqueServers = await fetchData('/mapart/uniqueServers');
             uniqueServers.unshift("All Servers");
             populateSelect('serverSelector', uniqueServers);
           } catch (error) {
@@ -116,7 +116,7 @@ html
         // Function to populate tag selector
         async function populateTagSelector() {
           try {
-            const uniqueTags = await fetchData('/mapArt-info/uniqueTags');
+            const uniqueTags = await fetchData('/mapart/uniqueTags');
             uniqueTags.unshift("All Tags");
             populateSelect('tagSelector', uniqueTags);
           } catch (error) {
@@ -241,7 +241,7 @@ html
             const card = document.createElement('div');
             card.className = 'card mb-3 mx-auto';
             card.innerHTML = `
-              <a href="/mapart/${map.id}">
+              <a href="/mapart/id/${map.id}">
                 <img src="/public/uploads/mapart/${map.imgUrl}" style="width:130px; height:130px;" class="pixelated-image" alt="Map Image">
               </a>
             `;
@@ -267,10 +267,10 @@ html
               <ul class="list-group list-group-flush">
                 <li class="list-group-item">Artist: ${map.artist}</li>
                 <li class="list-group-item">Tags: ${map.tags}</li>
-                <li class="list-group-item">Uploaded by: <a href="/profile/${map.username}">${map.username}</li>
+                <li class="list-group-item">Uploaded by: <a href="/profile/user/${map.username}">${map.username}</li>
               </ul>
               <div class="card-body">
-                <a href="/mapart/${map.id}" class="card-link">View Map</a>
+                <a href="/mapart/id/${map.id}" class="card-link">View Map</a>
               </div>
             `;
             gridContainer.appendChild(card);

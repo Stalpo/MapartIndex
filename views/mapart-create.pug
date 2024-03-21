@@ -240,7 +240,7 @@ html
                 console.log('Selected file:', file);
               });
 
-              fetch('/mapId-info/uniqueServers')
+              fetch('/mapid/uniqueServers')
                 .then(response => response.json())
                 .then(data => {
                   data.forEach(server => {
@@ -279,7 +279,7 @@ html
                 const tagsArray = tagsInput.value.split(',').map(tag => tag.trim());
                 formData.append('tags', JSON.stringify(tagsArray));
 
-                return fetch('/mapart-create', {
+                return fetch('/mapart/create', {
                   method: 'POST',
                   body: formData
                 })
@@ -300,7 +300,7 @@ html
 
                     const link = document.createElement('a');
                     link.textContent = 'here';
-                    link.href = '/mapart/' + data.id;
+                    link.href = '/mapart/id/' + data.id;
 
                     successText.appendChild(link);
                     successText.appendChild(document.createTextNode(' to view.'));

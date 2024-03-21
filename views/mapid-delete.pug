@@ -20,7 +20,7 @@ html(lang="en")
               img(src=`/public/uploads/${map.imgUrl}`)
             br
             div.text-center
-              form(action="/deleteMapId" method="POST")
+              form(action="/mapid/delete" method="POST")
                 input(type="hidden" name="mapId" value=mapId)
                 button.btn.btn-danger(type="submit") Confirm Deletion
           else
