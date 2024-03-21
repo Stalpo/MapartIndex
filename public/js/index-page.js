@@ -1,5 +1,5 @@
 // Fetch random images from /api/mapId/maps
-fetch('/api/mapId/maps?page=1&perPage=10')
+fetch('/api/mapArt/maps?page=1&perPage=10')
   .then(response => response.json())
   .then(images => {
     // Shuffle the array of images
@@ -12,8 +12,8 @@ fetch('/api/mapId/maps?page=1&perPage=10')
       const activeClass = index === 0 ? 'active' : '';
       const carouselItem = document.createElement('div');
       carouselItem.className = `carousel-item ${activeClass}`;
-      const imgUrl = `/public/uploads/${image.imgUrl}`;
-      const brightnessValue = 350; // Brightness value
+      const imgUrl = `/public/uploads/mapart/${image.imgUrl}`;
+      const brightnessValue = 800; // Brightness value
 
       carouselItem.innerHTML = `<img src="${imgUrl}" class="d-block w-100" style="image-rendering: pixelated; filter: brightness(${brightnessValue}%);" alt="Map Image">`;
       carouselInner.appendChild(carouselItem);
@@ -28,12 +28,3 @@ function shuffleArray(array) {
   }
   return array;
 }
-
-// Carousel fix
-document.addEventListener('DOMContentLoaded', function () {
-  // Select the navbar and change its background color
-  const navbar = document.querySelector('.navbar');
-  if (navbar) {
-    navbar.style.backgroundColor = 'white';
-  }
-});

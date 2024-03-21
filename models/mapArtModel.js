@@ -20,7 +20,7 @@ const getAllMapArts = async () => {
   }
 };
 
-const getMaps = async (page, perPage, user, artist, sort, server) => {
+const getMaps = async (page, perPage, user, artist, sort, server, tag) => {
   try {
     const where = {};
 
@@ -33,6 +33,11 @@ const getMaps = async (page, perPage, user, artist, sort, server) => {
     }
     if (server) {
       where.server = server;
+    }
+    if (tag) {
+      where.tags = {
+        has: tag
+      };
     }
 
     // Apply sorting criteria
@@ -133,6 +138,27 @@ const getUniqueServers = async () => {
     return filteredServers.map(({ server }) => server);
   } catch (error) {
     console.error('Error fetching unique servers:', error);
+    throw error;
+  }
+};
+
+const getUniqueTags = async () => {
+  try {
+    const mapArtRecords = await prisma.mapArt.findMany({
+      select: {
+        tags: true,
+      },
+    });
+
+    // Flatten the tags arrays and filter out null or undefined values
+    const allTags = mapArtRecords.flatMap(record => record.tags || []).filter(tag => tag);
+
+    // Create a Set to ensure uniqueness, then convert it back to an array
+    const uniqueTags = [...new Set(allTags)];
+
+    return uniqueTags;
+  } catch (error) {
+    console.error('Error fetching unique tags:', error);
     throw error;
   }
 };
@@ -238,6 +264,7 @@ module.exports = {
   getUniqueArtists,
   getUniqueUsernames,
   getUniqueServers,
+  getUniqueTags,
   createMapId,
   updateMapById,
   countMapIdsByServer,
