@@ -11,7 +11,13 @@ const archiver = require('archiver');
 const gitlog = require("gitlog").default;
 
 // Internal dependencies
-const { loggedInMiddleware, loggingMiddleware, checkAdminStatus, checkModStatus } = require('./middleware');
+const {
+  setFilePath,
+  loggedInMiddleware,
+  loggingMiddleware,
+  checkAdminStatus,
+  checkModStatus
+} = require('./middleware');
 
 // Init express
 const app = express();
@@ -35,6 +41,7 @@ app.use(cookieParser());
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // Custom middleware
+app.use(setFilePath);
 app.use(loggedInMiddleware);
 app.use(loggingMiddleware);
 app.use(checkAdminStatus);
