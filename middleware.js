@@ -1,4 +1,8 @@
+// Dependencies
 const moment = require('moment');
+const path = require('path');
+
+// Required controllers
 const userController = require('./controllers/userController');
 const profileController = require('./controllers/profileController');
 
