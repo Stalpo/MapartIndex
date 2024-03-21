@@ -1,6 +1,6 @@
 /* Navbar */
 .navbar-custom {
-  background-color: #d2bb92;
+  background-color: #dbcfba;
   color: #000000;
 }
 
@@ -10,7 +10,7 @@
 }
 
 .navbar-custom .navbar-toggler-icon {
-  background-color: #d2bb92;
+  background-color: #dbcfba;
 }
 
 .navbar-custom .navbar-toggler {
@@ -18,14 +18,14 @@
 }
 
 .navbar-custom .nav-item.dropdown .dropdown-menu {
-  background-color: #d2bb92;
+  background-color: #dbcfba;
 }
 
 .navbar-custom .nav-item.dropdown:hover .dropdown-menu {
-  background-color: #d2bb92;
+  background-color: #dbcfba;
 }
 
 .navbar-custom .nav-item.dropdown:hover .dropdown-menu a.dropdown-item:hover {
   color: #000000;
-  background-color: #d2bb92;
+  background-color: #dbcfba;
 }
