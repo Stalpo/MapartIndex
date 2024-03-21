@@ -103,7 +103,7 @@ const mapArtUpload = multer({
   storage: mapArtStorage,
   fileFilter: fileFilter, // Assuming fileFilter is defined elsewhere
   limits: {
-    fileSize: 1024 * 1024 * 2, // 10 MB limit for mapArt images
+    fileSize: 1024 * 1024 * 40, // 200 MB limit for mapArt images (wtf)
   },
 });
 
