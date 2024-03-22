@@ -161,11 +161,10 @@ const loginUser = async (username, password) => {
 const verifyToken = (token) => {
   try {
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
-    // Success
-    return { username: decoded.username, token: token, valid: true };
+    return { valid: true, username: decoded.username, token: token };
   } catch (error) {
-    console.error('Error verifying token:', error);
-    return { error: 'Invalid token' };
+    console.error('Error verifying token:', error.message);
+    return { valid: false, error: error.message };
   }
 };
 

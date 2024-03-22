@@ -71,10 +71,14 @@ const loggedInMiddleware = async (req, res, next) => {
       // Token is not valid, handle the error as needed
       console.error(verificationResult.error);
       res.locals.userId = null;
+      res.locals.username = null;
+      res.clearCookie('token');
     }
   } else {
     // No token present, set userId to null
     res.locals.userId = null;
+    res.locals.username = null;
+    res.clearCookie('token');
   }
 
   next();
