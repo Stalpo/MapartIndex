@@ -13,7 +13,7 @@ html
           | You are not logged in!
       else
         .container.mt-5
-          form#uploadForm(action='/upload', method='post', enctype='multipart/form-data')
+          form#uploadForm(action='/admin/initialPush', method='post', enctype='multipart/form-data')
             .form-group
               label(for='image', class='mb-2') Choose a map:
               input(type='file', name='images', id='images', class='form-control-file', multiple)
@@ -31,6 +31,6 @@ html
           .alert.alert-success#successMessage(style='text-align: center; display: none; margin-top: 10px;')
           .alert.alert-danger#errorMessage(style='text-align: center; display: none; margin-top: 10px;')
 
-      script(src="./public/js/joinImages.js")
-      script(src="./public/js/initialPush.js")
+      script(src="/public/js/joinImages.js")
+      script(src="/public/js/initialPush.js")
     include includes/scripts.pug

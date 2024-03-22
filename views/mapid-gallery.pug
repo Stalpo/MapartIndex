@@ -75,7 +75,7 @@ html
         // Function to populate user selector
         async function populateUserSelector() {
           try {
-            const uniqueUsernames = await fetchData('/mapId-info/uniqueUsernames');
+            const uniqueUsernames = await fetchData('/mapid/uniqueUsernames');
             uniqueUsernames.unshift("All Users");
             populateSelect('userSelector', uniqueUsernames);
           } catch (error) {
@@ -86,7 +86,7 @@ html
         // Function to populate artist selector
         async function populateArtistSelector() {
           try {
-            const uniqueArtists = await fetchData('/mapId-info/uniqueArtists');
+            const uniqueArtists = await fetchData('/mapid/uniqueArtists');
             uniqueArtists.unshift("All Artists");
             populateSelect('artistSelector', uniqueArtists);
           } catch (error) {
@@ -97,7 +97,7 @@ html
         // Function to populate server selector
         async function populateServerSelector() {
           try {
-            const uniqueServers = await fetchData('/mapId-info/uniqueServers');
+            const uniqueServers = await fetchData('/mapid/uniqueServers');
             uniqueServers.unshift("All Servers");
             populateSelect('serverSelector', uniqueServers);
           } catch (error) {
@@ -217,7 +217,7 @@ html
             const card = document.createElement('div');
             card.className = 'card mb-3 mx-auto';
             card.innerHTML = `
-              <a href="/mapId/${map.id}">
+              <a href="/mapid/id/${map.id}">
                 <img src="/public/uploads/${map.imgUrl}" class="pixelated-image" alt="Map Image">
               </a>
             `;
@@ -242,10 +242,10 @@ html
               </div>
               <ul class="list-group list-group-flush">
                 <li class="list-group-item">Artist: ${map.artist}</li>
-                <li class="list-group-item">Uploaded by: <a href="/profile/${map.username}">${map.username}</li>
+                <li class="list-group-item">Uploaded by: <a href="/profile/user/${map.username}">${map.username}</li>
               </ul>
               <div class="card-body">
-                <a href="/mapId/${map.id}" class="card-link">View Map</a>
+                <a href="/mapid/id/${map.id}" class="card-link">View Map</a>
               </div>
             `;
             gridContainer.appendChild(card);

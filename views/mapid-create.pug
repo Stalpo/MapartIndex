@@ -13,7 +13,7 @@ html
           | You are not an administrator or a moderator
       else
         .container.mt-5
-          form#uploadForm(action='/upload', method='post', enctype='multipart/form-data')
+          form#uploadForm(action='/mapid/create', method='post', enctype='multipart/form-data')
             .form-group
               label(for='image', class='mb-2') Choose a map:
               input(type='file', name='images', id='images', class='form-control-file', accept='image/*', multiple)
@@ -36,5 +36,5 @@ html
           // Preview Image Section
           #imagePreview(style='display: none; margin-top: 10px;')
 
-      script(src="./public/js/upload.js")
+      script(src="/public/js/upload.js")
     include includes/scripts.pug

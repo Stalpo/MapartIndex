@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "/update-password", true);
+    xhr.open("POST", "/user/update-password", true);
     xhr.setRequestHeader("Content-Type", "application/json");
 
     xhr.onreadystatechange = function() {

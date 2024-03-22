@@ -85,7 +85,7 @@ const getMaps = async (page, perPage, user, artist, sort, server, tag) => {
   }
 };
 
-const getMapIdById = async (mapId) => {
+const getMapById = async (mapId) => {
   try {
     return await prisma.mapArt.findUnique({
       where: { id: mapId }
@@ -163,7 +163,7 @@ const getUniqueTags = async () => {
   }
 };
 
-const createMapId = async ({ userId, username, name, description, mapIds, tags, imgUrl, displayName, hash, server, serverId }) => {
+const createMapId = async ({ userId, username, artist, name, description, mapIds, tags, imgUrl, displayName, hash, server, serverId }) => {
   try {
     return await prisma.mapArt.create({
       data: {
@@ -173,6 +173,7 @@ const createMapId = async ({ userId, username, name, description, mapIds, tags, 
           }
         },
         username,
+        artist,
         name,
         description,
         mapIds: {
@@ -260,7 +261,7 @@ const deleteMapById = async (mapId) => {
 module.exports = {
   getAllMapArts,
   getMaps,
-  getMapIdById,
+  getMapById,
   getUniqueArtists,
   getUniqueUsernames,
   getUniqueServers,

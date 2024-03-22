@@ -11,7 +11,7 @@ const getAllMapArts = async () => {
 
 const getMapById = async (mapId) => {
   try {
-    return await mapArtModel.getMapIdById(mapId);
+    return await mapArtModel.getMapById(mapId);
   } catch (error) {
     console.error('Error fetching map by ID:', error);
     throw error;
@@ -68,11 +68,12 @@ const getUniqueTags = async () => {
   }
 };
 
-const createMapId = async ({ userId, username, name, description, mapIds, tags, imgUrl, displayName, hash, server, serverId }) => {
+const createMapId = async ({ userId, username, artist, name, description, mapIds, tags, imgUrl, displayName, hash, server, serverId }) => {
   try {
     return await mapArtModel.createMapId({
       userId,
       username,
+      artist,
       name,
       description,
       mapIds,

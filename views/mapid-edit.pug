@@ -80,7 +80,7 @@ html
           var mapId = url.substring(url.lastIndexOf('/') + 1);
 
           var xhr = new XMLHttpRequest();
-          xhr.open('POST', `/mapId-edit/${mapId}`, true);
+          xhr.open('POST', `/mapid/edit/${mapId}`, true);
           xhr.onreadystatechange = function () {
               if (xhr.readyState === XMLHttpRequest.DONE) {
                   if (xhr.status === 200) {

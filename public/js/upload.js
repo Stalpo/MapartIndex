@@ -1,9 +1,16 @@
+// Prevent form submission on Enter key press
+document.addEventListener("keydown", function(event) {
+  if (event.key === "Enter" && event.target.tagName !== "TEXTAREA" && event.target.tagName !== "INPUT") {
+    event.preventDefault();
+  }
+});
+
 document.addEventListener("DOMContentLoaded", function () {
   const form = document.querySelector("form");
   const progressBar = document.getElementById("uploadProgressBar");
   const successMessage = document.getElementById("successMessage");
   const errorMessage = document.getElementById("errorMessage");
-  const previewImg = document.getElementById("imagePreview");
+  const imagePreview = document.getElementById("imagePreview"); // added this line
 
   form.addEventListener("submit", function (event) {
     event.preventDefault(); // Prevent the form from submitting normally
@@ -15,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
     progressBar.parentElement.style.display = "block";
 
     const xhr = new XMLHttpRequest();
-    xhr.open("POST", "/upload", true);
+    xhr.open("POST", "/mapid/create", true);
 
     xhr.upload.addEventListener("progress", function (event) {
       if (event.lengthComputable) {
@@ -38,11 +45,10 @@ document.addEventListener("DOMContentLoaded", function () {
         // Display the uploaded images in the success alert
         if (response.files && response.files.length > 0) {
           response.files.forEach((filename) => {
-            // const img = document.createElement("img");
-            // img.src = "./public/uploads/" + filename;
-            // console.log(img.src);
-            // img.className = "img-fluid";
-            // imagePreview.appendChild(img);
+            const img = document.createElement("img");
+            img.src = "/public/uploads/" + filename;
+            img.className = "img-fluid";
+            imagePreview.appendChild(img); // corrected this line
           });
 
           imagePreview.style.display = "block";

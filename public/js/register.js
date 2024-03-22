@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "/register", true);
+    xhr.open("POST", "/user/register", true);
     xhr.setRequestHeader("Content-Type", "application/json");
 
     xhr.onreadystatechange = function() {

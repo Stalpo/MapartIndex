@@ -141,3 +141,5 @@ public/uploads/mapart/*.png
 public/uploads/mapart/*.jpg
 public/uploads/mapart/tmp/*.png
 public/uploads/mapart/tmp/*.jpg
+
+public/uploads/tmp/*.js

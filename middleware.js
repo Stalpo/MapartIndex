@@ -1,6 +1,17 @@
+// Dependencies
 const moment = require('moment');
+const path = require('path');
+
+// Required controllers
 const userController = require('./controllers/userController');
 const profileController = require('./controllers/profileController');
+
+// File path middleware
+const setFilePath = async (req, res, next) => {
+  const currentPath = path.resolve(__dirname);
+  res.locals.filepath = currentPath;
+  next();
+};
 
 // Check admin status middleware
 const checkAdminStatus = async (req, res, next) => {
@@ -86,6 +97,7 @@ const loggingMiddleware = (req, res, next) => {
 };
 
 module.exports = {
+  setFilePath,
   checkAdminStatus,
   checkModStatus,
   loggedInMiddleware,

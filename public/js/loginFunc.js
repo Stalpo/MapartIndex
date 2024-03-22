@@ -1,6 +1,6 @@
 function sendLogin(username, password){
   var xhr = new XMLHttpRequest();
-  xhr.open("POST", "/login", true);
+  xhr.open("POST", "/user/login", true);
   xhr.setRequestHeader("Content-Type", "application/json");
 
   xhr.onreadystatechange = function() {
