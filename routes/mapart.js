@@ -1,42 +1,28 @@
 const express = require('express');
 const router = express.Router();
 const validator = require('validator');
+const bodyParser = require('body-parser');
 const multer = require('multer');
-const pathb = require('path');
+const path = require('path');
+const fs = require('fs');
+const crypto = require('crypto');
 
 // Required controllers
 const userController = require('../controllers/userController');
 const mapArtController = require('../controllers/mapArtController');
 
 // Multer config
-const mapArtStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, '../public/uploads/mapArt/tmp'); // Upload files to a directory specific to mapArt
-  },
-  filename: function (req, file, cb) {
-    // Generate a unique filename based on timestamp and random string
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const filename = uniqueSuffix + '.png'; // Ensure the file ends with .png
-    cb(null, filename);
-  }
-});
-
-// File filter for multer
-const fileFilter = (req, file, cb) => {
-  // Check if the file is a PNG image
-  if (file.mimetype === 'image/png') {
-    cb(null, true);
-  } else {
-    cb(new Error('Only PNG images are allowed!'), false);
-  }
-};
-
-// Init multer storage, file filter, and limits for /mapArt-create
 const mapArtUpload = multer({
-  storage: mapArtStorage,
-  fileFilter: fileFilter, // Assuming fileFilter is defined elsewhere
+  dest: 'uploads/', // Destination folder for uploaded files
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === 'image/png') {
+      cb(null, true);
+    } else {
+      cb(new Error('Only PNG images are allowed!'), false);
+    }
+  },
   limits: {
-    fileSize: 1024 * 1024 * 40, // 200 MB limit for mapArt images (wtf)
+    fileSize: 1024 * 1024 * 40, // 40 MB limit for mapArt images
   },
 });
 
@@ -45,69 +31,58 @@ router.get('/gallery', async (req, res) => {
 });
 
 // MapArt route
-router.get('/create', (req, res) => {
+router.get('/create', async (req, res) => {
   res.render('mapart-create');
 });
 
 router.post('/create', mapArtUpload.single('file'), async (req, res) => {
   try {
-    // Check if user is an admin and a moderator
     if (!res.locals.admin && !res.locals.mod) {
       return res.status(403).send('Forbidden');
     }
 
-    let { name, description, artist, server, mapIds, tags } = req.body;
-    let { filename, path, originalname } = req.file;
-
     if (!req.file) {
-      // If no files are provided
+      console.log('No file uploaded:', req.body);
       return res.status(400).json({ error: 'No files uploaded' });
     }
 
-    // Generate the desired filename based on server
-    const newFilename = await mapArtController.generateFilename(server);
+    console.log('Uploaded file:', req.file);
 
-    // Get current map count + 1
+    const { name, description, artist, server, mapIds, tags } = req.body;
+    const { filename, path, originalname } = req.file;
+
+    const newFilename = await mapArtController.generateFilename(server);
     const serverId = await mapArtController.getLatestServerIdByServer(server) + 1;
-    
-    console.log(path);
-    console.log(filename);
-    
-    // Constructing the file path using path.join()
-    const newFilepath = pathb.join(mapartDirectory, newFilename);
-    
-    
-    let displayName;
-    if (newFilename.endsWith(".png")) {
-      displayName = newFilename.slice(0, -4);
+    const newFilepath = `${res.locals.filepath}/public/uploads/mapart/${newFilename}`;
+
+    let displayName = newFilename.endsWith(".png") ? newFilename.slice(0, -4) : undefined;
+
+    if (!path) {
+      console.log('File path missing:', req.file);
+      return res.status(400).json({ error: 'File path missing' });
     }
 
-    // Rename the file
     fs.renameSync(path, newFilepath);
 
-    // Read the image file and convert it to base64
     const base64 = fs.readFileSync(newFilepath, { encoding: 'base64' });
-
-    // Calculate a hash of the base64 data
     const hash = crypto.createHash('md5').update(base64).digest('hex');
 
-    mapIds = JSON.parse(mapIds);
-
-    tags = JSON.parse(tags);
+    const parsedMapIds = JSON.parse(mapIds);
+    const parsedTags = JSON.parse(tags);
 
     const result = await mapArtController.createMapId({
       userId: res.locals.userId,
       username: res.locals.username,
       imgUrl: newFilename,
-      name: name,
-      description: description,
-      mapIds: mapIds,
-      tags: tags,
-      artist: artist,
-      displayName: displayName,
-      hash: hash,
-      server: server,
-      serverId: serverId,
+      name,
+      description,
+      mapIds: parsedMapIds,
+      tags: parsedTags,
+      artist,
+      displayName,
+      hash,
+      server,
+      serverId,
     });
 
     res.send(result);

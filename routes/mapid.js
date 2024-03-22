@@ -2,44 +2,103 @@ const express = require('express');
 const router = express.Router();
 const validator = require('validator');
 const multer = require('multer');
+const fs = require('fs');
+const crypto = require('crypto');
 
 // Required controllers
 const userController = require('../controllers/userController');
 const mapIdController = require('../controllers/mapIdController');
 
 // Multer config
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'public/uploads/tmp'); // Upload files to a temporary directory
+const mapIdUpload = multer({
+  dest: 'uploads/', // Destination folder for uploaded files
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === 'image/png') {
+      cb(null, true);
+    } else {
+      cb(new Error('Only PNG images are allowed!'), false);
+    }
   },
-  filename: function (req, file, cb) {
-    // Generate a unique filename
-    const filename = Date.now() + '-' + file.originalname;
-    cb(null, filename);
-  }
-});
-
-// File filter for multer
-const fileFilter = (req, file, cb) => {
-  // Check if the file is a PNG image
-  if (file.mimetype === 'image/png') {
-    cb(null, true);
-  } else {
-    cb(new Error('Only PNG images are allowed!'), false);
-  }
-};
-
-// Init multer storage, file filter, and limits
-const upload = multer({
-  storage,
-  fileFilter,
   limits: {
-    fileSize: 1024 * 64, // 64 KB limit
+    fileSize: 1024 * 1024 * 40, // 40 MB limit for mapArt images
   },
 });
 
 router.get('/gallery', async (req, res) => {
   res.render('mapid-gallery');
+});
+
+// Upload route
+router.get('/create', async (req, res) => {
+  res.render('mapid-create');
+});
+
+// POST endpoint for uploading files
+router.post('/create', mapIdUpload.array('images', 4000), async (req, res) => {
+  try {
+    // Check if user is an admin and a moderator
+    if (!res.locals.admin && !res.locals.mod) {
+      return res.status(403).send('Forbidden');
+    }
+
+    const { files } = req;
+
+    if (!files || files.length === 0) {
+      // If no files are provided
+      return res.status(400).json({ error: 'No files uploaded' });
+    }
+
+    const uploadedFiles = [];
+
+    // Process each file
+    for (const file of files) {
+      const { filename, path, originalname } = file;
+
+      // Generate the desired filename based on server
+      const server = req.body.server;
+      const newFilename = await mapIdController.generateFilename(server);
+
+      // Get current map count + 1
+      const serverId = await mapIdController.getLatestServerIdByServer(server) + 1;
+      const newFilepath = `${res.locals.filepath}/public/uploads/${newFilename}`;
+
+      let displayName;
+      if (newFilename.endsWith(".png")) {
+        displayName = newFilename.slice(0, -4);
+      }
+
+      // Rename the file
+      fs.renameSync(path, newFilepath);
+
+      // Read the image file and convert it to base64
+      const base64 = fs.readFileSync(newFilepath, { encoding: 'base64' });
+
+      // Calculate a hash of the base64 data
+      const hash = crypto.createHash('md5').update(base64).digest('hex');
+
+      // Add metadata to the db
+      await mapIdController.createMapId({
+        userId: res.locals.userId,
+        username: res.locals.username,
+        imgUrl: newFilename,
+        displayName: displayName,
+        hash: hash,
+        server: req.body.server,
+        serverId: serverId,
+      });
+
+      uploadedFiles.push({
+        originalname,
+        filename: newFilename,
+        path: newFilepath
+      });
+    }
+    // Send a response with information about the uploaded files
+    res.status(200).json({ message: 'Upload successful', files: uploadedFiles[0] });
+  } catch (error) {
+    console.error('Error uploading files:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 router.get('/id/:id', async (req, res) => {
@@ -76,7 +135,7 @@ router.get('/edit/:id', async (req, res) => {
   }
 });
 
-router.post('/edit/:id', upload.none(), async (req, res) => {
+router.post('/edit/:id', mapIdUpload.none(), async (req, res) => {
   try {
     // Check if user is an admin and a moderator
     if (!res.locals.admin && !res.locals.mod) {

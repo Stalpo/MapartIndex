@@ -279,9 +279,11 @@ html
                 const tagsArray = tagsInput.value.split(',').map(tag => tag.trim());
                 formData.append('tags', JSON.stringify(tagsArray));
 
+                console.log(formData);
+
                 return fetch('/mapart/create', {
                   method: 'POST',
-                  body: formData
+                  body: formData,
                 })
                 .then(response => {
                   if (!response.ok) {
