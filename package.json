@@ -21,6 +21,7 @@
     "multer": "^1.4.5-lts.1",
     "prisma": "^5.10.2",
     "pug": "^3.0.2",
+    "sanitize-filename": "^1.6.3",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
     "validator": "^13.11.0"
