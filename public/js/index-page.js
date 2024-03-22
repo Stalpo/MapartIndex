@@ -1,5 +1,7 @@
 // Fetch random images from /api/mapId/maps
-fetch('/api/mapArt/maps?page=1&perPage=10')
+const maparts = 20;
+const randomPage = Math.floor(Math.random() * 50);
+fetch(`/api/mapArt/maps?page=${randomPage}&perPage=${maparts}`)
   .then(response => response.json())
   .then(images => {
     // Shuffle the array of images
