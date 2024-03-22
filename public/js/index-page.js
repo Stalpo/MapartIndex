@@ -13,9 +13,9 @@ fetch('/api/mapArt/maps?page=1&perPage=10')
       const carouselItem = document.createElement('div');
       carouselItem.className = `carousel-item ${activeClass}`;
       const imgUrl = `/public/uploads/mapart/${image.imgUrl}`;
-      const brightnessValue = 800; // Brightness value
+      const opacity = 50; // Opacity %
 
-      carouselItem.innerHTML = `<img src="${imgUrl}" class="d-block w-100" style="image-rendering: pixelated; filter: brightness(${brightnessValue}%);" alt="Map Image">`;
+      carouselItem.innerHTML = `<img src="${imgUrl}" class="d-block w-100" style="image-rendering: pixelated; opacity: ${opacity}%;" alt="Map Image">`;
       carouselInner.appendChild(carouselItem);
     });
   });
