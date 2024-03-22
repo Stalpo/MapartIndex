@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
     progressBar.parentElement.style.display = "block";
 
     const xhr = new XMLHttpRequest();
-    xhr.open("POST", "/initialPush", true);
+    xhr.open("POST", "/admin/initialPush", true);
 
     xhr.upload.addEventListener("progress", function (event) {
       if (event.lengthComputable) {
@@ -128,7 +128,7 @@ async function stitchMaps(mapArtInfo, files){
               const tagsArray = [];
               formData.append('tags', JSON.stringify(tagsArray));
 
-              return fetch('/mapart-create', {
+              return fetch('/mapart/create', {
                 method: 'POST',
                 body: formData
               })

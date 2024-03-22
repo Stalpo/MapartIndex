@@ -2,9 +2,12 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const archiver = require('archiver');
+const fs = require('fs');
+const crypto = require('crypto');
 
 // Required controllers
 const userController = require('../controllers/userController');
+const mapIdController = require('../controllers/mapIdController');
 
 // Multer config
 const upload = multer({
@@ -13,7 +16,7 @@ const upload = multer({
     filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
   }),
   fileFilter: (req, file, cb) => cb(null, true),
-  limits: { fileSize: 1024 * 64 } // 64 KB limit
+  limits: { fileSize: 1024 * 1024 * 128 } // 128 MB limit
 });
 
 router.get('/', async (req, res) => {
@@ -117,10 +120,9 @@ router.post('/initialPush', upload.array('images', 4000), async (req, res) => {
       const newFilename = await mapIdController.generateFilename(server);
 
       // Get current map count + 1
+      // Get current map count + 1
       const serverId = await mapIdController.getLatestServerIdByServer(server) + 1;
-
-      // Construct the new filepath manually
-      const newFilepath = __dirname + '/public/uploads/' + newFilename;
+      const newFilepath = `${res.locals.filepath}/public/uploads/${newFilename}`;
 
       let displayName;
       if (newFilename.endsWith(".png")) {
