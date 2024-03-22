@@ -13,7 +13,7 @@ const mapArtController = require('../controllers/mapArtController');
 
 // Multer config
 const mapArtUpload = multer({
-  dest: 'uploads/', // Destination folder for uploaded files
+  dest: '/public/uploads/mapart/tmp', // Destination folder for uploaded files
   fileFilter: (req, file, cb) => {
     if (file.mimetype === 'image/png') {
       cb(null, true);
@@ -46,8 +46,6 @@ router.post('/create', mapArtUpload.single('file'), async (req, res) => {
       return res.status(400).json({ error: 'No files uploaded' });
     }
 
-    console.log('Uploaded file:', req.file);
-
     const { name, description, artist, server, mapIds, tags } = req.body;
     const { filename, path, originalname } = req.file;
 
@@ -58,7 +56,6 @@ router.post('/create', mapArtUpload.single('file'), async (req, res) => {
     let displayName = newFilename.endsWith(".png") ? newFilename.slice(0, -4) : undefined;
 
     if (!path) {
-      console.log('File path missing:', req.file);
       return res.status(400).json({ error: 'File path missing' });
     }
 

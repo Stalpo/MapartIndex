@@ -11,7 +11,7 @@ const mapIdController = require('../controllers/mapIdController');
 
 // Multer config
 const mapIdUpload = multer({
-  dest: 'uploads/', // Destination folder for uploaded files
+  dest: '/public/uploads/tmp', // Destination folder for uploaded files
   fileFilter: (req, file, cb) => {
     if (file.mimetype === 'image/png') {
       cb(null, true);

@@ -11,7 +11,6 @@ const getAllMapArts = async () => {
 
 const getMapById = async (mapId) => {
   try {
-    console.log(mapId);
     return await mapArtModel.getMapById(mapId);
   } catch (error) {
     console.error('Error fetching map by ID:', error);
