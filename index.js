@@ -6,7 +6,6 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
-const archiver = require('archiver');
 const gitlog = require("gitlog").default;
 
 // Internal dependencies
@@ -106,6 +105,10 @@ app.use('/mapid', mapIdRoutes);
 const mapArtRoutes = require('./routes/mapart');
 app.use('/mapart', mapArtRoutes);
 
+// Admin Routes
+const adminRoutes = require('./routes/admin');
+app.use('/admin', adminRoutes);
+
 // Discord Routes
 const discord = require('./routes/discord');
 app.use('/discord', discord);
@@ -149,38 +152,6 @@ app.get('/changelog', (req, res) => {
     }
     res.render('page-changelog', { commits });
   });
-});
-
-app.get('/admin', async (req, res) => {
-  try {
-    const allUsers = await userController.getAllUsers();
-    res.render('admin', { allUsers });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Internal Server Error');
-  }
-});
-
-// Route to download the zip file
-app.get('/admin/download', (req, res) => {
-  if (res.locals.admin) {
-    const uploadDir = './public/uploads';
-    const currentDate = new Date().toISOString().slice(0,10);
-    const currentTime = new Date().toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' }).replace(/:/g, '-');
-    const zipFileName = `uploads_${currentDate}_${currentTime}.zip`;
-  
-    const archive = archiver('zip', {
-        zlib: { level: 9 } // Set compression level
-    });
-  
-    archive.pipe(res);
-    archive.directory(uploadDir, false);
-    archive.finalize();
-  
-    res.attachment(zipFileName);
-  } else {
-    res.redirect('/admin');
-  }
 });
 
 // initialPush route

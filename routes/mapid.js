@@ -28,12 +28,10 @@ router.get('/gallery', async (req, res) => {
   res.render('mapid-gallery');
 });
 
-// Upload route
 router.get('/create', async (req, res) => {
   res.render('mapid-create');
 });
 
-// POST endpoint for uploading files
 router.post('/create', mapIdUpload.array('images', 4000), async (req, res) => {
   try {
     // Check if user is an admin and a moderator
@@ -162,7 +160,6 @@ router.post('/edit/:id', mapIdUpload.none(), async (req, res) => {
   }
 });
 
-// Delete mapId route
 router.get('/delete', async (req, res) => {
   try {
     let mapId = req.query.mapId || req.body.mapId;
