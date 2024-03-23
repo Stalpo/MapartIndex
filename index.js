@@ -2,19 +2,16 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
-const crypto = require('crypto');
 const gitlog = require("gitlog").default;
 
 // Internal dependencies
 const {
   setFilePath,
-  loggedInMiddleware,
-  loggingMiddleware,
+  checkUserStatus,
   checkAdminStatus,
-  checkModStatus
+  checkModStatus,
+  requestLogger,
 } = require('./middleware');
 
 // Init express
@@ -39,10 +36,10 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // Custom middleware
 app.use(setFilePath);
-app.use(loggedInMiddleware);
-app.use(loggingMiddleware);
+app.use(checkUserStatus);
 app.use(checkAdminStatus);
 app.use(checkModStatus);
+app.use(requestLogger);
 
 // User Routes
 const userRoutes = require('./routes/user');

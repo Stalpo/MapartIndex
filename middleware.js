@@ -48,7 +48,7 @@ const checkModStatus = async (req, res, next) => {
 };
 
 // loggedIn variable middleware
-const loggedInMiddleware = async (req, res, next) => {
+const checkUserStatus = async (req, res, next) => {
   const token = req.cookies.token;
 
   if (token) {
@@ -84,16 +84,18 @@ const loggedInMiddleware = async (req, res, next) => {
   next();
 };
 
-// Custom middleware for console logging
-const loggingMiddleware = (req, res, next) => {
+// Console.log requests into the terminal
+const requestLogger = (req, res, next) => {
   const timestamp = moment().format('MM-DD HH:mm:ss');
   const method = req.method;
   const url = req.url;
+  const ip = req.ip;
 
   res.on('finish', () => {
     const statusCode = res.statusCode;
     const responseTime = new Date() - req.startTime;
-    console.log(`[${timestamp}] ${method} ${url} ${statusCode} - ${responseTime}ms`);
+    let statusColor = statusCode >= 500 ? '\x1b[31m' : statusCode >= 400 ? '\x1b[33m' : '\x1b[32m';
+    console.log(`\x1b[36m[${timestamp}] \x1b[32m${method} \x1b[36m${url} from \x1b[33m${ip} ${statusColor}${statusCode}\x1b[0m - ${responseTime}ms`);
   });
 
   req.startTime = new Date();
@@ -104,6 +106,6 @@ module.exports = {
   setFilePath,
   checkAdminStatus,
   checkModStatus,
-  loggedInMiddleware,
-  loggingMiddleware,
+  checkUserStatus,
+  requestLogger,
 };
