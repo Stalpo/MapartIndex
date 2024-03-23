@@ -170,30 +170,42 @@ const verifyToken = (token) => {
 
 const loginDiscordUser = async (userId, discordId, username, avatar, email) => {
   try {
-    // Get the user by ID
-    let user = await userModel.getUserById(userId);
+    let user;
 
-    // If the user doesn't exist, create a new user with Discord data
-    if (!user) {
-      user = await userModel.createUserDiscord({ userId, discordId, username, avatar, email });
-    } else {
-      // If the user exists, check if it's already linked to a Discord account
-      let discordUser = await userModel.getUserByDiscordId(discordId);
-      if (discordUser) {
-        return { error: 'User has already linked a discord account!' };
+    if (!userId) {
+      // If the user is not logged in, they could be either registering or logging in with Discord
+      user = await userModel.getUserByDiscordId(discordId);
+
+      if (user) {
+        // If a user with the given Discord ID exists, it means they are logging in
+        await userModel.updateUserDiscordInfo(user.id, { discordId, username, avatar, email });
+      } else {
+        // If no user with the given Discord ID exists, it means they are registering
+        user = await userModel.createUserDiscord({ discordId, username, avatar, email });
       }
+    } else {
+      // If the user is logged in, they are updating their information
+      // Check if the user is already linked to a Discord account
+      const existingUser = await userModel.getUserById(userId);
+
+      if (existingUser.discordId) {
+        return { error: 'User is already linked to a Discord account!' };
+      }
+
+      // Update the users information
       await userModel.updateUserDiscordInfo(userId, { discordId, username, avatar, email });
     }
 
     // Generate JWT token for the user
     const token = jwt.sign({ username }, process.env.SECRET_KEY, { expiresIn: '24h' });
-    
+
     return { token };
   } catch (error) {
     console.error('Error in loginDiscordUser:', error);
     throw error;
   }
 };
+
 
 const updateUserPassword = async (userId, password) => {
   try {

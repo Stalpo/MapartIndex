@@ -153,6 +153,18 @@ const createUser = async ({ username, hashedPw }) => {
 const createUserDiscord = async ({ discordId, username, avatar, email }) => {
   try {
     const apiKey = generateApiKey();
+
+    const existingUser = await prisma.user.findUnique({
+      where: {
+        username: username,
+      },
+    });
+
+    if (existingUser) {
+      throw new Error('Username is already taken');
+    }
+
+    // Create the user if the username is available
     const user = await prisma.user.create({
       data: {
         discordId,
@@ -162,9 +174,9 @@ const createUserDiscord = async ({ discordId, username, avatar, email }) => {
           create: {
             email,
             username,
-            avatar
-          }
-        }
+            avatar,
+          },
+        },
       },
     });
     return user;
@@ -173,6 +185,7 @@ const createUserDiscord = async ({ discordId, username, avatar, email }) => {
     return null;
   }
 };
+
 
 const updateUserDiscordInfo = async (userId, { discordId, username, avatar, email }) => {
   try {
