@@ -41,27 +41,28 @@ html
               | Changelog
 
       // Stats Section
-      if totalMaps
-        .row.justify-content-center
-          .col-md-3
-            .card.border-primary.mb-3(style='max-width: 18rem;').text-center
+      .row.justify-content-center
+        if totalMaps
+          .col-md-3.mb-3
+            .card.border-primary.text-center
               .card-header Total Maps
               .card-body.text-primary
                 h5.card-title #{totalMaps}
-          .col-md-3
-            .card.border-primary.mb-3(style='max-width: 18rem;').text-center
+        if totalMaparts
+          .col-md-3.mb-3
+            .card.border-primary.text-center
               .card-header Total Maparts
               .card-body.text-primary
                 h5.card-title #{totalMaparts}
-      if totalUsers
-        .row.justify-content-center
-          .col-md-3
-            .card.border-success.mb-3(style='max-width: 18rem;').text-center
+        if totalUsers
+          .col-md-3.mb-3
+            .card.border-success.text-center
               .card-header Total Users
               .card-body.text-success
                 h5.card-title #{totalUsers}
-          .col-md-3
-            .card.border-success.mb-3(style='max-width: 18rem;').text-center
+        if totalServers
+          .col-md-3.mb-3
+            .card.border-success.text-center
               .card-header Total Servers
               .card-body.text-success
                 h5.card-title #{totalServers}
