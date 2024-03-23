@@ -85,6 +85,17 @@ const getMaps = async (page, perPage, user, artist, sort, server, tag) => {
   }
 };
 
+const countAllMapArts = async () => {
+  try {
+    const count = await prisma.mapArt.count();
+
+    return count;
+  } catch (error) {
+    console.error('Error counting all map arts:', error);
+    throw error;
+  }
+};
+
 const getMapById = async (mapId) => {
   try {
     return await prisma.mapArt.findUnique({
@@ -261,6 +272,7 @@ const deleteMapById = async (mapId) => {
 module.exports = {
   getAllMapArts,
   getMaps,
+  countAllMapArts,
   getMapById,
   getUniqueArtists,
   getUniqueUsernames,

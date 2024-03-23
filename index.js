@@ -72,8 +72,8 @@ app.use('/api', api);
 // Index route
 app.get('/', async (req, res) => {
   try {
-    const totalMaps = (await mapIdController.getMaps()).length;
-    const totalMaparts = (await mapArtController.getAllMapArts()).length;
+    const totalMaps = (await mapIdController.countMapIds());
+    const totalMaparts = (await mapArtController.countAllMapArts());
     const totalUsers = (await userController.getAllUsers()).length;
     const totalServers = (await mapIdController.getUniqueServers()).length;
     res.render('index', { totalMaps, totalUsers, totalMaparts, totalServers });
