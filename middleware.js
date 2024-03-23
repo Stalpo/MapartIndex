@@ -68,14 +68,13 @@ const checkUserStatus = async (req, res, next) => {
       }
 
     } else {
-      // Token is not valid, handle the error as needed
-      console.error(verificationResult.error);
+      // Token is not valid,
       res.locals.userId = null;
       res.locals.username = null;
       res.clearCookie('token');
     }
   } else {
-    // No token present, set userId to null
+    // No token present
     res.locals.userId = null;
     res.locals.username = null;
     res.clearCookie('token');
