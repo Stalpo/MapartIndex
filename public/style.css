@@ -30,3 +30,27 @@
   color: #000000;
   background-color: #dbcfba;
 }
+
+.nsfw .image-wrapper .image-link {
+  display: block;
+}
+
+.nsfw .image-wrapper .blurred {
+  width: 100%;
+  filter: blur(5px);
+}
+
+.nsfw .image-wrapper {
+  overflow: hidden;
+  border: 1px solid #b6b6b6;
+  border-radius: 5px;
+}
+
+.nsfw .image-wrapper img {
+  width: 100%;
+  filter: blur(5px);
+}
+
+.image-wrapper img {
+  width: 100%;
+}
