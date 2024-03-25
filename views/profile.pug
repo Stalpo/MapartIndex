@@ -63,19 +63,56 @@ html
                   button.btn.btn-primary(type="button", id="toggleApiKey", onclick="toggleApiKeyVisibility()") Show API Key
                   p#apiKey(style="display: none;") API Key: #{ apiKey }
                 a.btn.btn-danger(href="/user/deleteUser") Delete My Account
-        
+              br
+              div.col.text-center
+                button.btn.btn-primary(type="button", id="toggleNSFWButton", onclick="toggleNSFWCookie()")
+                  | Show NSFW
+                  span#nsfwStatus
+
         else
           div.container
             div.alert.alert-danger(role="alert")
-              | You are not logged in! 
+              | You are not logged in!
 
-    // include includes/footer.pug
     include includes/scripts.pug
       script.
+        // Function to toggle API key
         function toggleApiKeyVisibility() {
           var apiKeyElement = document.getElementById('apiKey');
           var toggleButton = document.getElementById('toggleApiKey');
           
           apiKeyElement.style.display = (apiKeyElement.style.display === 'none') ? 'block' : 'none';
           toggleButton.style.display = 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+          const nsfwStatusSpan = document.getElementById('nsfwStatus');
+          const showNSFW = getCookie('showNSFW');
+
+          if (showNSFW === 'true') {
+            nsfwStatusSpan.textContent = ' (Enabled)';
+          } else {
+            nsfwStatusSpan.textContent = ' (Disabled)';
+          }
+        });
+
+        // Function to toggle NSFW cookie
+        function toggleNSFWCookie() {
+          var showNSFW = getCookie('showNSFW');
+          showNSFW = (showNSFW === 'true') ? 'false' : 'true';
+          document.cookie = 'showNSFW=' + showNSFW + '; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/';
+          updateNSFWStatusText(showNSFW);
+        }
+
+        // Function to update NSFW status text
+        function updateNSFWStatusText(showNSFW) {
+          const nsfwStatusSpan = document.getElementById('nsfwStatus');
+          nsfwStatusSpan.textContent = (showNSFW === 'true') ? ' (Enabled)' : ' (Disabled)';
+        }
+
+        // Function to get cookie value
+        function getCookie(name) {
+          var value = "; " + document.cookie;
+          var parts = value.split("; " + name + "=");
+          if (parts.length == 2) return parts.pop().split(";").shift();
         }

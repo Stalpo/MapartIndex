@@ -238,27 +238,32 @@ html
         function buildSmallGrid(maps) {
           const gridContainer = document.getElementById('gridContainer');
 
+          // Check if showNSFW cookie is true
+          const showNSFW = getCookie('showNSFW');
+
           // Build grid
           maps.forEach(map => {
             const card = document.createElement('div');
             card.className = 'mb-3 mx-auto';
             card.innerHTML = `
-              <div class="card mb-3 mx-auto ${(map.nsfw ? 'nsfw' : '')}">
+              <div class="card mb-3 mx-auto ${showNSFW === 'true' ? '' : (map.nsfw ? 'nsfw' : '')}">
                 <div class="image-wrapper">
                   <a href="/mapart/id/${map.id}" class="image-link">
-                    <img src="/public/uploads/mapart/${map.imgUrl}" class="pixelated-image blurred" alt="Map Image">
+                    <img src="/public/uploads/mapart/${map.imgUrl}" class="pixelated-image ${showNSFW === 'true' ? '' : (map.nsfw ? 'blurred' : '')}" alt="Map Image">
                   </a>
                 </div>
               </div>
             `;
             gridContainer.appendChild(card);
           });
-        
         };
 
         // Function to build the grid
         function buildGrid(maps) {
           const gridContainer = document.getElementById('gridContainer');
+
+          // Check if showNSFW cookie is true
+          const showNSFW = getCookie('showNSFW');
 
           // Build grid
           maps.forEach(map => {
@@ -266,9 +271,9 @@ html
             card.className = 'mb-3 mx-auto';
             card.style = 'width: 18rem;';
             card.innerHTML = `
-              <div class="card mb-3 mx-auto ${(map.nsfw ? 'nsfw' : '')}">
+              <div class="card mb-3 mx-auto ${showNSFW === 'true' ? '' : (map.nsfw ? 'nsfw' : '')}">
                 <div class="image-wrapper">
-                  <img src="/public/uploads/mapart/${map.imgUrl}" class="pixelated-image ${(map.nsfw ? 'blurred' : '')}" alt="Map Image">
+                  <img src="/public/uploads/mapart/${map.imgUrl}" class="pixelated-image ${showNSFW === 'true' ? '' : (map.nsfw ? 'blurred' : '')}" alt="Map Image">
                 </div>
                 <div class="card-body">
                   <h5 class="card-title">${map.displayName}</h5>
@@ -284,6 +289,18 @@ html
             `;
             gridContainer.appendChild(card);
           });
+        }
+
+        // Function to get cookie value by name
+        function getCookie(name) {
+          const cookies = document.cookie.split(';');
+          for (let cookie of cookies) {
+            const [cookieName, cookieValue] = cookie.split('=');
+            if (cookieName.trim() === name) {
+              return cookieValue;
+            }
+          }
+          return '';
         }
 
         // Lazy loading
