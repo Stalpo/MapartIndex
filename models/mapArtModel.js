@@ -56,10 +56,10 @@ const getMaps = async (page, perPage, user, artist, sort, server, tag) => {
         orderBy = { createdAt: 'desc' };
         break;
       case 'mapIdsAsc':
-        orderBy = { mapIds: { _count: 'asc' } };
+        orderBy = { mapIdsCount: 'asc' };
         break;
       case 'mapIdsDesc':
-        orderBy = { mapIds: { _count: 'desc' } };
+        orderBy = { mapIdsCount: 'desc' };
         break;
       default:
         orderBy = { createdAt: 'desc' };
@@ -184,6 +184,7 @@ const getUniqueTags = async () => {
 
 const createMapId = async ({ userId, username, artist, name, description, mapIds, tags, imgUrl, displayName, hash, server, serverId }) => {
   try {
+    const mapIdsCount = mapIds.length;
     return await prisma.mapArt.create({
       data: {
         user: {
@@ -196,8 +197,9 @@ const createMapId = async ({ userId, username, artist, name, description, mapIds
         name,
         description,
         mapIds: {
-          connect: mapIds.map(id => ({ id })) // Connect each mapId by its id
+          connect: mapIds.map(id => ({ id }))
         },
+        mapIdsCount,
         tags,
         imgUrl,
         displayName,
@@ -211,7 +213,6 @@ const createMapId = async ({ userId, username, artist, name, description, mapIds
     throw error;
   }
 };
-
 
 const updateMapById = async (mapId, { artist, name, description, nsfw, tags }) => {
   try {
