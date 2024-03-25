@@ -47,6 +47,9 @@ html
 
           tbody(id='mapsTableBody')
 
+        if admin
+          include includes/admin-menu.pug
+
         script.
           // Function to populate select element with options
           function populateSelect(selectorId, data) {

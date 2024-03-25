@@ -1,0 +1,124 @@
+script.
+  function showAdminModal() {
+    var modalHtml = `
+      <div class="modal fade" id="adminActionsModal" tabindex="-1" role="dialog" aria-labelledby="adminActionsModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="adminActionsModalLabel">Admin Actions</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body text-center">
+              <button type="button" class="btn btn-primary" id="userModalButton">Users Panel</button>
+              <button type="button" class="btn btn-primary" id="systemInfoButton">System Info</button>
+              <button type="button" class="btn btn-primary" id="mapDBButton">Map DB Info</button>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    $('#adminActionsModal').modal('show');
+
+    document.getElementById('userModalButton').addEventListener('click', showUserModal);
+    document.getElementById('systemInfoButton').addEventListener('click', showSystemInfoModal);
+    document.getElementById('mapDBButton').addEventListener('click', showMapDBModal);
+  }
+
+  function showUserModal() {
+    var modalHtml = `
+      <div class="modal fade" id="userModal" tabindex="-1" role="dialog" aria-labelledby="userModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="userModalLabel">Users</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p>User modal content goes here...</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    $('#userModal').modal('show');
+  }
+
+  function showSystemInfoModal() {
+    var modalHtml = `
+      <div class="modal fade" id="systemInfoModal" tabindex="-1" role="dialog" aria-labelledby="systemInfoModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="systemInfoModalLabel">System Information</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p>System information modal content goes here...</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    $('#systemInfoModal').modal('show');
+  }
+
+  function showMapDBModal() {
+    var modalHtml = `
+      <div class="modal fade" id="mapDBModal" tabindex="-1" role="dialog" aria-labelledby="mapDBModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="mapDBModalLabel">Map DB Information</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p>Map DB modal content goes here...</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    $('#mapDBModal').modal('show');
+  }
+
+  function addButtonToNavbar() {
+    var button = document.createElement("button");
+    button.classList.add("btn", "btn-secondary", "ml-2");
+    button.innerText = "Admin Actions";
+
+    button.addEventListener("click", showAdminModal);
+
+    var navbar = document.querySelector('.navbar-collapse');
+    navbar.appendChild(button);
+  }
+
+  addButtonToNavbar();
