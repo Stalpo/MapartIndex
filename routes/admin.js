@@ -55,7 +55,7 @@ router.get('/initialPush', async (req, res) => {
   if (!res.locals.admin) {
     return res.status(403).send('Forbidden');
   }
-  res.render('initialPush');
+  res.render('admin-initial');
 });
 
 // POST endpoint for initial push
