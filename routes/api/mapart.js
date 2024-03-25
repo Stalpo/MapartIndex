@@ -34,16 +34,21 @@ const multer = require('multer');
  *         schema:
  *           type: string
  *         description: Filter maps by artist.
-*       - in: query
+ *       - in: query
  *         name: server
  *         schema:
  *           type: string
  *         description: Filter maps by server.
  *       - in: query
+ *         name: tag
+ *         schema:
+ *           type: string
+ *         description: Filter maps by tag.
+ *       - in: query
  *         name: sort
  *         schema:
  *           type: string
- *           enum: [nameAsc, nameDesc, dateAsc, dateDesc]
+ *           enum: [nameAsc, nameDesc, dateAsc, dateDesc, mapIdsAsc, mapIdsDesc]
  *         description: Sorting criteria.
  *     responses:
  *       200:
@@ -51,7 +56,7 @@ const multer = require('multer');
  *       404:
  *         description: Maps not found.
  *     tags:
- *     - Map ID
+ *     - Map Art
  */
 router.get('/maps', async (req, res) => {
   try {

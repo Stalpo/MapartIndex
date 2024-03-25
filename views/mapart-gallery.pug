@@ -131,7 +131,9 @@ html
             { value: 'nameAsc', label: 'Name (Ascending)' },
             { value: 'nameDesc', label: 'Name (Descending)' },
             { value: 'dateAsc', label: 'Date (Ascending)' },
-            { value: 'dateDesc', label: 'Date (Descending)', selected: true }
+            { value: 'dateDesc', label: 'Date (Descending)', selected: true },
+            { value: 'mapIdsAsc', label: 'Size (Ascending)'},
+            { value: 'mapIdsDesc', label: 'Size (Descending)'},
           ];
 
           options.forEach(option => {
@@ -239,7 +241,7 @@ html
           // Build grid
           maps.forEach(map => {
             const card = document.createElement('div');
-            card.className = 'card mb-3 mx-auto';
+            card.className = 'mb-3 mx-auto';
             card.innerHTML = `
               <div class="card mb-3 mx-auto ${(map.nsfw ? 'nsfw' : '')}">
                 <div class="image-wrapper">

@@ -53,6 +53,14 @@ const getMaps = async (page, perPage, user, artist, sort, server, tag) => {
         orderBy = { createdAt: 'asc' };
         break;
       case 'dateDesc':
+        orderBy = { createdAt: 'desc' };
+        break;
+      case 'mapIdsAsc':
+        orderBy = { mapIds: { _count: 'asc' } };
+        break;
+      case 'mapIdsDesc':
+        orderBy = { mapIds: { _count: 'desc' } };
+        break;
       default:
         orderBy = { createdAt: 'desc' };
         break;
