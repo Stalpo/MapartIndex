@@ -1,12 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const mapArtController = require('../../controllers/mapArtController');
-const userController = require('../../controllers/userController');
-const fs = require("fs");
-const sanitize = require('sanitize-filename');
-const path = require('path');
-const crypto = require("crypto");
-const multer = require('multer');
 
 /**
  * @swagger

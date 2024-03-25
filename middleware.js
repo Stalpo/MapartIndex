@@ -47,7 +47,7 @@ const checkModStatus = async (req, res, next) => {
   }
 };
 
-// loggedIn variable middleware
+// Check user status middleware
 const checkUserStatus = async (req, res, next) => {
   const token = req.cookies.token;
 

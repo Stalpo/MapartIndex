@@ -3,8 +3,6 @@ const router = express.Router();
 const mapIdController = require('../../controllers/mapIdController');
 const userController = require('../../controllers/userController');
 const fs = require("fs");
-const sanitize = require('sanitize-filename');
-const path = require('path');
 const crypto = require("crypto");
 const multer = require('multer');
 
