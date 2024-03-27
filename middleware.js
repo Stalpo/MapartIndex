@@ -65,6 +65,11 @@ const checkUserStatus = async (req, res, next) => {
         res.locals.userId = userId;
         // Update lastSeen
         await profileController.updateLastSeen(userId, new Date());
+      } else {
+        // User is not valid
+        res.locals.userId = null;
+        res.locals.username = null;
+        res.clearCookie('token');
       }
 
     } else {
