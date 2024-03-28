@@ -62,9 +62,9 @@ const updateProfile = async (userId, {
   }
 };
 
-const incrementMapViews = async (userId) => {
+const incrementProfileViews = async (userId) => {
   try {
-    return await profileModel.incrementMapViews(userId);
+    return await profileModel.incrementProfileViews(userId);
   } catch (error) {
     console.error('Error incrementing profile views:', error);
     throw error;
@@ -156,7 +156,7 @@ module.exports = {
   getProfileById,
   createProfile,
   updateProfile,
-  incrementMapViews,
+  incrementProfileViews,
   updateUsername,
   updateLocation,
   updateEmail,

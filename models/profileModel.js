@@ -53,11 +53,11 @@ const updateProfile = async (userId, {
 const incrementProfileViews = async (userId) => {
   try {
     const profile = await prisma.profile.findUnique({
-      where: { id: userId }
+      where: { userId }
     });
     const views = profile.views + 1;
     return await prisma.profile.update({
-      where: { id: userId },
+      where: { userId },
       data: {
         views,
       },

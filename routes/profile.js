@@ -55,7 +55,7 @@ router.get('/user/:username', async (req, res) => {
       res.locals.isMod = await userController.isMod(user.id);
     }
     
-    profileController.incrementProfileViews(userId);
+    profileController.incrementProfileViews(user.id);
 
     res.render('profile');
   } catch (error) {
