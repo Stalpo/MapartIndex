@@ -232,6 +232,24 @@ const updateMapById = async (mapId, { artist, name, description, nsfw, tags }) =
   }
 };
 
+const incrementMapViews = async (mapId) => {
+  try {
+    const mapArt = await prisma.mapArt.findUnique({
+      where: { id: mapId }
+    });
+    const views = mapArt.views + 1;
+    return await prisma.mapArt.update({
+      where: { id: mapId },
+      data: {
+        views,
+      },
+    });
+  } catch (error) {
+    console.error('Error in incrementMapViews:', error);
+    throw error;
+  }
+};
+
 const countMapIdsByServer = async (server) => {
   try {
     const count = await prisma.mapArt.count({
@@ -289,6 +307,7 @@ module.exports = {
   getUniqueTags,
   createMapId,
   updateMapById,
+  incrementMapViews,
   countMapIdsByServer,
   getLatestServerIdByServer,
   deleteMapById,

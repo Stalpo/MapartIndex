@@ -50,6 +50,25 @@ const updateProfile = async (userId, {
   }
 };
 
+const incrementProfileViews = async (userId) => {
+  try {
+    const profile = await prisma.profile.findUnique({
+      where: { id: userId }
+    });
+    const views = profile.views + 1;
+    return await prisma.profile.update({
+      where: { id: userId },
+      data: {
+        views,
+      },
+    });
+  } catch (error) {
+    console.error('Error in incrementProfileViews:', error);
+    throw error;
+  }
+};
+
+
 const updateUsername = async (userId, username) => {
   try {
     return await prisma.profile.update({
@@ -162,6 +181,7 @@ module.exports = {
   getProfileById,
   createProfile,
   updateProfile,
+  incrementProfileViews,
   updateUsername,
   updateLocation,
   updateEmail,

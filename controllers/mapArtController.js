@@ -124,6 +124,15 @@ const updateMapById = async (mapId, { artist, name, description, nsfw, tags }) =
   }
 };
 
+const incrementMapViews = async (mapId) => {
+  try {
+    return await mapArtModel.incrementMapViews(mapId);
+  } catch (error) {
+    console.error('Error incrementing map views:', error);
+    throw error;
+  }
+};
+
 const generateFilename = async (server) => {
   try {
     const mapCount = await getLatestServerIdByServer(server) + 1;
@@ -167,6 +176,7 @@ module.exports = {
   createMapId,
   countMapIdsByServer,
   updateMapById,
+  incrementMapViews,
   generateFilename,
   deleteMapById,
   getLatestServerIdByServer,

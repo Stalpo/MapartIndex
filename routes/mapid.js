@@ -106,6 +106,8 @@ router.get('/id/:id', async (req, res) => {
     // Sanitize mapId
     mapId = validator.trim(mapId);
     mapId = validator.escape(mapId);
+    
+    mapIdController.incrementMapViews(id);
 
     res.render('mapid', { pageTitle: 'MapId', mapId });
   } catch (error) {

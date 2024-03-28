@@ -107,6 +107,15 @@ const updateMapById = async (mapId, { artist, nsfw }) => {
   }
 };
 
+const incrementMapViews = async (mapId) => {
+  try {
+    return await mapIdModel.incrementMapViews(mapId);
+  } catch (error) {
+    console.error('Error incrementing map views:', error);
+    throw error;
+  }
+};
+
 const deleteMapById = async (mapId) => {
   try {
     return await mapIdModel.deleteMapById(mapId);
@@ -184,6 +193,7 @@ module.exports = {
   generateFilename,
   createMapId,
   updateMapById,
+  incrementMapViews,
   deleteMapById,
   getUniqueUsernames,
   getUniqueArtists,

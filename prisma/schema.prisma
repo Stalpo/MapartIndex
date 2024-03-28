@@ -43,6 +43,7 @@ model Profile {
   avatar    String?
   links     String[]
   mcUuid    String?
+  views     Int      @default(0)
 }
 
 model MapArt {
@@ -64,6 +65,9 @@ model MapArt {
   hash         String?
   nsfw         Boolean  @default(false)
   tags         String[]
+  views        Int      @default(0)
+  likes        Int      @default(0)
+  favorites        Int      @default(0)
 }
 
 model MapId {
@@ -82,4 +86,5 @@ model MapId {
   imgUrl       String
   hash         String
   nsfw         Boolean  @default(false)
+  views        Int      @default(0)
 }
