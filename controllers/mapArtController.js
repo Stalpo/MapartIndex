@@ -133,6 +133,16 @@ const incrementMapViews = async (mapId) => {
   }
 };
 
+const setFavoriteMapArt = async (userId, mapArtId) => {
+  try {
+    const updatedProfile = await mapArtModel.setFavoriteMapArt(userId, mapArtId);
+    return updatedProfile;
+  } catch (error) {
+    console.error('Error setting favorite mapArt:', error);
+    throw error;
+  }
+};
+
 const generateFilename = async (server) => {
   try {
     const mapCount = await getLatestServerIdByServer(server) + 1;
@@ -177,6 +187,7 @@ module.exports = {
   countMapIdsByServer,
   updateMapById,
   incrementMapViews,
+  setFavoriteMapArt,
   generateFilename,
   deleteMapById,
   getLatestServerIdByServer,

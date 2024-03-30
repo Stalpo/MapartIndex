@@ -55,9 +55,10 @@ html
                   <div class="row">
                     <div class="col-md-12 text-center">
                       <p>Artist: ${map.artist || 'N/A'}</p>
-                      <p>Uploaded By: <a href="/profile/${map.username}">${map.username}</a></p>
+                      <p>Uploaded By: <a href="/profile/user/${map.username}">${map.username}</a></p>
                       <p>NSFW: ${map.nsfw}</p>
                       <p>Date Uploaded: ${dateUploaded}</p>
+                      <p>Views: ${map.views}</p>
                     </div>
                   </div>`;
                 mapContent.appendChild(mapInfo);

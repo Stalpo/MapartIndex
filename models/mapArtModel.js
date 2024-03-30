@@ -107,7 +107,8 @@ const countAllMapArts = async () => {
 const getMapById = async (mapId) => {
   try {
     return await prisma.mapArt.findUnique({
-      where: { id: mapId }
+      where: { id: mapId },
+      include: { favorites: true },
     });
   } catch (error) {
     console.error('Error in getMapIdById:', error);
@@ -250,6 +251,39 @@ const incrementMapViews = async (mapId) => {
   }
 };
 
+const setFavoriteMapArt = async (userId, mapArtId) => {
+  try {
+    // Retrieve the profile associated with the userId
+    const profile = await prisma.profile.findUnique({
+      where: { userId },
+      include: { favorites: true },
+    });
+
+    if (!profile) {
+      throw new Error('Profile not found');
+    }
+
+    // Check if the mapArtId is already in favorites
+    const isMapArtFavorited = profile.favorites.some(favorite => favorite.mapArtId === mapArtId);
+    if (isMapArtFavorited) {
+      throw new Error('MapArt already favorited');
+    }
+
+    // Create a new entry in the Favorite table
+    const newFavorite = await prisma.favorites.create({
+      data: {
+        profileId: userId,
+        mapArtId: mapArtId,
+      },
+    });
+
+    return newFavorite;
+  } catch (error) {
+    console.error('Error setting favorite mapArt:', error);
+    throw error;
+  }
+};
+
 const countMapIdsByServer = async (server) => {
   try {
     const count = await prisma.mapArt.count({
@@ -308,6 +342,7 @@ module.exports = {
   createMapId,
   updateMapById,
   incrementMapViews,
+  setFavoriteMapArt,
   countMapIdsByServer,
   getLatestServerIdByServer,
   deleteMapById,
