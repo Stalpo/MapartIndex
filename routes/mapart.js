@@ -90,7 +90,6 @@ router.post('/create', mapArtUpload.single('file'), async (req, res) => {
 router.get('/id/:id', async (req, res) => {
   try {
     let mapId = req.params.id;
-    let userId = res.locals.userId;
 
     // Sanitize mapId
     mapId = validator.trim(mapId);
@@ -98,7 +97,7 @@ router.get('/id/:id', async (req, res) => {
 
     mapArtController.incrementMapViews(mapId);
 
-    res.render('mapart', { pageTitle: 'MapArt', mapId, userId });
+    res.render('mapart', { pageTitle: 'MapArt', mapId });
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
@@ -189,25 +188,6 @@ router.get('/uniqueTags', async (req, res) => {
     const uniqueTags = await mapArtController.getUniqueTags();
     res.json(uniqueTags);
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
-// Add favorite mapArt
-router.post('/favorite', async (req, res) => {
-  try {
-    const { userId, mapArtId } = req.body;
-
-    // Check if userId and mapArtId are provided
-    if (!userId || !mapArtId) {
-      return res.status(400).json({ error: 'userId and mapArtId are required' });
-    }
-
-    const updatedProfile = await mapArtController.setFavoriteMapArt(userId, mapArtId);
-
-    res.json(updatedProfile);
-  } catch (error) {
-    console.error('Error adding favorite mapArt:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });

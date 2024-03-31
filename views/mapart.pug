@@ -1,8 +1,7 @@
 doctype html
 html
-  head
-    title= pageTitle
-    include includes/head.pug
+  - const pageTitle = "Map Art: " + mapId
+  include includes/head.pug
   body
     include includes/navbar.pug
     div.container
@@ -15,17 +14,12 @@ html
       div#mapContainer.text-center
         i#loadingSpinner.fa.fa-spinner.fa-spin.fa-3x
         p Loading map data...
-        
-      div.text-center
-        button.btn.btn-success#addToFavorites Add to Favorites
 
       script(src="https://code.jquery.com/jquery-3.6.0.min.js")
       script.
         document.addEventListener('DOMContentLoaded', () => {
           const mapId = `#{mapId}`;
-          const userId = `#{userId}`;
           const mapContainer = document.getElementById('mapContainer');
-          const addToFavoritesBtn = document.getElementById('addToFavorites');
 
           fetch(`/api/mapArt/${mapId}`)
             .then(response => {
@@ -59,13 +53,9 @@ html
                   <div class="row">
                     <div class="col-md-12 text-center">
                       <p>Artist: ${map.artist || 'N/A'}</p>
-                      <p>Uploaded By: <a href="/profile/user/${map.username}">${map.username}</a></p>
+                      <p>Uploaded By: <a href="/profile/${map.username}">${map.username}</a></p>
                       <p>NSFW: ${map.nsfw}</p>
                       <p>Date Uploaded: ${dateUploaded}</p>
-                      <p>Tags: ${map.tags}</p>
-                      <p>Views: ${map.views}</p>
-                      <p>Likes: ${map.likes}</p>
-                      <p>Favorites: ${JSON.stringify(map.favorites)}</p>
                     </div>
                   </div>`;
                 mapContent.appendChild(mapInfo);
@@ -80,31 +70,6 @@ html
               mapContainer.innerHTML = '<div class="alert alert-danger" role="alert">Error fetching data: ' + error.message + '</div>';
             });
 
-          addToFavoritesBtn.addEventListener('click', () => {
-            fetch('/mapart/favorite', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                userId: userId,
-                mapArtId: mapId
-              })
-            })
-            .then(response => {
-              if (!response.ok) {
-                throw new Error(response.statusText);
-              }
-              return response.json();
-            })
-            .then(updatedProfile => {
-              console.log('Favorite added successfully', updatedProfile);
-            })
-            .catch(error => {
-              console.error('Error adding favorite:', error);
-            });
-          });
-
         });
 
-    include includes/scripts.pug
+      include includes/scripts.pug
