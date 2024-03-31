@@ -44,6 +44,7 @@ model Profile {
   links     String[]
   mcUuid    String?
   views     Int      @default(0)
+  favorites String[]
 }
 
 model MapArt {
@@ -66,8 +67,6 @@ model MapArt {
   nsfw         Boolean  @default(false)
   tags         String[]
   views        Int      @default(0)
-  likes        Int      @default(0)
-  favorites        Int      @default(0)
 }
 
 model MapId {

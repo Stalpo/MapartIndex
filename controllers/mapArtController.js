@@ -133,6 +133,33 @@ const incrementMapViews = async (mapId) => {
   }
 };
 
+const setFavoriteMapArtId = async (userId, mapId) => {
+  try {
+    return await mapArtModel.setFavoriteMapArtId(userId, mapId);
+  } catch (error) {
+    console.error('Error setting favorite mapart:', error);
+    throw error;
+  }
+};
+
+const removeFavoriteMapArtId = async (userId, mapId) => {
+  try {
+    return await mapArtModel.removeFavoriteMapArtId(userId, mapId);
+  } catch (error) {
+    console.error('Error setting favorite mapart:', error);
+    throw error;
+  }
+};
+
+const isMapArtFavorite = async (userId, mapArtId) => {
+  try {
+    return await mapArtModel.isMapArtFavorite(userId, mapArtId);
+  } catch (error) {
+    console.error('Error checking favorite status:', error);
+    throw error;
+  }
+}
+
 const generateFilename = async (server) => {
   try {
     const mapCount = await getLatestServerIdByServer(server) + 1;
@@ -177,6 +204,9 @@ module.exports = {
   countMapIdsByServer,
   updateMapById,
   incrementMapViews,
+  setFavoriteMapArtId,
+  removeFavoriteMapArtId,
+  isMapArtFavorite,
   generateFilename,
   deleteMapById,
   getLatestServerIdByServer,

@@ -19,6 +19,7 @@ html
       script.
         document.addEventListener('DOMContentLoaded', () => {
           const mapId = `#{mapId}`;
+          const userId = `#{userId}`;
           const mapContainer = document.getElementById('mapContainer');
 
           fetch(`/api/mapArt/${mapId}`)
@@ -71,6 +72,68 @@ html
               mapContainer.innerHTML = '<div class="alert alert-danger" role="alert">Error fetching data: ' + error.message + '</div>';
             });
 
+
+          function handleFavorite(mapId, action) {
+            fetch(`/mapart/favorite/${mapId}`, {
+              method: action === 'add' ? 'POST' : 'DELETE',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ userId: userId }),
+            })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Failed to perform action');
+              }
+              return response.json();
+            })
+            .then(data => {
+              console.log(data);
+            })
+            .catch(error => {
+              console.error('Error:', error);
+            });
+          }
+
+          function createFavoriteButton(mapId) {
+            const button = document.createElement('button');
+            button.textContent = 'Loading...';
+
+            // Fetch favorite status from API
+            fetch(`/mapart/favorite/${mapId}`)
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error('Failed to fetch favorite status');
+                }
+                return response.json();
+              })
+              .then(data => {
+                // Set button text based on favorite status
+                button.textContent = data.isFavorite ? 'Remove Favorite' : 'Add Favorite';
+                
+                // Set onclick event based on favorite status
+                button.onclick = function() {
+                  const action = data.isFavorite ? 'remove' : 'add';
+                  handleFavorite(mapId, action);
+                  
+                  // Toggle button text after click
+                  button.textContent = data.isFavorite ? 'Add Favorite' : 'Remove Favorite';
+                  // Update favorite status
+                  data.isFavorite = !data.isFavorite;
+                };
+              })
+              .catch(error => {
+                console.error('Error:', error);
+                button.textContent = 'Error'; // Display error text if fetching failed
+              });
+
+            return button;
+          }
+
+          let isFavorite = false;
+          const favoriteButton = createFavoriteButton(mapId, isFavorite);
+          document.body.appendChild(favoriteButton);
+            
         });
 
       include includes/scripts.pug

@@ -250,6 +250,86 @@ const incrementMapViews = async (mapId) => {
   }
 };
 
+const setFavoriteMapArtId = async (userId, mapArtId) => {
+  try {
+    const profile = await prisma.profile.findUnique({ where: { userId: userId } });
+    if (profile) {
+      let favorites = profile.favorites || [];
+
+      if (!favorites.includes(mapArtId)) {
+        favorites.push(mapArtId);
+
+        const updatedProfile = await prisma.user.update({
+          where: { id: userId },
+          data: {
+            Profile: {
+              update: {
+                favorites: favorites,
+              }
+            }
+          },
+        });
+
+        return updatedProfile;
+      } else {
+        throw new Error('That favorite has already been saved');
+      }
+
+    } else {
+      throw new Error('That profile does not exist');
+    }
+  } catch (error) {
+    console.error('Error in setFavoriteMapArtId:', error);
+  }
+};
+
+const removeFavoriteMapArtId = async (userId, mapArtId) => {
+  try {
+    const profile = await prisma.profile.findUnique({ where: { userId: userId } });
+    if (profile) {
+      let favorites = profile.favorites || [];
+
+      if (favorites.includes(mapArtId)) {
+        favorites = favorites.filter(fav => fav !== mapArtId);
+
+        const updatedProfile = await prisma.user.update({
+          where: { id: userId },
+          data: {
+            Profile: {
+              update: {
+                favorites: favorites,
+              }
+            }
+          },
+        });
+
+        return updatedProfile;
+      } else {
+        throw new Error('That favorite does not exist');
+      }
+    } else {
+      throw new Error('That profile does not exist');
+    }
+  } catch (error) {
+    console.error('Error in removeFavoriteMapArtId:', error);
+  }
+};
+
+ const isMapArtFavorite = async (userId, mapArtId) => {
+  try {
+    const profile = await prisma.profile.findUnique({ where: { userId: userId } });
+    if (profile) {
+      const favorites = profile.favorites || [];
+      return favorites.includes(mapArtId);
+    } else {
+      throw new Error('Profile not found');
+    }
+  } catch (error) {
+    console.error('Error checking favorite status:', error);
+    throw error;
+  }
+}
+
 const countMapIdsByServer = async (server) => {
   try {
     const count = await prisma.mapArt.count({
@@ -308,6 +388,9 @@ module.exports = {
   createMapId,
   updateMapById,
   incrementMapViews,
+  setFavoriteMapArtId,
+  removeFavoriteMapArtId,
+  isMapArtFavorite,
   countMapIdsByServer,
   getLatestServerIdByServer,
   deleteMapById,

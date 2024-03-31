@@ -90,6 +90,7 @@ router.post('/create', mapArtUpload.single('file'), async (req, res) => {
 router.get('/id/:id', async (req, res) => {
   try {
     let mapId = req.params.id;
+    let userId = res.locals.userId;
 
     // Sanitize mapId
     mapId = validator.trim(mapId);
@@ -97,7 +98,9 @@ router.get('/id/:id', async (req, res) => {
 
     mapArtController.incrementMapViews(mapId);
 
-    res.render('mapart', { pageTitle: 'MapArt', mapId });
+    mapArtController.setFavoriteMapArtId(userId, mapId);
+
+    res.render('mapart', { pageTitle: 'MapArt', mapId, userId });
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
@@ -152,6 +155,57 @@ router.post('/edit/:id', mapArtUpload.none(), async (req, res) => {
     res.redirect(`/admin`);
   } catch (error) {
     console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+router.get('/favorite/:id', async (req, res) => {
+  try {
+    const mapId = req.params.id;
+    const userId = res.locals.userId;
+
+    // Check if the mapId is a favorite for the user
+    const isFavorite = await mapArtController.isMapArtFavorite(userId, mapId);
+
+    res.status(200).json({ isFavorite: isFavorite });
+  } catch (error) {
+    console.error('Error checking favorite status:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+router.post('/favorite/:id', async (req, res) => {
+  try {
+    const mapId = req.params.id;
+    const userId = res.locals.userId;
+
+    // Sanitize mapId
+    const sanitizedMapId = validator.escape(validator.trim(mapId));
+
+    // Add favorite
+    await mapArtController.setFavoriteMapArtId(userId, sanitizedMapId);
+
+    res.status(200).send('Favorite added successfully');
+  } catch (error) {
+    console.error('Error adding favorite:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+router.delete('/favorite/:id', async (req, res) => {
+  try {
+    const mapId = req.params.id;
+    const userId = res.locals.userId;
+
+    // Sanitize mapId
+    const sanitizedMapId = validator.escape(validator.trim(mapId));
+
+    // Remove favorite
+    await mapArtController.removeFavoriteMapArtId(userId, sanitizedMapId);
+
+    res.status(200).send('Favorite removed successfully');
+  } catch (error) {
+    console.error('Error removing favorite:', error);
     res.status(500).send('Internal Server Error');
   }
 });
