@@ -208,6 +208,51 @@ router.delete('/favorite/:id', async (req, res) => {
   }
 });
 
+router.post('/like/:id', async (req, res) => {
+  try {
+    const mapId = req.params.id;
+    const userId = res.locals.userId;
+
+    // Call controller function to add like
+    const updatedMapArt = await mapArtController.likeMapArtId(userId, mapId);
+
+    res.status(200).json({ message: 'Like added successfully', mapArt: updatedMapArt });
+  } catch (error) {
+    console.error('Error adding like:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+router.delete('/like/:id', async (req, res) => {
+  try {
+    const mapId = req.params.id;
+    const userId = res.locals.userId;
+
+    // Call controller function to remove like
+    const updatedMapArt = await mapArtController.unlikeMapArtId(userId, mapId);
+
+    res.status(200).json({ message: 'Like removed successfully', mapArt: updatedMapArt });
+  } catch (error) {
+    console.error('Error removing like:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+router.get('/likes/:id', async (req, res) => {
+  try {
+    const mapId = req.params.id;
+    const userId = res.locals.userId;
+
+    // Call controller function to check if mapArtId is liked by userId
+    const isLiked = await mapArtController.isMapArtIdLiked(userId, mapId);
+
+    res.status(200).json({ isLiked });
+  } catch (error) {
+    console.error('Error checking if mapArt is liked:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 router.get('/uniqueUsernames', async (req, res) => {
   try {
     const uniqueUsernames = await mapArtController.getUniqueUsernames();

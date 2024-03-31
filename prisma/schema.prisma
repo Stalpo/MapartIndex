@@ -67,6 +67,8 @@ model MapArt {
   nsfw         Boolean  @default(false)
   tags         String[]
   views        Int      @default(0)
+  likes        Int      @default(0)
+  likedBy      String[]
 }
 
 model MapId {

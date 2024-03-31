@@ -160,6 +160,33 @@ const isMapArtFavorite = async (userId, mapArtId) => {
   }
 }
 
+const likeMapArtId = async (userId, mapArtId) => {
+  try {
+    return await mapArtModel.likeMapArtId(userId, mapArtId);
+  } catch (error) {
+    console.error('Error liking map art:', error);
+    throw error;
+  }
+}
+
+const unlikeMapArtId = async (userId, mapArtId) => {
+  try {
+    return await mapArtModel.unlikeMapArtId(userId, mapArtId);
+  } catch (error) {
+    console.error('Error unliking map art:', error);
+    throw error;
+  }
+}
+
+const isMapArtIdLiked = async (userId, mapArtId) => {
+  try {
+    return await mapArtModel.isMapArtIdLiked(userId, mapArtId);
+  } catch (error) {
+    console.error('Error finding if map art was liked:', error);
+    throw error;
+  }
+}
+
 const generateFilename = async (server) => {
   try {
     const mapCount = await getLatestServerIdByServer(server) + 1;
@@ -207,6 +234,9 @@ module.exports = {
   setFavoriteMapArtId,
   removeFavoriteMapArtId,
   isMapArtFavorite,
+  likeMapArtId,
+  unlikeMapArtId,
+  isMapArtIdLiked,
   generateFilename,
   deleteMapById,
   getLatestServerIdByServer,

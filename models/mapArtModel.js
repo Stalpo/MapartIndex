@@ -330,6 +330,74 @@ const removeFavoriteMapArtId = async (userId, mapArtId) => {
   }
 }
 
+const likeMapArtId = async (userId, mapArtId) => {
+  try {
+    const updatedMapArt = await prisma.mapArt.update({
+      where: { id: mapArtId },
+      data: {
+        likes: {
+          increment: 1
+        },
+        likedBy: {
+          push: userId
+        }
+      }
+    });
+    return updatedMapArt;
+  } catch (error) {
+    console.error('Error liking map art:', error);
+    throw error;
+  }
+}
+
+const unlikeMapArtId = async (userId, mapArtId) => {
+  try {
+    const mapArt = await prisma.mapArt.findUnique({
+      where: { id: mapArtId },
+      select: { likedBy: true }
+    });
+
+    if (!mapArt) {
+      throw new Error('MapArt not found');
+    }
+
+    const updatedLikedBy = mapArt.likedBy.filter(id => id !== userId);
+
+    const updatedMapArt = await prisma.mapArt.update({
+      where: { id: mapArtId },
+      data: {
+        likes: {
+          decrement: 1
+        },
+        likedBy: updatedLikedBy
+      }
+    });
+
+    return updatedMapArt;
+  } catch (error) {
+    console.error('Error unliking map art:', error);
+    throw error;
+  }
+};
+
+const isMapArtIdLiked = async (userId, mapArtId) => {
+  try {
+    const likedMapArt = await prisma.mapArt.findFirst({
+      where: {
+        id: mapArtId,
+        likedBy: {
+          has: userId
+        }
+      }
+    });
+
+    return !!likedMapArt;
+  } catch (error) {
+    console.error('Error checking if mapArt is liked:', error);
+    throw error;
+  }
+}
+
 const countMapIdsByServer = async (server) => {
   try {
     const count = await prisma.mapArt.count({
@@ -391,6 +459,9 @@ module.exports = {
   setFavoriteMapArtId,
   removeFavoriteMapArtId,
   isMapArtFavorite,
+  likeMapArtId,
+  unlikeMapArtId,
+  isMapArtIdLiked,
   countMapIdsByServer,
   getLatestServerIdByServer,
   deleteMapById,
