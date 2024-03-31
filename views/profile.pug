@@ -42,7 +42,7 @@ html
                 h3.text-center Upload Count
                 p.text-center(style="font-size: 2em; font-weight: bold; color: #4285f4;") #{ userMaps.length }
             div.row.mt-4
-              div.col-md-12
+              div.col-md-6
                 h3.text-center Achievements
                 ul.list-group
                   li.list-group-item
@@ -54,6 +54,13 @@ html
                   li.list-group-item
                     i.fa.fa-trophy.mr-2
                     | Museum Collector
+
+              div.col
+                h3.text-center Favorites
+                each map in profile.favorites.slice(-5).reverse()
+                  li.list-group-item.text-center
+                    a(href="/mapart/id/" + map, target="_blank")
+                      | #{ map }
             br
             if username === profile.username
               div.col.text-center
