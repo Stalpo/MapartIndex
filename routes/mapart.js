@@ -98,8 +98,6 @@ router.get('/id/:id', async (req, res) => {
 
     mapArtController.incrementMapViews(mapId);
 
-    mapArtController.setFavoriteMapArtId(userId, mapId);
-
     res.render('mapart', { pageTitle: 'MapArt', mapId, userId });
   } catch (error) {
     console.error(error);
