@@ -7,9 +7,6 @@ html
     div.container
       h1.text-center Map Art
       hr
-      if admin || mod
-        div.text-center
-          a.btn.btn-primary(href=`/mapart/edit/${mapId}`) Visit Map Edit Page
 
       div#mapContainer.text-center
         i#loadingSpinner.fa.fa-spinner.fa-spin.fa-3x
@@ -44,20 +41,23 @@ html
                 const mapContent = document.createElement('div');
                 const mapInfo = document.createElement('div');
                 mapInfo.innerHTML = `
-                  <p>Map ID: ${map.displayName}</p>
-                  <div class="row">
-                    <div class="col-md-12 text-center">
-                      <img src="${imageUrl}" alt="${mapId}" class="pixelated-image img-fluid" style="width: 60%; max-width: none; height: auto; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); image-rendering: pixelated;">
-                    </div>
-                  </div>
-                  <br>
-                  <div class="row">
-                    <div class="col-md-12 text-center">
-                      <p>Artist: ${map.artist || 'N/A'}</p>
-                      <p>Uploaded By: <a href="/profile/${map.username}">${map.username}</a></p>
-                      <p>NSFW: ${map.nsfw}</p>
-                      <p>Date Uploaded: ${dateUploaded}</p>
-                      <p>Views: ${map.views}</p>
+                  <div class="jumbotron">
+                    <div class="row">
+                      <div class="col-md-8">
+                        <img src="${imageUrl}" alt="${mapId}" class="pixelated-image img-fluid" style="width: 80%; max-width: none; height: auto; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); image-rendering: pixelated;">
+                      </div>
+                      <div class="col-md-4">
+                        <h3>${map.displayName}</h3>
+                        <br> 
+                        <ul class="list-group">
+                          <li class="list-group-item">Artist: ${map.artist || 'N/A'}</li>
+                          <li class="list-group-item">Uploader: <a href="/profile/user/${map.username}">${map.username}</a></li>
+                          <li class="list-group-item">Uploaded: ${dateUploaded}</li>
+                          <li class="list-group-item">NSFW: ${map.nsfw}</li>
+                          <li class="list-group-item">Views: ${map.views}</li>
+                        </ul>
+
+                      </div>
                     </div>
                   </div>`;
                 mapContent.appendChild(mapInfo);
@@ -137,5 +137,9 @@ html
           */
             
         });
+
+      if admin || mod
+        div.text-center
+          a.btn.btn-primary(href=`/mapart/edit/${mapId}`) Visit Map Edit Page
 
       include includes/scripts.pug
