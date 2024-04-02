@@ -57,6 +57,10 @@ app.use('/mapid', mapIdRoutes);
 const mapArtRoutes = require('./routes/mapart');
 app.use('/mapart', mapArtRoutes);
 
+// MapSearch Routes
+const mapSearchRoutes = require('./routes/search');
+app.use('/search', mapSearchRoutes);
+
 // Admin Routes
 const adminRoutes = require('./routes/admin');
 app.use('/admin', adminRoutes);
