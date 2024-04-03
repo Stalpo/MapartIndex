@@ -21,12 +21,34 @@ html
 
       // Results
       if results 
-        each result in results
-          if result.displayName.includes("MAPART")
-            a(href=`/mapart/id/${result.id}`)
-              p #{result.displayName}
-          else
-            a(href=`/mapid/id/${result.id}`)
-              p #{result.displayName}
+        div.row
+          each result in results
+            div.col-md-3.mb-3.text-center
+              if result.displayName.includes("MAPART")
+                a(href=`/mapart/id/${result.id}`)
+                  img(style="width: 100px; height: 100px;" src=`/public/uploads/mapart/${result.displayName + ".png"}`)
+                  p #{result.displayName}
+              else
+                a(href=`/mapid/id/${result.id}`)
+                  img(style="width: 100px; height: 100px;" src=`/public/uploads/${result.displayName + ".png"}`)
+                  p #{result.displayName}
 
+      script.
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentPage = parseInt(urlParams.get('page')) || 1;
+        const nextPage = currentPage + 1;
+
+        // Pagination
+        if (currentPage > 1) {
+          const url = new URL(window.location.href);
+          url.searchParams.set('page', currentPage - 1);
+          document.write(`<button class="btn btn-primary" onclick="window.location.href='${url.href}'">Previous</button>`);
+        }
+
+        if (nextPage) {
+          const url = new URL(window.location.href);
+          url.searchParams.set('page', nextPage);
+          document.write(`<button class="btn btn-primary" onclick="window.location.href='${url.href}'">Next</button>`);
+        }
+      
     include includes/scripts.pug
