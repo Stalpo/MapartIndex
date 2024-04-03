@@ -1,6 +1,6 @@
 const prisma = require('../util/db').prisma;
 
-const searchMaps = async (page, perPage = 25, user, artist, sort, server, tag, searchTerm) => {
+const searchMaps = async (page, perPage = 25, user, artist, sort, server, searchTerm) => {
   try {
     const whereMapArt = {};
     const whereMapId = {};
