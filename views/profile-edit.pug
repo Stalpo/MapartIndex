@@ -59,8 +59,9 @@ html
                   input#mcUuidInput.form-control(type="text" name="mcUuid" value=profile.mcUuid placeholder="Enter your Minecraft UUID")
 
               // Submit button
-              button.btn.btn-primary(type="submit", style="margin-right: 10px;") Save Changes
-              a.btn.btn-secondary(href='/user/update-password') Update Password
+              button.btn.btn-primary(type="submit", style='margin-right: 10px;') Save Changes
+              a.btn.btn-secondary(href='/user/update-password' style='margin-right: 10px;') Update Password
+              a.btn.btn-secondary(href='/discord/link-account') Link Discord
 
       script(src="/public/js/profile-edit.js")
       // include includes/footer.pug
