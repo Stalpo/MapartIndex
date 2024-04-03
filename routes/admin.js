@@ -6,8 +6,10 @@ const fs = require('fs');
 const crypto = require('crypto');
 const os = require('os');
 
+
 // Required for DB stats
 const prisma = require('../util/db').prisma;
+const { MongoClient } = require('mongodb');
 
 // Required controllers
 const userController = require('../controllers/userController');
@@ -137,17 +139,33 @@ router.get('/system-info', (req, res) => {
 router.get('/db-stats', async (req, res) => {
   try {
     if (res.locals.admin) {
+      // Use the same MongoDB URI for Prisma and MongoDB driver
+      const client = new MongoClient(process.env.DATABASE_URL);
+      await client.connect();
+      const db = client.db();
+
+      // Count documents in different collections using Prisma models
       const usersCount = await prisma.user.count();
       const profilesCount = await prisma.profile.count();
       const mapArtsCount = await prisma.mapArt.count();
       const mapIdsCount = await prisma.mapId.count();
-  
+
+      // MongoDB-specific statistics
+      const collections = await db.listCollections().toArray();
+      const serverStatus = await db.admin().serverStatus();
+      const storageStats = await db.stats();
+
       res.json({
         usersCount,
         profilesCount,
         mapArtsCount,
         mapIdsCount,
+        collections,
+        serverStatus,
+        storageStats,
       });
+
+      await client.close();
     } else {
       return res.status(403).send('Forbidden');
     }

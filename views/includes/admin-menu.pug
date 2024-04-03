@@ -261,53 +261,77 @@ script.
   }
 
   function showMapDBModal() {
-    var modalHtml = `
-      <div class="modal fade" id="mapDBModal" tabindex="-1" role="dialog" aria-labelledby="mapDBModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="mapDBModalLabel">Map DB Information</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <p>Loading...</p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      var modalHtml = `
+        <div class="modal fade" id="mapDBModal" tabindex="-1" role="dialog" aria-labelledby="mapDBModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="mapDBModalLabel">Map DB Information</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <p>Loading...</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    `;
+      `;
 
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-    $('#mapDBModal').modal('show');
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+      $('#mapDBModal').modal('show');
 
-    // Fetch DB statistics
-    fetch('/admin/db-stats')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        var modalBody = $('#mapDBModal .modal-body');
-        modalBody.empty();
-        modalBody.append(`<p><strong>Users:</strong> ${data.usersCount}</p>`);
-        modalBody.append(`<p><strong>Profiles:</strong> ${data.profilesCount}</p>`);
-        modalBody.append(`<p><strong>MapArts:</strong> ${data.mapArtsCount}</p>`);
-        modalBody.append(`<p><strong>MapIds:</strong> ${data.mapIdsCount}</p>`);
-      })
-      .catch(error => {
-        var modalBody = $('#mapDBModal .modal-body');
-        modalBody.empty();
-        modalBody.append(`<p>Error fetching DB statistics: ${error.message}</p>`);
-      });
+      // Fetch DB statistics
+      fetch('/admin/db-stats')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          var modalBody = $('#mapDBModal .modal-body');
+          modalBody.empty();
+          modalBody.append(`<p><strong>Users:</strong> ${data.usersCount}</p>`);
+          modalBody.append(`<p><strong>Profiles:</strong> ${data.profilesCount}</p>`);
+          modalBody.append(`<p><strong>MapArts:</strong> ${data.mapArtsCount}</p>`);
+          modalBody.append(`<p><strong>MapIds:</strong> ${data.mapIdsCount}</p>`);
+
+          if (data.collections) {
+            modalBody.append('<h5>Collections:</h5>');
+            data.collections.forEach(collection => {
+              modalBody.append(`<pre>${collection.name}</pre>`);
+            });
+          }
+
+          if (data.indexes) {
+            modalBody.append('<h5>Indexes:</h5>');
+            data.indexes.forEach(index => {
+              modalBody.append(`<p>${index.name}</p>`);
+            });
+          }
+
+          if (data.serverStatus) {
+            modalBody.append('<h5>Server Status:</h5>');
+            modalBody.append(`<p>Uptime: ${data.serverStatus.uptime}</p>`);
+            modalBody.append(`<p>Memory Usage: ${data.serverStatus.mem.resident * 1024 + "KB"}</p>`);
+          }
+
+          if (data.storageStats) {
+            modalBody.append('<h5>Storage Stats:</h5>');
+            modalBody.append(`<p>Database Size: ${data.storageStats.storageSize / 1024 + "KB"}</p>`);
+          }
+        })
+        .catch(error => {
+          var modalBody = $('#mapDBModal .modal-body');
+          modalBody.empty();
+          modalBody.append(`<p>Error fetching DB statistics: ${error.message}</p>`);
+        });
   }
-
 
   function addButtonToNavbar() {
     var button = document.createElement("button");
