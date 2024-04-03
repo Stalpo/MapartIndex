@@ -226,9 +226,20 @@ script.
                 </div>
                 <div class="modal-body">
                   <p><strong>Server Host:</strong> ${systemInfo.host}</p>
-                  <p><strong>Server OS:</strong> ${systemInfo.os}</p>
-                  <p><strong>Server CPU:</strong> ${systemInfo.cpu}</p>
+                  <p><strong>Server OS:</strong> ${systemInfo.os.platform} ${systemInfo.os.release}</p>
+                  <p><strong>Server CPU:</strong> ${systemInfo.cpu.model}, Cores: ${systemInfo.cpu.cores}, Speed: ${systemInfo.cpu.speed} GHz</p>
                   <p><strong>Server RAM:</strong> ${systemInfo.ram}</p>
+                  <p><strong>Load Average:</strong> ${systemInfo.loadAverage.join(', ')}</p>
+                  <p><strong>Total Memory:</strong> ${systemInfo.totalMemory}</p>
+                  <p><strong>Free Memory:</strong> ${systemInfo.freeMemory}</p>
+                  <p><strong>Uptime:</strong> ${systemInfo.uptime}</p>
+                  <p><strong>Network Interfaces:</strong></p>
+                  <ul>
+                    ${Object.entries(systemInfo.networkInterfaces).map(([name, details]) => `
+                      <li>${name}: ${details.map(({address}) => address).join(', ')}</li>
+                    `).join('')}
+                  </ul>
+                  <p><strong>User Info:</strong> Username: ${systemInfo.userInfo.username}, Home Directory: ${systemInfo.userInfo.homedir}</p>
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

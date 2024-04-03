@@ -101,11 +101,29 @@ router.get('/system-info', (req, res) => {
     if (res.locals.admin) {
       const systemInfo = {
         host: os.hostname(),
-        os: os.platform(),
-        cpu: os.cpus()[0].model,
-        ram: `${(os.totalmem() / 1024 / 1024 / 1024).toFixed(2)} GB`
+        os: {
+          platform: os.platform(),
+          type: os.type(),
+          arch: os.arch(),
+          release: os.release(),
+        },
+        cpu: {
+          model: os.cpus()[0].model,
+          cores: os.cpus().length,
+          speed: os.cpus()[0].speed
+        },
+        ram: `${(os.totalmem() / 1024 / 1024 / 1024).toFixed(2)} GB`,
+        uptime: `${(os.uptime() / 3600).toFixed(2)} hours`,
+        networkInterfaces: os.networkInterfaces(),
+        userInfo: {
+          username: os.userInfo().username,
+          homedir: os.userInfo().homedir
+        },
+        loadAverage: os.loadavg(),
+        totalMemory: `${(os.totalmem() / 1024 / 1024).toFixed(2)} MB`,
+        freeMemory: `${(os.freemem() / 1024 / 1024).toFixed(2)} MB`
       };
-      
+
       res.json(systemInfo);
     } else {
       return res.status(403).send('Forbidden');
