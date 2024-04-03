@@ -24,6 +24,32 @@ const isMod = async (userId) => {
   }
 };
 
+const setAdminStatus = async (userId, bool) => {
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { admin: bool },
+    });
+    return updatedUser;
+  } catch (error) {
+    console.error('Error in setAdminStatus:', error);
+    throw error;
+  }
+};
+
+const setModStatus = async (userId, bool) => {
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { mod: bool },
+    });
+    return updatedUser;
+  } catch (error) {
+    console.error('Error in setModStatus:', error);
+    throw error;
+  }
+};
+
 const getApiKeyById = async (userId) => {
   try {
     const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -247,6 +273,8 @@ const deleteUserById = async (userId) => {
 module.exports = {
   isAdmin,
   isMod,
+  setAdminStatus,
+  setModStatus,
   getApiKeyById,
   verifyApiKey,
   getUserByApiKey,

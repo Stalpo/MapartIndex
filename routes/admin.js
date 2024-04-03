@@ -46,6 +46,56 @@ router.get('/users', async (req, res) => {
   }
 });
 
+// GET user by ID
+router.get('/users/:userId', async (req, res) => {
+  try {
+    if (res.locals.admin) {
+      const { userId } = req.params;
+      const user = await userController.getUserById(userId);
+      res.json(user);
+    } else {
+      return res.status(403).send('Forbidden');
+    }
+  } catch (error) {
+    console.error('Error fetching user by ID:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+router.post('/set-admin/:userId', async (req, res) => {
+  try {
+    if (res.locals.admin) {
+      const { userId } = req.params;
+      const { bool } = req.query;
+      const isAdmin = bool === 'true';
+      await userController.setAdminStatus(userId, isAdmin);
+      res.status(200).send(`User admin status set to ${isAdmin} successfully`);
+    } else {
+      return res.status(403).send('Forbidden');
+    }
+  } catch (error) {
+    console.error('Error setting user as admin:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+router.post('/set-mod/:userId', async (req, res) => {
+  try {
+    if (res.locals.admin) {
+      const { userId } = req.params;
+      const { bool } = req.query;
+      const isMod = bool === 'true';
+      await userController.setModStatus(userId, isMod);
+      res.status(200).send(`User mod status set to ${isMod} successfully`);
+    } else {
+      return res.status(403).send('Forbidden');
+    }
+  } catch (error) {
+    console.error('Error setting user as mod:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 router.get('/system-info', (req, res) => {
   try {
     if (res.locals.admin) {

@@ -24,6 +24,24 @@ const isMod = async (userId) => {
   }
 };
 
+const setAdminStatus = async (userId, bool) => {
+  try {
+    return await userModel.setAdminStatus(userId, bool);
+  } catch (error) {
+    console.error('Error in setAdminStatus controller:', error);
+    throw error;
+  }
+};
+
+const setModStatus = async (userId, bool) => {
+  try {
+    return await userModel.setModStatus(userId, bool);
+  } catch (error) {
+    console.error('Error in setModStatus controller:', error);
+    throw error;
+  }
+};
+
 const getApiKeyById = async (userId) => {
   try {
     const apiKey = await userModel.getApiKeyById(userId);
@@ -262,6 +280,8 @@ const getIdFromUsername = async (username) => {
 module.exports = {
   isAdmin,
   isMod,
+  setAdminStatus,
+  setModStatus,
   getApiKeyById,
   verifyApiKey,
   newApiKey,

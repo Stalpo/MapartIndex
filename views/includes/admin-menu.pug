@@ -33,7 +33,7 @@ script.
   }
 
   function showUserModal() {
-    // Fetch the list of users from the API
+    // Fetch the list of users from the API each time the modal is opened
     fetch('/admin/users')
       .then(response => {
         // Check if the response is successful
@@ -49,28 +49,25 @@ script.
         users.forEach(user => {
           userListHtml += `
             <li>
-              <strong>Username:</strong> ${user.username}<br>
-              <strong>Discord ID:</strong> ${user.discordId}<br>
-              <strong>Admin:</strong> ${user.admin ? 'Yes' : 'No'}<br>
-              <strong>Mod:</strong> ${user.mod ? 'Yes' : 'No'}<br>
+              <a href="#" class="user-link" data-user-id="${user.id}">${user.username}</a><br>
             </li>
           `;
         });
         userListHtml += '</ul>';
 
-        // Create modal HTML
-        var modalHtml = `
-          <div class="modal fade" id="userModal" tabindex="-1" role="dialog" aria-labelledby="userModalLabel" aria-hidden="true">
+        // Create modal HTML for user list
+        var userListModalHtml = `
+          <div class="modal fade" id="userListModal" tabindex="-1" role="dialog" aria-labelledby="userListModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="userModalLabel">Users</h5>
+                  <h5 class="modal-title" id="userListModalLabel">Users</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
                 <div class="modal-body">
-                  ${userListHtml} <!-- Insert user list here -->
+                  ${userListHtml}
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -80,15 +77,130 @@ script.
           </div>
         `;
 
-        // Append modal HTML to the body
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        // Remove existing modal if exists
+        $('#userListModal').remove();
 
-        // Show the modal
-        $('#userModal').modal('show');
+        // Append modal HTML for user list to the body
+        document.body.insertAdjacentHTML('beforeend', userListModalHtml);
+
+        // Show the modal for user list
+        $('#userListModal').modal('show');
+
+        // Add event listener to user links to open user detail modal
+        $('.user-link').click(function() {
+          var userId = $(this).data('user-id');
+          showUserDetailModal(userId);
+        });
       })
       .catch(error => {
         console.error('Error fetching users:', error);
       });
+  }
+
+  function showUserDetailModal(userId) {
+    // Fetch user detail from API
+    fetch(`/admin/users/${userId}`)
+      .then(response => {
+        // Check if the response is successful
+        if (!response.ok) {
+          throw new Error('Failed to fetch user detail');
+        }
+        // Parse the response JSON
+        return response.json();
+      })
+      .then(user => {
+        // Generate HTML for user detail
+        var userDetailHtml = `
+          <div class="modal fade" id="userDetailModal" tabindex="-1" role="dialog" aria-labelledby="userDetailModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="userDetailModalLabel">${user.username}</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <strong>Username:</strong> ${user.username}<br>
+                  <strong>Discord ID:</strong> ${user.discordId}<br>
+                  <strong>Admin:</strong> ${user.admin ? 'Yes' : 'No'} <button class="btn-sm btn-secondary" onclick="setAdminStatus('${user.id}', ${!user.admin})">${user.admin ? 'Revoke Admin' : 'Grant Admin'}</button><br>
+                  <strong>Mod:</strong> ${user.mod ? 'Yes' : 'No'} <button class="btn-sm btn-secondary" onclick="setModStatus('${user.id}', ${!user.mod})">${user.mod ? 'Revoke Mod' : 'Grant Mod'}</button><br>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Remove existing modal if exists
+        $('#userDetailModal').remove();
+
+        // Append modal HTML for user detail to the body
+        document.body.insertAdjacentHTML('beforeend', userDetailHtml);
+
+        // Show the modal for user detail
+        $('#userDetailModal').modal('show');
+      })
+      .catch(error => {
+        console.error('Error fetching user detail:', error);
+      });
+  }
+
+  function showToastInModal(message, type) {
+    const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+
+    const alertElement = document.createElement('div');
+    alertElement.classList.add('alert', alertClass, 'mt-3');
+    alertElement.setAttribute('role', 'alert');
+    alertElement.innerText = message;
+
+    const modalBody = document.querySelector('#userDetailModal');
+    modalBody.appendChild(alertElement);
+
+    // Remove the alert after 5 seconds
+    setTimeout(() => {
+      alertElement.remove();
+    }, 5000);
+  }
+
+  function setAdminStatus(userId, bool) {
+    fetch(`/admin/set-admin/${userId}?bool=${bool}`, {
+      method: 'POST'
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to set admin status');
+      }
+      return response.text();
+    })
+    .then(message => {
+      showToastInModal('Updated admin status!', 'success');
+    })
+    .catch(error => {
+      console.error('Error setting admin status:', error);
+      showToastInModal('Failed to update admin status');
+    });
+  }
+
+  function setModStatus(userId, bool) {
+    fetch(`/admin/set-mod/${userId}?bool=${bool}`, {
+      method: 'POST'
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to set mod status');
+      }
+      return response.text();
+    })
+    .then(message => {
+      showToastInModal('Updated mod status!', 'success');
+    })
+    .catch(error => {
+      console.error('Error setting mod status:', error);
+      showToastInModal('Failed to update mod status');
+    });
   }
 
   function showSystemInfoModal() {
