@@ -4,6 +4,10 @@ const multer = require('multer');
 const archiver = require('archiver');
 const fs = require('fs');
 const crypto = require('crypto');
+const os = require('os');
+
+// Required for DB stats
+const prisma = require('../util/db').prisma;
 
 // Required controllers
 const userController = require('../controllers/userController');
@@ -33,10 +37,55 @@ router.get('/users', async (req, res) => {
     if (res.locals.admin) {
       const allUsers = await userController.getAllUsers();
       res.json(allUsers);
+    } else {
+      return res.status(403).send('Forbidden');
     }
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
+  }
+});
+
+router.get('/system-info', (req, res) => {
+  try {
+    if (res.locals.admin) {
+      const systemInfo = {
+        host: os.hostname(),
+        os: os.platform(),
+        cpu: os.cpus()[0].model,
+        ram: `${(os.totalmem() / 1024 / 1024 / 1024).toFixed(2)} GB`
+      };
+      
+      res.json(systemInfo);
+    } else {
+      return res.status(403).send('Forbidden');
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+router.get('/db-stats', async (req, res) => {
+  try {
+    if (res.locals.admin) {
+      const usersCount = await prisma.user.count();
+      const profilesCount = await prisma.profile.count();
+      const mapArtsCount = await prisma.mapArt.count();
+      const mapIdsCount = await prisma.mapId.count();
+  
+      res.json({
+        usersCount,
+        profilesCount,
+        mapArtsCount,
+        mapIdsCount,
+      });
+    } else {
+      return res.status(403).send('Forbidden');
+    }
+  } catch (error) {
+    console.error('Error fetching DB stats:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 

@@ -91,32 +91,50 @@ script.
       });
   }
 
-
-
   function showSystemInfoModal() {
-    var modalHtml = `
-      <div class="modal fade" id="systemInfoModal" tabindex="-1" role="dialog" aria-labelledby="systemInfoModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="systemInfoModalLabel">System Information</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <p>System information modal content goes here...</p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    // Make a Fetch request to fetch system information from the server
+    fetch('/admin/system-info')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(systemInfo => {
+        // Construct modal HTML with system information
+        var modalHtml = `
+          <div class="modal fade" id="systemInfoModal" tabindex="-1" role="dialog" aria-labelledby="systemInfoModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="systemInfoModalLabel">System Information</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <p><strong>Server Host:</strong> ${systemInfo.host}</p>
+                  <p><strong>Server OS:</strong> ${systemInfo.os}</p>
+                  <p><strong>Server CPU:</strong> ${systemInfo.cpu}</p>
+                  <p><strong>Server RAM:</strong> ${systemInfo.ram}</p>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-    `;
+        `;
 
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-    $('#systemInfoModal').modal('show');
+        // Add modal HTML to the document
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        // Show the modal
+        $('#systemInfoModal').modal('show');
+      })
+      .catch(error => {
+        console.error('Error fetching system information:', error);
+        // Handle error
+      });
   }
 
   function showMapDBModal() {
@@ -131,7 +149,7 @@ script.
               </button>
             </div>
             <div class="modal-body">
-              <p>Map DB modal content goes here...</p>
+              <p>Loading...</p>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -143,7 +161,30 @@ script.
 
     document.body.insertAdjacentHTML('beforeend', modalHtml);
     $('#mapDBModal').modal('show');
+
+    // Fetch DB statistics
+    fetch('/admin/db-stats')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        var modalBody = $('#mapDBModal .modal-body');
+        modalBody.empty();
+        modalBody.append(`<p><strong>Users:</strong> ${data.usersCount}</p>`);
+        modalBody.append(`<p><strong>Profiles:</strong> ${data.profilesCount}</p>`);
+        modalBody.append(`<p><strong>MapArts:</strong> ${data.mapArtsCount}</p>`);
+        modalBody.append(`<p><strong>MapIds:</strong> ${data.mapIdsCount}</p>`);
+      })
+      .catch(error => {
+        var modalBody = $('#mapDBModal .modal-body');
+        modalBody.empty();
+        modalBody.append(`<p>Error fetching DB statistics: ${error.message}</p>`);
+      });
   }
+
 
   function addButtonToNavbar() {
     var button = document.createElement("button");
