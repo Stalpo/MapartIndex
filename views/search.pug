@@ -15,15 +15,18 @@ html
             div.input-group-prepend
               span.input-group-text.icon-prepend
                 i.fas.fa-search
-            input#artist.form-control(type='text', name='searchTerm', placeholder='Search by Artist, Uploader and Map Name')
+            input#artist.form-control(type='text', name='query', placeholder='Search by Artist, Uploader and Map Name')
             div.input-group-append
               button.btn.btn-outline-primary(type='submit') Search
-
-
 
       // Results
       if results 
         each result in results
-          p= result.displayName
+          if result.displayName.includes("MAPART")
+            a(href=`/mapart/id/${result.id}`)
+              p #{result.displayName}
+          else
+            a(href=`/mapid/id/${result.id}`)
+              p #{result.displayName}
 
     include includes/scripts.pug

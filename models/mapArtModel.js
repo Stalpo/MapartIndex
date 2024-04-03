@@ -249,13 +249,17 @@ const incrementMapViews = async (mapId) => {
     const mapArt = await prisma.mapArt.findUnique({
       where: { id: mapId }
     });
-    const views = mapArt.views + 1;
-    return await prisma.mapArt.update({
-      where: { id: mapId },
-      data: {
-        views,
-      },
-    });
+    if (mapArt.id) {
+      const views = mapArt.views + 1;
+      return await prisma.mapArt.update({
+        where: { id: mapId },
+        data: {
+          views,
+        },
+      });
+    } else {
+      throw new Error('Cannot increment map that doesnt exist.');
+    }
   } catch (error) {
     console.error('Error in incrementMapViews:', error);
     throw error;

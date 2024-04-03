@@ -106,6 +106,12 @@ router.get('/id/:id', async (req, res) => {
     // Sanitize mapId
     mapId = validator.trim(mapId);
     mapId = validator.escape(mapId);
+
+    const map = await mapIdController.getMapById(mapId);
+
+    if (!map) {
+      return res.render('404');
+    }
     
     mapIdController.incrementMapViews(mapId);
 
@@ -125,6 +131,10 @@ router.get('/edit/:id', async (req, res) => {
     mapId = validator.escape(mapId);
 
     const map = await mapIdController.getMapById(mapId);
+
+    if (!map) {
+      return res.render('404');
+    }
 
     const user = await userController.getUserById(map.userId);
 

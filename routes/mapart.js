@@ -96,6 +96,12 @@ router.get('/id/:id', async (req, res) => {
     mapId = validator.trim(mapId);
     mapId = validator.escape(mapId);
 
+    const map = await mapArtController.getMapById(mapId);
+
+    if (!map) {
+      return res.render('404');
+    }
+
     mapArtController.incrementMapViews(mapId);
 
     res.render('mapart', { pageTitle: 'MapArt', mapId, userId });
@@ -115,8 +121,12 @@ router.get('/edit/:id', async (req, res) => {
 
     const map = await mapArtController.getMapById(mapId);
 
-    const user = await userController.getUserById(map.userId);
+    if (!map) {
+      return res.render('404');
+    }
 
+    const user = await userController.getUserById(map.userId);
+    
     res.render('mapart-edit', { map, user });
   } catch (error) {
     console.error(error);

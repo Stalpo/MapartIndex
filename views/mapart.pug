@@ -52,7 +52,7 @@ html
                         <ul class="list-group">
                           <li class="list-group-item">Artist: ${map.artist || 'N/A'}</li>
                           <li class="list-group-item">Description: ${map.description || 'N/A'}</li>
-                          ${map.tags[0].length != "" ? `<li class="list-group-item">Tags: ${map.tags.join(', ')}</li>` : ''}
+                          ${map.tags[0] != "" ? `<li class="list-group-item">Tags: ${map.tags.join(', ')}</li>` : ''}
                           <li class="list-group-item">Uploader: <a href="/profile/user/${map.username}">${map.username}</a></li>
                           <li class="list-group-item">Uploaded: ${dateUploaded}</li>
                           <li class="list-group-item">NSFW: ${map.nsfw}</li>

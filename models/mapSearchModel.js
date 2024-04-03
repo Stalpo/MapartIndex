@@ -31,11 +31,13 @@ const searchMaps = async (page, perPage = 25, user, artist, sort, server, search
     if (searchTerm) {
       whereMapArt.OR = [
         { displayName: { contains: searchTerm } },
+        { username: { contains: searchTerm } },
         { artist: { contains: searchTerm } },
         { server: { contains: searchTerm } }
       ];
       whereMapId.OR = [
         { displayName: { contains: searchTerm } },
+        { username: { contains: searchTerm } },
         { artist: { contains: searchTerm } },
         { server: { contains: searchTerm } }
       ];
