@@ -3,10 +3,10 @@ const mapSearchModel = require('../models/mapSearchModel');
 const searchMaps = async (req, res, next) => {
   try {
     // Extract query parameters from request object
-    const { page, perPage, user, artist, sort, server, query } = req.query;
+    const { page, perPage, user, artist, sort, tag, server, query } = req.query;
 
     // Call the searchMaps function from mapSearchModel.js
-    const maps = await mapSearchModel.searchMaps(page, perPage, user, artist, sort, server, query);
+    const maps = await mapSearchModel.searchMaps(page, perPage, user, artist, sort, tag, server, query);
 
     // Send the response
     return JSON.stringify(maps);
