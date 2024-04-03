@@ -21,8 +21,19 @@ const upload = multer({
 
 router.get('/', async (req, res) => {
   try {
-    const allUsers = await userController.getAllUsers();
-    res.render('admin', { allUsers });
+    res.render('admin');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+router.get('/users', async (req, res) => {
+  try {
+    if (res.locals.admin) {
+      const allUsers = await userController.getAllUsers();
+      res.json(allUsers);
+    }
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
