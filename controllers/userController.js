@@ -208,10 +208,20 @@ const loginDiscordUser = async (userId, discordId, username, avatar, email) => {
 
       if (existingUser.discordId) {
         return { error: 'User is already linked to a Discord account!' };
+      } else {
+        // Check if the username already exists
+        const usernameCheck = await userModel.getUserByUsername(username);
+
+        if (usernameCheck) {
+          return { error: 'This username is already registered with a different account!' };
+        } else {
+          // Everything is good, link the account
+          // Update the users information
+          await userModel.updateUserDiscordInfo(userId, { discordId, username, avatar, email });
+        }
+
       }
 
-      // Update the users information
-      await userModel.updateUserDiscordInfo(userId, { discordId, username, avatar, email });
     }
 
     // Generate JWT token for the user

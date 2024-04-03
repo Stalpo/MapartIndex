@@ -43,7 +43,7 @@ router.get('/auth-callback', async (req, res) => {
 
     } catch (err) {
         console.error('Error in /auth-callback:', err);
-        return res.redirect('http://localhost:3000/login')
+        return res.redirect('http://localhost:3000/user/login')
     }
 });
 
