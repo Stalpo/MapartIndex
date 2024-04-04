@@ -8,7 +8,6 @@ html
     div.container
       h1.text-center= pageTitle
       hr
-
       form(action="/search/" method="GET")
         div.mb-3.form-group
           div.input-group
@@ -20,9 +19,9 @@ html
               button.btn.btn-outline-primary(type='submit') Search
 
       // Results
-      if results 
+      if results
         div.row
-          each result in results
+          each result in results.maps
             div.col-md-3.mb-3.text-center
               if result.displayName.includes("MAPART")
                 a(href=`/mapart/id/${result.id}`)
@@ -33,22 +32,72 @@ html
                   img(style="width: 100px; height: 100px;" src=`/public/uploads/${result.displayName + ".png"}`)
                   p #{result.displayName}
 
-      script.
-        const urlParams = new URLSearchParams(window.location.search);
-        const currentPage = parseInt(urlParams.get('page')) || 1;
-        const nextPage = currentPage + 1;
-
         // Pagination
-        if (currentPage > 1) {
-          const url = new URL(window.location.href);
-          url.searchParams.set('page', currentPage - 1);
-          document.write(`<button class="btn btn-primary" onclick="window.location.href='${url.href}'">Previous</button>`);
-        }
+        nav(aria-label="Pagination" class="d-flex justify-content-center")
+          ul.pagination
 
-        if (nextPage) {
-          const url = new URL(window.location.href);
-          url.searchParams.set('page', nextPage);
-          document.write(`<button class="btn btn-primary" onclick="window.location.href='${url.href}'">Next</button>`);
-        }
-      
+        script.
+          const urlParams = new URLSearchParams(window.location.search);
+          const currentPage = parseInt(urlParams.get('page')) || 1;
+          const totalPages = parseInt(`#{results.totalPages}`);
+          const maxPagesToShow = 5; // Adjust this value as needed
+
+          // Pagination
+          const paginationContainer = document.querySelector('.pagination');
+          if (paginationContainer) {
+            paginationContainer.innerHTML = '';
+
+            const urlParams = new URLSearchParams(window.location.search);
+
+            // Remove existing 'page' parameter
+            urlParams.delete('page');
+
+            if (currentPage > 1) {
+              const previousButton = document.createElement('li');
+              previousButton.classList.add('page-item');
+              previousButton.innerHTML = `<a class="page-link" href="?${urlParams.toString()}&page=${currentPage - 1}">Previous</a>`;
+              paginationContainer.appendChild(previousButton);
+            } else {
+              const previousButton = document.createElement('li');
+              previousButton.classList.add('page-item', 'disabled');
+              previousButton.innerHTML = `<span class="page-link">Previous</span>`;
+              paginationContainer.appendChild(previousButton);
+            }
+
+            // Calculate range of pages to show
+            let startPage = Math.max(1, currentPage - maxPagesToShow);
+            let endPage = Math.min(totalPages, currentPage + maxPagesToShow);
+
+            if (currentPage - startPage < maxPagesToShow) {
+              endPage = Math.min(totalPages, startPage + maxPagesToShow * 2);
+            } else if (endPage - currentPage < maxPagesToShow) {
+              startPage = Math.max(1, endPage - maxPagesToShow * 2);
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+              const pageButton = document.createElement('li');
+              pageButton.classList.add('page-item');
+              if (i === currentPage) {
+                pageButton.classList.add('active');
+              }
+              pageButton.innerHTML = `<a class="page-link" href="?${urlParams.toString()}&page=${i}">${i}</a>`;
+              paginationContainer.appendChild(pageButton);
+            }
+
+            if (currentPage < totalPages) {
+              const nextButton = document.createElement('li');
+              nextButton.classList.add('page-item');
+              nextButton.innerHTML = `<a class="page-link" href="?${urlParams.toString()}&page=${currentPage + 1}">Next</a>`;
+              paginationContainer.appendChild(nextButton);
+            } else {
+              const nextButton = document.createElement('li');
+              nextButton.classList.add('page-item', 'disabled');
+              nextButton.innerHTML = `<span class="page-link">Next</span>`;
+              paginationContainer.appendChild(nextButton);
+            }
+          } else {
+            console.error('Pagination container not found');
+          }
+
+
     include includes/scripts.pug

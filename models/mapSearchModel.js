@@ -1,5 +1,11 @@
 const prisma = require('../util/db').prisma;
 
+/**
+ *  There is a problem with pagination because we are doing 25 perPage but we are doing 2 queries to the db for mapart and mapid.
+ *  So in the view it is showing 50 results on most pages, which is making the pagination off decently at times.
+ *  There may be extra code here for debugging and coming up with a solution to that problem.
+ */
+
 const searchMaps = async (page, perPage = 25, user, artist, sort, server, searchTerm) => {
   try {
     const whereMapArt = {};
@@ -44,6 +50,27 @@ const searchMaps = async (page, perPage = 25, user, artist, sort, server, search
       ];
     }
 
+    // Fetch unique map IDs for MapArt
+    const uniqueMapIdsArt = await prisma.mapArt.findMany({
+      select: { id: true },
+      where: whereMapArt,
+      distinct: ['id']
+    });
+
+    // Fetch unique map IDs for MapId
+    const uniqueMapIdsId = await prisma.mapId.findMany({
+      select: { id: true },
+      where: whereMapId,
+      distinct: ['id']
+    });
+
+    // Combine the unique map IDs from both models
+    const uniqueMapIds = [...new Set([...uniqueMapIdsArt.map(map => map.id), ...uniqueMapIdsId.map(map => map.id)])];
+
+    // Count the total number of unique maps
+    const totalCount = uniqueMapIds.length;
+    //console.log(totalCount);
+
     // Apply sorting criteria (assuming both models have the same sorting options)
     let orderBy;
     switch (sort) {
@@ -80,7 +107,10 @@ const searchMaps = async (page, perPage = 25, user, artist, sort, server, search
     // Combine and sort the results from both models
     const combinedMaps = [...mapsArt, ...mapsId].sort((a, b) => a.createdAt - b.createdAt);
 
-    return combinedMaps;
+    // Calculate the total number of pages based on the total count of maps
+    const totalPages = Math.ceil(totalCount / perPage);
+
+    return { maps: combinedMaps, totalPages };
   } catch (error) {
     console.error('Error fetching maps:', error);
     throw error;
