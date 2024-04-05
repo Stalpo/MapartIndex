@@ -41,40 +41,40 @@ const getMaps = async (page, perPage, user, artist, sort, server, tag) => {
     }
 
     // Apply sorting criteria
-    let orderBy;
+    let orderBy = [{}, { createdAt: 'desc' }];
     switch (sort) {
       case 'nameAsc':
-        orderBy = { artist: 'asc' };
+        orderBy[0] = { artist: 'asc' };
         break;
       case 'nameDesc':
-        orderBy = { artist: 'desc' };
+        orderBy[0] = { artist: 'desc' };
         break;
       case 'dateAsc':
-        orderBy = { createdAt: 'asc' };
+        orderBy[0] = { createdAt: 'asc' };
         break;
       case 'dateDesc':
         orderBy = { createdAt: 'desc' };
         break;
       case 'mapIdsAsc':
-        orderBy = { mapIdsCount: 'asc' };
+        orderBy[0] = { mapIdsCount: 'asc' };
         break;
       case 'mapIdsDesc':
-        orderBy = { mapIdsCount: 'desc' };
+        orderBy[0] = { mapIdsCount: 'desc' };
         break;
       case 'viewsAsc':
-        orderBy = { views: 'asc' };
+        orderBy[0] = { views: 'asc' };
         break;
       case 'viewsDesc':
-        orderBy = { views: 'desc' };
+        orderBy[0] = { views: 'desc' };
         break;
       case 'likesAsc':
-        orderBy = { likes: 'asc' };
+        orderBy[0] = { likes: 'asc' };
         break;
       case 'likesDesc':
-        orderBy = { likes: 'desc' };
+        orderBy[0] = { likes: 'desc' };
         break;
       default:
-        orderBy = { createdAt: 'desc' };
+        orderBy[0] = { createdAt: 'desc' };
         break;
     }
 
