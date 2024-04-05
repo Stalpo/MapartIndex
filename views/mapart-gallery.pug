@@ -282,7 +282,7 @@ html
                   <img src="/public/uploads/mapart/${map.imgUrl}" class="pixelated-image ${showNSFW === 'true' ? '' : (map.nsfw ? 'blurred' : '')}" alt="Map Image">
                 </div>
                 <div class="card-body">
-                  <h5 class="card-title">${map.displayName}</h5>
+                  <h5 class="card-title">${map.name ? map.name : map.displayName}</h5>
                 </div>
                 <ul class="list-group list-group-flush">
                   <li class="list-group-item">Artist: ${map.artist}</li>

@@ -59,7 +59,7 @@ model MapArt {
   serverId     Int?
   displayName  String?
   imgUrl       String
-  name         String
+  name         String?
   description  String
   mapIds       MapId[]
   mapIdsCount  Int?     @map("mapIdsCount")

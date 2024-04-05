@@ -47,7 +47,8 @@ html
                         <img src="${imageUrl}" alt="${mapId}" class="pixelated-image img-fluid" style="width: 80%; max-width: none; height: auto; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); image-rendering: pixelated;">
                       </div>
                       <div class="col-md-4">
-                        <h3>${map.displayName}</h3>
+                        ${map.name ? `<h2>${map.name}</h2>` : ''}
+                        <h5>${map.displayName}</h5>
                         <br> 
                         <ul class="list-group">
                           <li class="list-group-item">Artist: ${map.artist || 'N/A'}</li>

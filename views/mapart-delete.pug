@@ -14,7 +14,7 @@ html(lang="en")
             div.alert.alert-warning.text-center(role="alert")
               p Are you sure you want to delete the file with
               p Map ID: #{mapId}?
-              p Name: #{map.displayName}
+              p Name: #{map.name ? map.name : map.displayName}
 
             div.text-center
               img(src=`/public/uploads/mapart/${map.imgUrl}`)
