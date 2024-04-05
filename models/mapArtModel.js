@@ -44,9 +44,15 @@ const getMaps = async (page, perPage, user, artist, sort, server, tag) => {
     let orderBy = [{}, { createdAt: 'desc' }];
     switch (sort) {
       case 'nameAsc':
-        orderBy[0] = { artist: 'asc' };
+        orderBy[0] = { name: 'asc' };
         break;
       case 'nameDesc':
+        orderBy[0] = { name: 'desc' };
+        break;
+      case 'artistAsc':
+        orderBy[0] = { artist: 'asc' };
+        break;
+      case 'artistDesc':
         orderBy[0] = { artist: 'desc' };
         break;
       case 'dateAsc':

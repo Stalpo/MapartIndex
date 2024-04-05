@@ -37,7 +37,7 @@
 
 .nsfw .image-wrapper .blurred {
   width: 100%;
-  filter: blur(5px);
+  filter: blur(10px);
 }
 
 .nsfw .image-wrapper {
