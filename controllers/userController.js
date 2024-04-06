@@ -116,8 +116,8 @@ const registerUser = async (username, password) => {
   password = sanitizeInput(password);
 
   // Validate username
-  if (username.length < 5) {
-    return { error: 'Invalid username. It must be at least 5 characters and only alphanumeric.' };
+  if (username.length < 3 || username.length > 16 || !isAlphanumeric(username)) {
+    return { error: 'Invalid username. It must be 3-16 characters only letters, numbers, and underscores.' };
   }
 
   // Validate password
@@ -274,7 +274,7 @@ const deleteUserById = async (userId) => {
 };
 
 // Function to check if a string is alphanumeric
-const isAlphanumeric = (str) => /^[a-zA-Z0-9]+$/.test(str);
+const isAlphanumeric = (str) => /^[a-zA-Z0-9_]*$/.test(str);
 
 // Sanitize input
 const sanitizeInput = (input) => validator.escape(input);
