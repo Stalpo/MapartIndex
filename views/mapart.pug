@@ -38,13 +38,16 @@ html
                   hour12: true
                 }) : 'Unknown';
 
+                // Check if showNSFW cookie is true
+                const showNSFW = getCookie('showNSFW');
+
                 const mapContent = document.createElement('div');
                 const mapInfo = document.createElement('div');
                 mapInfo.innerHTML = `
                   <div class="jumbotron">
                     <div class="row">
                       <div class="col-md-8">
-                        <img src="${imageUrl}" alt="${mapId}" class="pixelated-image img-fluid" style="width: 80%; max-width: none; height: auto; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); image-rendering: pixelated;">
+                        <img src="${imageUrl}" alt="${mapId}" class="pixelated-image img-fluid ${showNSFW === 'true' ? '' : (map.nsfw ? 'blurred' : '')}" style="width: 80%; max-width: none; height: auto; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); image-rendering: pixelated;">
                       </div>
                       <div class="col-md-4">
                         ${map.name ? `<h2>${map.name}</h2>` : ''}
@@ -61,7 +64,6 @@ html
                           <li class="list-group-item">Views: ${map.views}</li>
                           <li class="list-group-item">Likes: ${map.likes}</li>
                         </ul>
-
                       </div>
                     </div>
                   </div>`;
@@ -100,47 +102,17 @@ html
             });
           }
 
-          /**
-          function createFavoriteButton(mapId) {
-            const button = document.createElement('button');
-            button.textContent = 'Loading...';
-
-            // Fetch favorite status from API
-            fetch(`/mapart/favorite/${mapId}`)
-              .then(response => {
-                if (!response.ok) {
-                  throw new Error('Failed to fetch favorite status');
-                }
-                return response.json();
-              })
-              .then(data => {
-                // Set button text based on favorite status
-                button.textContent = data.isFavorite ? 'Remove Favorite' : 'Add Favorite';
-                
-                // Set onclick event based on favorite status
-                button.onclick = function() {
-                  const action = data.isFavorite ? 'remove' : 'add';
-                  handleFavorite(mapId, action);
-                  
-                  // Toggle button text after click
-                  button.textContent = data.isFavorite ? 'Add Favorite' : 'Remove Favorite';
-                  // Update favorite status
-                  data.isFavorite = !data.isFavorite;
-                };
-              })
-              .catch(error => {
-                console.error('Error:', error);
-                button.textContent = 'Error'; // Display error text if fetching failed
-              });
-
-            return button;
+          // Function to get cookie value by name
+          function getCookie(name) {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+              const [cookieName, cookieValue] = cookie.split('=');
+              if (cookieName.trim() === name) {
+                return cookieValue;
+              }
+            }
+            return '';
           }
-
-          let isFavorite = false;
-          const favoriteButton = createFavoriteButton(mapId, isFavorite);
-          document.body.appendChild(favoriteButton);
-          */
-            
         });
 
       if admin || mod
