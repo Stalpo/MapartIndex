@@ -14,43 +14,43 @@ html
       else
         div.row
           div.col-md-8.offset-md-2.text-center
-            form(id='editForm', class='text-center')
-              div.mb-3.form-group
+            form#editForm.text-center
+              div.mb-3.form-group(data-toggle='tooltip', title='Name')
                 div.input-group
                   div.input-group-prepend
                     span.input-group-text.icon-prepend
-                      i.fas.fa-font
+                      i.fas.fa-file
                   input#name.form-control(type='text', name='name', value=map.name, placeholder='Name')
 
-              div.mb-3.form-group
+              div.mb-3.form-group(data-toggle='tooltip', title='Description')
                 div.input-group
                   div.input-group-prepend
                     span.input-group-text.icon-prepend
                       i.fas.fa-font
                   input#description.form-control(type='text', name='description', value=map.description, placeholder='Description')
 
-              div.mb-3.form-group
+              div.mb-3.form-group(data-toggle='tooltip', title='Artist')
                 div.input-group
                   div.input-group-prepend
                     span.input-group-text.icon-prepend
                       i.fas.fa-paint-brush
                   input#artist.form-control(type='text', name='artist', value=map.artist, placeholder='Artist')
 
-              div.mb-3.form-group
+              div.mb-3.form-group(data-toggle='tooltip', title='Tags (comma-separated)')
                 div.input-group
                   div.input-group-prepend
                     span.input-group-text.icon-prepend
-                      i.fas.fa-font
-                  input#tags.form-control(type='text', name='tags', value=map.tags, placeholder='Tags (comma-seperated)')
+                      i.fas.fa-list
+                  input#tags.form-control(type='text', name='tags', value=map.tags, placeholder='Tags (comma-separated)')
 
-              div.mb-3.form-group
+              div.mb-3.form-group(data-toggle='tooltip', title='Uploader')
                 div.input-group
                   div.input-group-prepend
                     span.input-group-text.icon-prepend
                       i.fas.fa-upload
-                  input#user.form-control(type='text', name='user', value=map.username, readonly, placeholder='Uploaded By')
+                  input#user.form-control(type='text', name='user', value=map.username, readonly, placeholder='Uploader')
 
-              div.mb-3.form-group
+              div.mb-3.form-group(data-toggle='tooltip', title='NSFW')
                 div.input-group
                   label.fancy-checkbox
                     input#nsfw.form-check-input(type='checkbox', name='nsfw', checked=map.nsfw)
@@ -87,6 +87,11 @@ html
         }
 
     script.
+      $(document).ready(function(){
+        $('[data-toggle="tooltip"]').tooltip();
+      });
+
+
       document.addEventListener("DOMContentLoaded", function() {
           // Load tags into the tags input field
           var tagsInput = document.getElementById('tags');
