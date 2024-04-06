@@ -44,7 +44,7 @@ router.post('/create', mapArtUpload.single('file'), async (req, res) => {
       return res.status(400).json({ error: 'No files uploaded' });
     }
 
-    const { name, description, artist, server, mapIds, tags } = req.body;
+    const { name, description, artist, server, mapIds, width, height, tags } = req.body;
     const { filename, path, originalname } = req.file;
 
     const newFilename = await mapArtController.generateFilename(server);
@@ -72,6 +72,8 @@ router.post('/create', mapArtUpload.single('file'), async (req, res) => {
       name,
       description,
       mapIds: parsedMapIds,
+      width: parseInt(width),
+      height: parseInt(height),
       tags: parsedTags,
       artist,
       displayName,

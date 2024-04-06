@@ -53,11 +53,13 @@ html
                         <ul class="list-group">
                           <li class="list-group-item">Artist: ${map.artist || 'N/A'}</li>
                           <li class="list-group-item">Description: ${map.description || 'N/A'}</li>
+                          <li class="list-group-item">Size: ${map.mapIdsCount} (${map.width} x ${map.height})</li>
                           ${map.tags[0] !== "" ? `<li class="list-group-item">Tags: ${map.tags.map(tag => `<a href="/search?query=${tag}"><span class="badge badge-secondary">${tag}</span></a>`).join(' ')}</li>` : ''}
                           <li class="list-group-item">Uploader: <a href="/profile/user/${map.username}">${map.username}</a></li>
                           <li class="list-group-item">Uploaded: ${dateUploaded}</li>
                           <li class="list-group-item">NSFW: ${map.nsfw}</li>
                           <li class="list-group-item">Views: ${map.views}</li>
+                          <li class="list-group-item">Likes: ${map.likes}</li>
                         </ul>
 
                       </div>

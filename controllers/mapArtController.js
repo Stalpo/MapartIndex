@@ -78,7 +78,7 @@ const getUniqueTags = async () => {
   }
 };
 
-const createMapId = async ({ userId, username, artist, name, description, mapIds, tags, imgUrl, displayName, hash, server, serverId }) => {
+const createMapId = async ({ userId, username, artist, name, description, mapIds, width, height, tags, imgUrl, displayName, hash, server, serverId }) => {
   try {
     return await mapArtModel.createMapId({
       userId,
@@ -87,6 +87,8 @@ const createMapId = async ({ userId, username, artist, name, description, mapIds
       name,
       description,
       mapIds,
+      width,
+      height,
       tags,
       imgUrl,
       displayName,

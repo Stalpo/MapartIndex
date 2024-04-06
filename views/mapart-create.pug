@@ -275,6 +275,8 @@ html
                 formData.append('server', serverSelect.value);
                 formData.append('file', blobObj);
                 formData.append('mapIds', JSON.stringify(mapIds));
+                formData.append('width', parseInt(widthSelector.value));
+                formData.append('height', parseInt(heightSelector.value));
                 // Convert comma-separated values into a JSON array
                 const tagsArray = tagsInput.value.split(',').map(tag => tag.trim());
                 formData.append('tags', JSON.stringify(tagsArray));

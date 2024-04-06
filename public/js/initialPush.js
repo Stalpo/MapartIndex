@@ -118,12 +118,13 @@ async function stitchMaps(mapArtInfo, files){
 
               // post new mapart
               const formData = new FormData();
-              formData.append('name', "N/A");
               formData.append('description', "");
               formData.append('artist', "N/A");
               formData.append('server', "2b2t");
               formData.append('file', blobObj);
               formData.append('mapIds', JSON.stringify(mapIds));
+              formData.append('width', width);
+              formData.append('height', height);
               // Convert comma-separated values into a JSON array
               const tagsArray = [];
               formData.append('tags', JSON.stringify(tagsArray));

@@ -63,6 +63,8 @@ model MapArt {
   description  String
   mapIds       MapId[]
   mapIdsCount  Int?     @map("mapIdsCount")
+  width        Int?     
+  height       Int?     
   hash         String?
   nsfw         Boolean  @default(false)
   tags         String[]

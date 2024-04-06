@@ -200,7 +200,7 @@ const getUniqueTags = async () => {
   }
 };
 
-const createMapId = async ({ userId, username, artist, name, description, mapIds, tags, imgUrl, displayName, hash, server, serverId }) => {
+const createMapId = async ({ userId, username, artist, name, description, mapIds, width, height, tags, imgUrl, displayName, hash, server, serverId }) => {
   try {
     const mapIdsCount = mapIds.length;
     return await prisma.mapArt.create({
@@ -218,6 +218,8 @@ const createMapId = async ({ userId, username, artist, name, description, mapIds
           connect: mapIds.map(id => ({ id }))
         },
         mapIdsCount,
+        width,
+        height,
         tags,
         imgUrl,
         displayName,
