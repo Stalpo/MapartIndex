@@ -1,5 +1,3 @@
-// discord.js
-
 const express = require('express');
 const axios = require("axios");
 const router = express.Router();
@@ -7,14 +5,14 @@ const userController = require('../controllers/userController');
 
 router.get('/login', (req, res) => {
     const CLIENT_ID = process.env.DISCORD_CLIENT_ID;
-    const REDIRECT_URI = 'http://localhost:3000/discord/auth-callback'
+    const REDIRECT_URI = req.protocol + '://' + req.get('host') + '/discord/auth-callback';
     res.redirect(`https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=identify+email`);
 });
 
 router.get('/auth-callback', async (req, res) => {
     const CLIENT_ID = process.env.DISCORD_CLIENT_ID;
     const CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
-    const REDIRECT_URI = 'http://localhost:3000/discord/auth-callback'
+    const REDIRECT_URI = req.protocol + '://' + req.get('host') + '/discord/auth-callback';
 
     const code = req.query.code;
 
@@ -50,7 +48,7 @@ router.get('/auth-callback', async (req, res) => {
 // New endpoint for linking accounts
 router.get('/link-account', (req, res) => {
     const CLIENT_ID = process.env.DISCORD_CLIENT_ID;
-    const REDIRECT_URI = 'http://localhost:3000/discord/auth-callback'
+    const REDIRECT_URI = req.protocol + '://' + req.get('host') + '/discord/auth-callback';
     res.redirect(`https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=identify+email`);
 });
 
