@@ -65,7 +65,7 @@ async function handleUserData(req, res, data, userId) {
         return res.status(409).render('500', { errorMessage: token.error });
     } else {
         res.cookie("token", token.token);
-        return res.redirect('http://localhost:3000/profile');
+        return res.redirect(`${req.protocol}://${req.get('host')}/profile`);
     }
 }
 
