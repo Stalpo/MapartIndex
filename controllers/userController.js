@@ -112,8 +112,11 @@ const getAllUsers = async () => {
 };
 
 const registerUser = async (username, password) => {
+  username = sanitizeInput(username);
+  password = sanitizeInput(password);
+
   // Validate username
-  if (username.length < 5 || !isAlphanumeric(username)) {
+  if (username.length < 5) {
     return { error: 'Invalid username. It must be at least 5 characters and only alphanumeric.' };
   }
 
