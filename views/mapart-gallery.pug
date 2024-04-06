@@ -286,6 +286,7 @@ html
                 </div>
                 <ul class="list-group list-group-flush">
                   <li class="list-group-item">Artist: ${map.artist}</li>
+                  ${map.tags[0] !== "" ? `<li class="list-group-item">Tags: ${map.tags.map(tag => `<a href="/search?query=${tag}"><span class="badge badge-secondary">${tag}</span></a>`).join(' ')}</li>` : ''}
                   <li class="list-group-item">Size: ${map.mapIdsCount} (${map.width} x ${map.height}) </li>
                 </ul>
                 <div class="card-body">
