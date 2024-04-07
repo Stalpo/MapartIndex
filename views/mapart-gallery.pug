@@ -134,8 +134,8 @@ html
             { value: 'artistDesc', label: 'Artist (Descending)' },
             { value: 'dateAsc', label: 'Date (Ascending)' },
             { value: 'dateDesc', label: 'Date (Descending)', selected: true },
-            { value: 'mapIdsAsc', label: 'Size (Ascending)'},
-            { value: 'mapIdsDesc', label: 'Size (Descending)'},
+            { value: 'sizeAsc', label: 'Size (Ascending)'},
+            { value: 'sizeDesc', label: 'Size (Descending)'},
             { value: 'viewsAsc', label: 'Views (Ascending)'},
             { value: 'viewsDesc', label: 'Views (Descending)'},
             { value: 'likesAsc', label: 'Likes (Ascending)'},
@@ -287,7 +287,7 @@ html
                 <ul class="list-group list-group-flush">
                   <li class="list-group-item">Artist: ${map.artist}</li>
                   ${map.tags[0] !== "" ? `<li class="list-group-item">Tags: ${map.tags.map(tag => `<a href="/search?query=${tag}"><span class="badge badge-secondary">${tag}</span></a>`).join(' ')}</li>` : ''}
-                  <li class="list-group-item">Size: ${map.mapIdsCount} (${map.width} x ${map.height}) </li>
+                  <li class="list-group-item">Size: ${map.size} (${map.width} x ${map.height}) </li>
                 </ul>
                 <div class="card-body">
                   <a href="/mapart/id/${map.id}" class="card-link">View Map</a>
