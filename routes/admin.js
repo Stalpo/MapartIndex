@@ -205,7 +205,7 @@ router.get('/initialPush', async (req, res) => {
 });
 
 // POST endpoint for initial push
-router.post('/initialPush', upload.array('images', 4000), async (req, res) => {
+router.post('/initialPush', upload.array('images', 8000), async (req, res) => {
   try {
     // Check if user is an admin
     if (!res.locals.admin) {
