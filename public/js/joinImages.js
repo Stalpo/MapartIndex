@@ -13,7 +13,12 @@ const joinImages = (width, height, imgUrls, rotations) => {
         for (let i = 0; i < imgs.length; i++) {
           const rotation = rotations[i];
           const rotatedImage = rotateImage(imgs[i], rotation);
-          ctx.drawImage(rotatedImage, (i % width) * 128, Math.floor(i / width) * 128);
+          if(width == 56){
+            // exception for Narnia which is top-down then left-right
+            ctx.drawImage(rotatedImage, Math.floor(i / height) * 128, (i % height) * 128);
+          }else{
+            ctx.drawImage(rotatedImage, (i % width) * 128, Math.floor(i / width) * 128);
+          }
         }
         const url = canvas.toDataURL();
         resolve(url);
