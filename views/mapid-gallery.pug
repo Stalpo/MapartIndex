@@ -48,8 +48,8 @@ html
                 div.input-group-prepend
                   div.input-group-text View
                 select#viewSelector.form-control
-                  option(value='smallGrid') Thumbnails
-                  option(value='grid' selected='true') Cards
+                  option(value='smallGrid' selected='true') Thumbnails
+                  option(value='grid') Cards
 
       script.
         // Function to fetch data from the API
@@ -165,7 +165,7 @@ html
                 buildGrid(data);
                 break;
               default:
-                buildGrid(data);
+                buildSmallGrid(data);
                 break;
             }
 
