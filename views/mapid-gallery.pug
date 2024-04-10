@@ -256,7 +256,7 @@ html
                   <h5 class="card-title">${map.displayName}</h5>
                 </div>
                 <ul class="list-group list-group-flush">
-                  <li class="list-group-item">Artist: ${map.artist}</li>
+                  <li class="list-group-item">Artist: <a href="/search?query=${map.artist}">${map.artist}</a></li>
                   <li class="list-group-item">Uploaded by: <a href="/profile/user/${map.username}">${map.username}</a></li>
                 </ul>
                 <div class="card-body">

@@ -289,7 +289,7 @@ html
                   <h5 class="card-title">${map.name ? map.name : map.displayName}</h5>
                 </div>
                 <ul class="list-group list-group-flush">
-                  <li class="list-group-item">Artist: ${map.artist}</li>
+                  <li class="list-group-item">Artist: <a href="/search?query=${map.artist}">${map.artist}</a></li>
                   ${map.tags[0] !== "" ? `<li class="list-group-item">Tags: ${map.tags.map(tag => `<a href="/search?query=${tag}"><span class="badge badge-secondary">${tag}</span></a>`).join(' ')}</li>` : ''}
                   <li class="list-group-item">Size: ${map.size} (${map.width} x ${map.height}) </li>
                 </ul>
