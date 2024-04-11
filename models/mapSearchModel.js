@@ -1,120 +1,65 @@
 const prisma = require('../util/db').prisma;
 
-/**
- *  There is a problem with pagination because we are doing 25 perPage but we are doing 2 queries to the db for mapart and mapid.
- *  So in the view it is showing 50 results on most pages, which is making the pagination off decently at times.
- *  There may be extra code here for debugging and coming up with a solution to that problem.
- */
+// Helper function to create filter objects for queries
+function createFilter(user, artist, server, searchTerm, includeTags = false) {
+  const filter = {};
+  if (user) filter.username = user;
+  if (artist) filter.artist = artist;
+  if (server) filter.server = server;
+  if (searchTerm) {
+    filter.OR = [
+      { displayName: { contains: searchTerm, mode: 'insensitive' } },
+      { username: { contains: searchTerm, mode: 'insensitive' } },
+      { artist: { contains: searchTerm, mode: 'insensitive' } },
+      { server: { contains: searchTerm, mode: 'insensitive' } },
+    ];
+    if (includeTags) {
+      filter.OR.push({ tags: { hasSome: [searchTerm] } });
+    }
+  }
+  return filter;
+}
 
+// Adjust the searchMaps function
 const searchMaps = async (page, perPage = 25, user, artist, sort, server, searchTerm) => {
   try {
-    const whereMapArt = {};
-    const whereMapId = {};
+    const whereMapArt = createFilter(user, artist, server, searchTerm, true); // Include tags for mapArt
+    const whereMapId = createFilter(user, artist, server, searchTerm); // Do not include tags for mapId
 
-    // Apply filtering criteria for MapArt
-    if (user) {
-      whereMapArt.username = user;
-    }
-    if (artist) {
-      whereMapArt.artist = artist;
-    }
-    if (server) {
-      whereMapArt.server = server;
-    }
-
-    // Apply filtering criteria for MapId
-    if (user) {
-      whereMapId.username = user;
-    }
-    if (artist) {
-      whereMapId.artist = artist;
-    }
-    if (server) {
-      whereMapId.server = server;
-    }
-
-    // Apply search criteria for both models
-    if (searchTerm) {
-      whereMapArt.OR = [
-        { displayName: { contains: searchTerm, mode: 'insensitive' } },
-        { username: { contains: searchTerm, mode: 'insensitive' } },
-        { artist: { contains: searchTerm, mode: 'insensitive' } },
-        { server: { contains: searchTerm, mode: 'insensitive' } },
-        { tags: { hasSome: [searchTerm] } }
-      ];
-      whereMapId.OR = [
-        { displayName: { contains: searchTerm, mode: 'insensitive' } },
-        { username: { contains: searchTerm, mode: 'insensitive' } },
-        { artist: { contains: searchTerm, mode: 'insensitive' } },
-        { server: { contains: searchTerm, mode: 'insensitive' } }
-      ];
-    }
-
-    // Fetch unique map IDs for MapArt
-    const uniqueMapIdsArt = await prisma.mapArt.findMany({
-      select: { id: true },
-      where: whereMapArt,
-      distinct: ['id']
-    });
-
-    // Fetch unique map IDs for MapId
-    const uniqueMapIdsId = await prisma.mapId.findMany({
-      select: { id: true },
-      where: whereMapId,
-      distinct: ['id']
-    });
-
-    // Combine the unique map IDs from both models
-    const uniqueMapIds = [...new Set([...uniqueMapIdsArt.map(map => map.id), ...uniqueMapIdsId.map(map => map.id)])];
-
-    // Count the total number of unique maps
-    const totalCount = uniqueMapIds.length;
-    //console.log(totalCount);
-
-    // Apply sorting criteria (assuming both models have the same sorting options)
-    let orderBy;
-    switch (sort) {
-      case 'nameAsc':
-        orderBy = { artist: 'asc' };
-        break;
-      case 'nameDesc':
-        orderBy = { artist: 'desc' };
-        break;
-      case 'dateAsc':
-        orderBy = { createdAt: 'asc' };
-        break;
-      case 'dateDesc':
-      default:
-        orderBy = { createdAt: 'desc' };
-        break;
-    }
-
-    // Fetch maps from both models with pagination, filtering, and sorting
+    // Fetch data from both models
     const mapsArt = await prisma.mapArt.findMany({
       where: whereMapArt,
-      orderBy,
-      skip: page ? (page - 1) * perPage : 0,
-      take: perPage || Number.MAX_SAFE_INTEGER
+      orderBy: getOrderBy(sort)
     });
 
     const mapsId = await prisma.mapId.findMany({
       where: whereMapId,
-      orderBy,
-      skip: page ? (page - 1) * perPage : 0,
-      take: perPage || Number.MAX_SAFE_INTEGER
+      orderBy: getOrderBy(sort)
     });
 
     // Combine and sort the results from both models
-    const combinedMaps = [...mapsArt, ...mapsId].sort((a, b) => a.createdAt - b.createdAt);
+    const combinedMaps = [...mapsArt, ...mapsId].sort((a, b) => b.createdAt - a.createdAt); // Correct sorting order
 
-    // Calculate the total number of pages based on the total count of maps
-    const totalPages = Math.ceil(totalCount / perPage);
+    // Manually apply pagination
+    const startIndex = (page - 1) * perPage;
+    const paginatedMaps = combinedMaps.slice(startIndex, startIndex + perPage);
+    const totalPages = Math.ceil(combinedMaps.length / perPage);
 
-    return { maps: combinedMaps, totalPages };
+    return { maps: paginatedMaps, totalPages };
   } catch (error) {
     console.error('Error fetching maps:', error);
     throw error;
   }
 };
+
+function getOrderBy(sort) {
+  switch (sort) {
+    case 'nameAsc': return { artist: 'asc' };
+    case 'nameDesc': return { artist: 'desc' };
+    case 'dateAsc': return { createdAt: 'asc' };
+    case 'dateDesc':
+    default: return { createdAt: 'desc' };
+  }
+}
 
 module.exports = { searchMaps };
