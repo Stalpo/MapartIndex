@@ -1,7 +1,6 @@
 const prisma = require('../util/db').prisma;
 
-// Helper function to create filter objects for queries
-function createFilter(user, artist, server, searchTerm, includeTags = false) {
+const createFilter = (user, artist, server, searchTerm, includeTags = false) => {
   const filter = {};
   if (user) filter.username = user;
   if (artist) filter.artist = artist;
@@ -20,7 +19,7 @@ function createFilter(user, artist, server, searchTerm, includeTags = false) {
   return filter;
 }
 
-function getOrderBy(sort) {
+const getOrderBy = (sort) => {
   switch (sort) {
     case 'nameAsc': return { artist: 'asc' };
     case 'nameDesc': return { artist: 'desc' };
