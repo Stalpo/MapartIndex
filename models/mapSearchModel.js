@@ -36,17 +36,17 @@ const searchMaps = async (page, perPage = 25, user, artist, sort, server, search
     // Apply search criteria for both models
     if (searchTerm) {
       whereMapArt.OR = [
-        { displayName: { equals: searchTerm, mode: 'insensitive' } },
-        { username: { equals: searchTerm, mode: 'insensitive' } },
-        { artist: { equals: searchTerm, mode: 'insensitive' } },
-        { server: { equals: searchTerm, mode: 'insensitive' } },
+        { displayName: { contains: searchTerm, mode: 'insensitive' } },
+        { username: { contains: searchTerm, mode: 'insensitive' } },
+        { artist: { contains: searchTerm, mode: 'insensitive' } },
+        { server: { contains: searchTerm, mode: 'insensitive' } },
         { tags: { hasSome: [searchTerm] } }
       ];
       whereMapId.OR = [
-        { displayName: { equals: searchTerm, mode: 'insensitive' } },
-        { username: { equals: searchTerm, mode: 'insensitive' } },
-        { artist: { equals: searchTerm, mode: 'insensitive' } },
-        { server: { equals: searchTerm, mode: 'insensitive' } }
+        { displayName: { contains: searchTerm, mode: 'insensitive' } },
+        { username: { contains: searchTerm, mode: 'insensitive' } },
+        { artist: { contains: searchTerm, mode: 'insensitive' } },
+        { server: { contains: searchTerm, mode: 'insensitive' } }
       ];
     }
 
