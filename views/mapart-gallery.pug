@@ -95,9 +95,16 @@ html
         // Function to populate artist selector
         async function populateArtistSelector() {
           try {
-            const uniqueArtists = await fetchData('/mapart/uniqueArtists');
+            const artistArray = await fetchData('/mapart/uniqueArtists');
+            
+            let uniqueArtists = artistArray.reduce((acc, artistString) => {
+              return acc.concat(artistString.split(',').map(artist => artist.trim()).filter(artist => artist !== ''));
+            }, []);
+
+            uniqueArtists = [...new Set(uniqueArtists)];
             uniqueArtists.unshift("All Artists");
             uniqueArtists.sort();
+
             populateSelect('artistSelector', uniqueArtists);
           } catch (error) {
             console.error('Error fetching artist data:', error);
