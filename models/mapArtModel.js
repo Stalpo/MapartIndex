@@ -29,7 +29,10 @@ const getMaps = async (page, perPage, user, artist, sort, server, tag) => {
       where.username = user;
     }
     if (artist) {
-      where.artist = artist;
+      where.artist = {
+        contains: artist,
+        mode: 'insensitive'
+      };
     }
     if (server) {
       where.server = server;
