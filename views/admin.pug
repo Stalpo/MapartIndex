@@ -82,17 +82,31 @@ html
           // Function to populate artist selector
           async function populateArtistSelector() {
             try {
-              const artistArray = await fetchData('/mapart/uniqueArtists');
+              const uniqueArtistsMapId = await fetchData('/mapid/uniqueArtists');
+              const uniqueArtistsMapArt = await fetchData('/mapart/uniqueArtists');
               
-              let uniqueArtists = artistArray.reduce((acc, artistString) => {
+              const combinedUniqueArtists = [...new Set([...uniqueArtistsMapId, ...uniqueArtistsMapArt])];
+
+              let uniqueArtists = combinedUniqueArtists.reduce((acc, artistString) => {
                 return acc.concat(artistString.split(',').map(artist => artist.trim()).filter(artist => artist !== ''));
               }, []);
 
-              uniqueArtists = [...new Set(uniqueArtists)];
-              uniqueArtists.unshift("All Artists");
-              uniqueArtists.sort();
+              let artistOptions = uniqueArtists.map(user => ({ value: user, label: user }));
 
-              populateSelect('artistSelector', uniqueArtists);
+              // Adding the "All Users" option to the start
+              artistOptions.unshift({ value: null, label: "All Users" });
+
+              // Removing duplicates
+              const seen = new Map();
+              artistOptions = artistOptions.filter(option => {
+                const key = JSON.stringify({ value: option.value, label: option.label });
+                return !seen.has(key) && seen.set(key, true);
+              });
+
+              // Sorting the array by label
+              artistOptions.sort((a, b) => a.label.localeCompare(b.label));
+
+              populateSelect('artistSelector', artistOptions);
             } catch (error) {
               console.error('Error fetching artist data:', error);
             }
