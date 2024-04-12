@@ -251,12 +251,18 @@ html
               const editUrl = map.displayName.includes("MAPART") ? `/mapart/edit/${map.id}` : `/mapid/edit/${map.id}`;
               const deleteUrl = map.displayName.includes("MAPART") ? `/mapart/delete?mapId=${map.id}` : `/mapid/delete?mapId=${map.id}`;
 
+              // Clean up artist names
+              const cleanedArtists = map.artist.split(',')
+                .map(artist => artist.trim())
+                .filter(artist => artist.length > 0)
+                .join(', ');
+
               newRow.innerHTML = `
                 <td>${map.displayName}</td>
                 <td>${new Date(map.createdAt).toLocaleString('en-US')}</td>
                 <td>${map.username}</td>
                 <td><img src="${imgUrl}" alt="Map Image" style="max-width: 100px; max-height: 100px;"></td>
-                <td>${map.artist}</td>
+                <td>${cleanedArtists}</td>
                 <td>${map.nsfw}</td>
                 <td>
                   <div class='btn-group' role='group' aria-label='Buttons'>
