@@ -19,7 +19,7 @@ html
                   p.card-text Tags: #{map.tags && map.tags.length ? map.tags.join(', ') : 'No Tags'}
                   div.d-flex.justify-content-between.align-items-center
                     div.btn-group
-                      a.btn.btn-sm.btn-outline-secondary(href=`/map/${map.id}`) View
+                      a.btn.btn-sm.btn-outline-secondary(href=`/mapart/id/${map.id}`) View
                       if admin || mod
                         a.btn.btn-sm.btn-outline-secondary(href=`/mapart/edit/${map.id}`) Edit
                     small.text-muted #{new Date(map.createdAt).toLocaleDateString()}
