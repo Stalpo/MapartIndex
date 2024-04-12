@@ -61,14 +61,19 @@ html
           return response.json();
         }
 
-        // Function to populate select element with options
-        function populateSelect(selectorId, data) {
-          const selector = document.getElementById(selectorId);
-          selector.innerHTML = ''; // Clear previous options
-          data.forEach(item => {
-            const option = document.createElement('option');
-            option.text = item;
-            selector.add(option);
+        // Function to populate a select element and optionally set a default selection
+        function populateSelect(selectId, options, defaultOption = "") {
+          const select = document.getElementById(selectId);
+          select.innerHTML = "";
+
+          options.forEach(option => {
+            const optElement = document.createElement("option");
+            optElement.value = option;
+            optElement.textContent = option;
+            if (option === defaultOption) {
+              optElement.selected = true;
+            }
+            select.appendChild(optElement);
           });
         }
 
@@ -78,7 +83,7 @@ html
             const uniqueUsernames = await fetchData('/mapid/uniqueUsernames');
             uniqueUsernames.unshift("All Users");
             uniqueUsernames.sort();
-            populateSelect('userSelector', uniqueUsernames);
+            populateSelect('userSelector', uniqueUsernames, "All Users");
           } catch (error) {
             console.error('Error fetching user data:', error);
           }
@@ -97,7 +102,7 @@ html
             uniqueArtists.unshift("All Artists");
             uniqueArtists.sort();
 
-            populateSelect('artistSelector', uniqueArtists);
+            populateSelect('artistSelector', uniqueArtists, "All Artists");
           } catch (error) {
             console.error('Error fetching artist data:', error);
           }
@@ -109,7 +114,7 @@ html
             const uniqueServers = await fetchData('/mapid/uniqueServers');
             uniqueServers.unshift("All Servers");
             uniqueServers.sort();
-            populateSelect('serverSelector', uniqueServers);
+            populateSelect('serverSelector', uniqueServers, "All Servers");
           } catch (error) {
             console.error('Error fetching server data:', error);
           }
