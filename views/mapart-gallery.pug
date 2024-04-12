@@ -69,14 +69,19 @@ html
           return response.json();
         }
 
-        // Function to populate select element with options
-        function populateSelect(selectorId, data) {
-          const selector = document.getElementById(selectorId);
-          selector.innerHTML = ''; // Clear previous options
-          data.forEach(item => {
-            const option = document.createElement('option');
-            option.text = item;
-            selector.add(option);
+        // Function to populate a select element and optionally set a default selection
+        function populateSelect(selectId, options, defaultOption = "") {
+          const select = document.getElementById(selectId);
+          select.innerHTML = "";
+
+          options.forEach(option => {
+            const optElement = document.createElement("option");
+            optElement.value = option;
+            optElement.textContent = option;
+            if (option === defaultOption) {
+              optElement.selected = true;
+            }
+            select.appendChild(optElement);
           });
         }
 
@@ -86,7 +91,7 @@ html
             const uniqueUsernames = await fetchData('/mapart/uniqueUsernames');
             uniqueUsernames.unshift("All Users");
             uniqueUsernames.sort();
-            populateSelect('userSelector', uniqueUsernames);
+            populateSelect('userSelector', uniqueUsernames, "All Users");
           } catch (error) {
             console.error('Error fetching user data:', error);
           }
@@ -101,11 +106,12 @@ html
               return acc.concat(artistString.split(',').map(artist => artist.trim()).filter(artist => artist !== ''));
             }, []);
 
+            // Remove duplicates and sort, ensuring "All Artists" is first in the list
             uniqueArtists = [...new Set(uniqueArtists)];
             uniqueArtists.unshift("All Artists");
-            uniqueArtists.sort();
+            uniqueArtists.sort((a, b) => (a === "All Artists" ? -1 : b === "All Artists" ? 1 : a.localeCompare(b)));
 
-            populateSelect('artistSelector', uniqueArtists);
+            populateSelect('artistSelector', uniqueArtists, "All Artists");
           } catch (error) {
             console.error('Error fetching artist data:', error);
           }
@@ -117,7 +123,7 @@ html
             const uniqueServers = await fetchData('/mapart/uniqueServers');
             uniqueServers.unshift("All Servers");
             uniqueServers.sort();
-            populateSelect('serverSelector', uniqueServers);
+            populateSelect('serverSelector', uniqueServers, "All Servers");
           } catch (error) {
             console.error('Error fetching server data:', error);
           }
@@ -129,7 +135,7 @@ html
             const uniqueTags = await fetchData('/mapart/uniqueTags');
             uniqueTags.unshift("All Tags");
             uniqueTags.sort();
-            populateSelect('tagSelector', uniqueTags);
+            populateSelect('tagSelector', uniqueTags, "All Tags");
           } catch (error) {
             console.error('Error fetching tag data:', error);
           }
