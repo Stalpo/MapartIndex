@@ -265,6 +265,15 @@ router.get('/likes/:id', async (req, res) => {
   }
 });
 
+router.get('/missingInfo', async (req, res) => {
+  try {
+    const missingInfo = await mapArtController.fetchMapsMissingInfo();
+    res.render('mapart-missing', { missingInfo });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 router.get('/uniqueUsernames', async (req, res) => {
   try {
     const uniqueUsernames = await mapArtController.getUniqueUsernames();

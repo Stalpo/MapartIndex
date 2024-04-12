@@ -462,6 +462,21 @@ const getLatestServerIdByServer = async (server) => {
   }
 };
 
+const fetchMapsMissingInfo = async () => {
+  try {
+    const maps = await prisma.mapArt.findMany({
+      where: { name: "" },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+    return maps;
+  } catch (error) {
+    console.error('Error fetching maps missing critical information:', error);
+    throw error;
+  }
+};
+
 const deleteMapById = async (mapId) => {
   try {
     return await prisma.mapArt.delete({ where: { id: mapId } });
@@ -491,5 +506,6 @@ module.exports = {
   isMapArtIdLiked,
   countMapIdsByServer,
   getLatestServerIdByServer,
+  fetchMapsMissingInfo,
   deleteMapById,
 };

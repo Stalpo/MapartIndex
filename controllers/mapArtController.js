@@ -202,6 +202,15 @@ const generateFilename = async (server) => {
   }
 };
 
+const fetchMapsMissingInfo = async () => {
+  try {
+    return await mapArtModel.fetchMapsMissingInfo();
+  } catch (error) {
+    console.error('Error finding maps missing info:', error);
+    throw error;
+  }
+}
+
 const deleteMapById = async (mapId) => {
   try {
     return await mapArtModel.deleteMapById(mapId);
@@ -240,6 +249,7 @@ module.exports = {
   unlikeMapArtId,
   isMapArtIdLiked,
   generateFilename,
+  fetchMapsMissingInfo,
   deleteMapById,
   getLatestServerIdByServer,
 }
