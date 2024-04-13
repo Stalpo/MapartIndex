@@ -465,7 +465,13 @@ const getLatestServerIdByServer = async (server) => {
 const fetchMapsMissingInfo = async () => {
   try {
     const maps = await prisma.mapArt.findMany({
-      where: { name: "" },
+      where: {
+        OR: [
+          { description: "" },
+          { tags: { equals: [] } },
+          { AND: [{ name: { not: null } }, { description: "" }] }
+        ],
+      },
       orderBy: {
         createdAt: 'desc',
       },
