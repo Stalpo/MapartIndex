@@ -1,7 +1,7 @@
 const prisma = require('../util/db').prisma;
 
 // Helper function to create filter objects for queries
-function createFilter(user, artist, server, searchTerm, includeTags = false) {
+const createFilter = (user, artist, server, searchTerm, includeTags = false) => {
   const filter = {};
   if (user) filter.username = user;
   if (artist) filter.artist = artist;
@@ -20,8 +20,19 @@ function createFilter(user, artist, server, searchTerm, includeTags = false) {
   return filter;
 }
 
-// Adjust the searchMaps function
-const searchMaps = async (page, perPage = 25, user, artist, sort, server, searchTerm) => {
+// Helper function to create sorting object for queries
+const getOrderBy = (sort) => {
+  switch (sort) {
+    case 'nameAsc': return { artist: 'asc' };
+    case 'nameDesc': return { artist: 'desc' };
+    case 'dateAsc': return { createdAt: 'asc' };
+    case 'dateDesc':
+    default: return { createdAt: 'desc' };
+  }
+}
+
+// searchMaps with pagination for search page
+const searchMaps = async (page = 1, perPage = 25, user, artist, sort, server, searchTerm) => {
   try {
     const whereMapArt = createFilter(user, artist, server, searchTerm, true);
     const whereMapId = createFilter(user, artist, server, searchTerm);
@@ -51,15 +62,5 @@ const searchMaps = async (page, perPage = 25, user, artist, sort, server, search
     throw error;
   }
 };
-
-function getOrderBy(sort) {
-  switch (sort) {
-    case 'nameAsc': return { artist: 'asc' };
-    case 'nameDesc': return { artist: 'desc' };
-    case 'dateAsc': return { createdAt: 'asc' };
-    case 'dateDesc':
-    default: return { createdAt: 'desc' };
-  }
-}
 
 module.exports = { searchMaps };
