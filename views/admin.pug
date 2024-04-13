@@ -51,15 +51,19 @@ html
           include includes/admin-menu.pug
 
         script.
-          // Function to populate select element with options
-          function populateSelect(selectorId, data) {
-            const selector = document.getElementById(selectorId);
-            selector.innerHTML = ''; // Clear previous options
-            data.forEach(option => {
-              const optionElement = document.createElement('option');
-              optionElement.value = option.value; // Set the value of the option
-              optionElement.textContent = option.label; // Set the text content of the option
-              selector.appendChild(optionElement); // Append the option to the select element
+          // Function to populate a select element and optionally set a default selection
+          function populateSelect(selectId, options, defaultOption = "") {
+            const select = document.getElementById(selectId);
+            select.innerHTML = "";
+
+            options.forEach(option => {
+              const optElement = document.createElement("option");
+              optElement.value = option;
+              optElement.textContent = option;
+              if (option === defaultOption) {
+                optElement.selected = true;
+              }
+              select.appendChild(optElement);
             });
           }
 
@@ -69,11 +73,15 @@ html
               const uniqueUsernamesMapId = await fetchData('/mapid/uniqueUsernames');
               const uniqueUsernamesMapArt = await fetchData('/mapart/uniqueUsernames');
               
-              const combinedUniqueUsernames = [...new Set([...uniqueUsernamesMapId, ...uniqueUsernamesMapArt])];
-              const userOptions = combinedUniqueUsernames.map(user => ({ value: user, label: user }));
-              userOptions.unshift({ value: null, label: "All Users" });
-              
-              populateSelect('userSelector', userOptions);
+              // Combining and deduplicating usernames
+              let combinedUniqueUsernames = [...new Set([...uniqueUsernamesMapId, ...uniqueUsernamesMapArt])];
+              combinedUniqueUsernames.sort(); // Sorting the usernames alphabetically
+
+              // Ensure "All Users" is first in the list
+              combinedUniqueUsernames.unshift("All Users");
+
+              // Call populateSelect with the updated array
+              populateSelect('userSelector', combinedUniqueUsernames);
             } catch (error) {
               console.error('Error fetching user data:', error);
             }
@@ -91,26 +99,19 @@ html
                 return acc.concat(artistString.split(',').map(artist => artist.trim()).filter(artist => artist !== ''));
               }, []);
 
-              let artistOptions = uniqueArtists.map(user => ({ value: user, label: user }));
+              // Remove duplicates from the combined list
+              uniqueArtists = [...new Set(uniqueArtists)];
+              // Ensure "All Artists" is first in the list
+              uniqueArtists.unshift("All Artists");
+              // Sort the array, ensuring "All Artists" remains at the top
+              uniqueArtists.sort((a, b) => (a === "All Artists" ? -1 : b === "All Artists" ? 1 : a.localeCompare(b)));
 
-              // Adding the "All Users" option to the start
-              artistOptions.unshift({ value: null, label: "All Users" });
-
-              // Removing duplicates
-              const seen = new Map();
-              artistOptions = artistOptions.filter(option => {
-                const key = JSON.stringify({ value: option.value, label: option.label });
-                return !seen.has(key) && seen.set(key, true);
-              });
-
-              // Sorting the array by label
-              artistOptions.sort((a, b) => a.label.localeCompare(b.label));
-
-              populateSelect('artistSelector', artistOptions);
+              populateSelect('artistSelector', uniqueArtists, "All Artists");
             } catch (error) {
               console.error('Error fetching artist data:', error);
             }
           }
+
 
           async function populateSortSelector() {
             const sortSelector = document.getElementById('sortSelector');
@@ -160,6 +161,7 @@ html
 
           // Function to handle API call with updated parameters
           async function fetchMaps(page = 1, user = "", artist = "", sort = "dateDesc") {
+
             const perPage = 25;
             let mapIdData = [];
             let mapArtData = [];
@@ -168,8 +170,8 @@ html
             if (!mapId404) {
               let mapIdUrl = `/api/mapId/maps?page=${page}&perPage=${perPage}&sort=${sort}`;
               // Construct user and artist parameters conditionally
-              const userParam = (user && user !== "null") ? `&user=${user}` : "";
-              const artistParam = (artist && artist !== "null") ? `&artist=${artist}` : "";
+              const userParam = (user && user !== "All Users") ? `&user=${user}` : "";
+              const artistParam = (artist && artist !== "All Artists") ? `&artist=${artist}` : "";
               mapIdUrl += userParam + artistParam;
               // Fetch data
               const mapIdResponse = await fetchData(mapIdUrl);
@@ -183,8 +185,8 @@ html
             if (!mapArt404) {
               let mapArtUrl = `/api/mapArt/maps?page=${page}&perPage=${perPage}&sort=${sort}`;
               // Construct user and artist parameters conditionally
-              const userParam = (user && user !== "null") ? `&user=${user}` : "";
-              const artistParam = (artist && artist !== "null") ? `&artist=${artist}` : "";
+              const userParam = (user && user !== "All Users") ? `&user=${user}` : "";
+              const artistParam = (artist && artist !== "All Artists") ? `&artist=${artist}` : "";
               mapArtUrl += userParam + artistParam;
               // Fetch data
               const mapArtResponse = await fetchData(mapArtUrl);
