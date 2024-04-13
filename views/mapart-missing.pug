@@ -13,13 +13,39 @@ html
       else 
         form(method='get', action='/mapart/missingInfo')
           .form-group.text-center
-            label(for='missingType') Filter by missing info type:
-            select.form-group(name='type')
-              option(value='all') All
-              option(value='artist') Artist
-              option(value='description') Description
-              option(value='tags') Tags
-            button.btn.btn-primary(type='submit') Filter
+            label.sr-only(for='missingType') Filter by missing info type:
+            .input-group.mb-2.mr-sm-2
+              .input-group-prepend
+                .input-group-text Type
+              select#missingType.form-control(name='type')
+                option(value='all') All
+                option(value='artist') Artist
+                option(value='description') Description
+                option(value='tags') Tags
+              .input-group-append
+                button.btn.btn-primary(type='submit') Filter
+
+          script.
+            document.addEventListener('DOMContentLoaded', function () {
+              // Function to get query parameters by name
+              function getQueryParam(name) {
+                name = name.replace(/[\[\]]/g, '\\$&');
+                var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                    results = regex.exec(window.location.href);
+                if (!results) return null;
+                if (!results[2]) return '';
+                return decodeURIComponent(results[2].replace(/\+/g, ' '));
+              }
+              
+              // Get the 'type' query parameter
+              var type = getQueryParam('type');
+              
+              // Set the select element's value
+              if (type) {
+                var selectElement = document.getElementById('missingType');
+                selectElement.value = type;
+              }
+            });
 
         if missingInfo.length
           .row
