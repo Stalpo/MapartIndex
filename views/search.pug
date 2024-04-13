@@ -14,7 +14,7 @@ html
             div.input-group-prepend
               span.input-group-text.icon-prepend
                 i.fas.fa-search
-            input#artist.form-control(type='text', name='query', placeholder='Search by Artist, Uploader, Tags, and Map Name')
+            input#search-input.form-control(type='text', name='query', placeholder='Search by Artist, Uploader, Tags, and Map Name')
             div.input-group-append
               button.btn.btn-outline-primary(type='submit') Search
 
@@ -37,67 +37,69 @@ html
           ul.pagination
 
         script.
-          const urlParams = new URLSearchParams(window.location.search);
-          const currentPage = parseInt(urlParams.get('page')) || 1;
-          const totalPages = parseInt(`#{results.totalPages}`);
-          const maxPagesToShow = 5; // Adjust this value as needed
-
-          // Pagination
-          const paginationContainer = document.querySelector('.pagination');
-          if (paginationContainer) {
-            paginationContainer.innerHTML = '';
-
+          document.addEventListener('DOMContentLoaded', function () {
             const urlParams = new URLSearchParams(window.location.search);
-
-            // Remove existing 'page' parameter
-            urlParams.delete('page');
-
-            if (currentPage > 1) {
-              const previousButton = document.createElement('li');
-              previousButton.classList.add('page-item');
-              previousButton.innerHTML = `<a class="page-link" href="?${urlParams.toString()}&page=${currentPage - 1}">Previous</a>`;
-              paginationContainer.appendChild(previousButton);
-            } else {
-              const previousButton = document.createElement('li');
-              previousButton.classList.add('page-item', 'disabled');
-              previousButton.innerHTML = `<span class="page-link">Previous</span>`;
-              paginationContainer.appendChild(previousButton);
+            const queryParam = urlParams.get('query');
+            const searchInput = document.getElementById('search-input');
+            if (queryParam && searchInput) {
+              searchInput.value = queryParam;
             }
 
-            // Calculate range of pages to show
-            let startPage = Math.max(1, currentPage - maxPagesToShow);
-            let endPage = Math.min(totalPages, currentPage + maxPagesToShow);
+            const currentPage = parseInt(urlParams.get('page')) || 1;
+            const totalPages = parseInt(`#{results.totalPages}`);
+            const maxPagesToShow = 5; // Adjust this value as needed
 
-            if (currentPage - startPage < maxPagesToShow) {
-              endPage = Math.min(totalPages, startPage + maxPagesToShow * 2);
-            } else if (endPage - currentPage < maxPagesToShow) {
-              startPage = Math.max(1, endPage - maxPagesToShow * 2);
-            }
+            // Pagination logic
+            const paginationContainer = document.querySelector('.pagination');
+            if (paginationContainer) {
+              paginationContainer.innerHTML = '';
 
-            for (let i = startPage; i <= endPage; i++) {
-              const pageButton = document.createElement('li');
-              pageButton.classList.add('page-item');
-              if (i === currentPage) {
-                pageButton.classList.add('active');
+              urlParams.delete('page'); // Remove existing 'page' parameter for pagination links
+
+              if (currentPage > 1) {
+                const previousButton = document.createElement('li');
+                previousButton.classList.add('page-item');
+                previousButton.innerHTML = `<a class="page-link" href="?${urlParams.toString()}&page=${currentPage - 1}">Previous</a>`;
+                paginationContainer.appendChild(previousButton);
+              } else {
+                const previousButton = document.createElement('li');
+                previousButton.classList.add('page-item', 'disabled');
+                previousButton.innerHTML = `<span class="page-link">Previous</span>`;
+                paginationContainer.appendChild(previousButton);
               }
-              pageButton.innerHTML = `<a class="page-link" href="?${urlParams.toString()}&page=${i}">${i}</a>`;
-              paginationContainer.appendChild(pageButton);
-            }
 
-            if (currentPage < totalPages) {
-              const nextButton = document.createElement('li');
-              nextButton.classList.add('page-item');
-              nextButton.innerHTML = `<a class="page-link" href="?${urlParams.toString()}&page=${currentPage + 1}">Next</a>`;
-              paginationContainer.appendChild(nextButton);
+              let startPage = Math.max(1, currentPage - maxPagesToShow);
+              let endPage = Math.min(totalPages, currentPage + maxPagesToShow);
+              if (currentPage - startPage < maxPagesToShow) {
+                endPage = Math.min(totalPages, startPage + maxPagesToShow * 2);
+              } else if (endPage - currentPage < maxPagesToShow) {
+                startPage = Math.max(1, endPage - maxPagesToShow * 2);
+              }
+
+              for (let i = startPage; i <= endPage; i++) {
+                const pageButton = document.createElement('li');
+                pageButton.classList.add('page-item');
+                if (i === currentPage) {
+                  pageButton.classList.add('active');
+                }
+                pageButton.innerHTML = `<a class="page-link" href="?${urlParams.toString()}&page=${i}">${i}</a>`;
+                paginationContainer.appendChild(pageButton);
+              }
+
+              if (currentPage < totalPages) {
+                const nextButton = document.createElement('li');
+                nextButton.classList.add('page-item');
+                nextButton.innerHTML = `<a class="page-link" href="?${urlParams.toString()}&page=${currentPage + 1}">Next</a>`;
+                paginationContainer.appendChild(nextButton);
+              } else {
+                const nextButton = document.createElement('li');
+                nextButton.classList.add('page-item', 'disabled');
+                nextButton.innerHTML = `<span class="page-link">Next</span>`;
+                paginationContainer.appendChild(nextButton);
+              }
             } else {
-              const nextButton = document.createElement('li');
-              nextButton.classList.add('page-item', 'disabled');
-              nextButton.innerHTML = `<span class="page-link">Next</span>`;
-              paginationContainer.appendChild(nextButton);
+              console.error('Pagination container not found');
             }
-          } else {
-            console.error('Pagination container not found');
-          }
-
+          });
 
     include includes/scripts.pug
