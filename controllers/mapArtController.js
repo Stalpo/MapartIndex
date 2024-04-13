@@ -202,9 +202,9 @@ const generateFilename = async (server) => {
   }
 };
 
-const fetchMapsMissingInfo = async () => {
+const fetchMapsMissingInfo = async (type) => {
   try {
-    return await mapArtModel.fetchMapsMissingInfo();
+    return await mapArtModel.fetchMapsMissingInfo(type);
   } catch (error) {
     console.error('Error finding maps missing info:', error);
     throw error;

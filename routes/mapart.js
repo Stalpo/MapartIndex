@@ -267,8 +267,9 @@ router.get('/likes/:id', async (req, res) => {
 
 router.get('/missingInfo', async (req, res) => {
   try {
-    const missingInfo = await mapArtController.fetchMapsMissingInfo();
-    res.render('mapart-missing', { missingInfo });
+    const type = req.query.type;
+    const missingInfo = await mapArtController.fetchMapsMissingInfo(type);
+    res.render('mapart-missing', { missingInfo, type: type || 'all' });
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
   }

@@ -7,23 +7,37 @@ html
     .container
       h1.text-center Maps Missing Information
       hr
-      if missingInfo.length
-        .row
-          each map in missingInfo
-            .col-md-4
-              .card.mb-4.box-shadow
-                img.card-img-top(src=`/public/uploads/mapart/${map.imgUrl}`, alt=`Image for ${map.name || 'Unnamed Map'}`)
-                .card-body
-                  h5.card-title #{map.name || 'No Name'}
-                  p.card-text Description: #{map.description || 'N/A'}
-                  p.card-text Tags: #{map.tags && map.tags.length ? map.tags.join(', ') : 'No Tags'}
-                  div.d-flex.justify-content-between.align-items-center
-                    div.btn-group
-                      a.btn.btn-sm.btn-outline-secondary(href=`/mapart/id/${map.id}`) View
-                      if admin || mod
-                        a.btn.btn-sm.btn-outline-secondary(href=`/mapart/edit/${map.id}`) Edit
-                    small.text-muted #{new Date(map.createdAt).toLocaleDateString()}
-      else
-        .alert.alert-warning Maps with complete info or no records found.
+      if !admin && !mod
+        div.alert.alert-danger(role="alert")
+          | You are not an administrator or a moderator
+      else 
+        form(method='get', action='/mapart/missingInfo')
+          .form-group.text-center
+            label(for='missingType') Filter by missing info type:
+            select.form-group(name='type')
+              option(value='all') All
+              option(value='artist') Artist
+              option(value='description') Description
+              option(value='tags') Tags
+            button.btn.btn-primary(type='submit') Filter
+
+        if missingInfo.length
+          .row
+            each map in missingInfo
+              .col-md-4
+                .card.mb-4.box-shadow
+                  img.card-img-top(src=`/public/uploads/mapart/${map.imgUrl}`, alt=`Image for ${map.name || 'Unnamed Map'}`)
+                  .card-body
+                    h5.card-title #{map.name || 'No Name'}
+                    p.card-text Description: #{map.description || 'N/A'}
+                    p.card-text Tags: #{map.tags && map.tags.length ? map.tags.join(', ') : 'No Tags'}
+                    div.d-flex.justify-content-between.align-items-center
+                      div.btn-group
+                        a.btn.btn-sm.btn-outline-secondary(href=`/mapart/id/${map.id}`) View
+                        if admin || mod
+                          a.btn.btn-sm.btn-outline-secondary(href=`/mapart/edit/${map.id}`) Edit
+                      small.text-muted #{new Date(map.createdAt).toLocaleDateString()}
+        else
+          .alert.alert-warning Maps with complete info or no records found.
 
     include includes/scripts.pug

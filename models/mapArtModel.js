@@ -462,23 +462,39 @@ const getLatestServerIdByServer = async (server) => {
   }
 };
 
-const fetchMapsMissingInfo = async () => {
-  try {
-    const maps = await prisma.mapArt.findMany({
-      where: {
+const fetchMapsMissingInfo = async (type) => {
+  let whereClause = {};
+
+  switch (type) {
+    case 'artist':
+      whereClause = { artist: "N/A" };
+      break;
+    case 'description':
+      whereClause = { description: "" };
+      break;
+    case 'tags':
+      whereClause = { tags: { equals: [] } };
+      break;
+    default:
+      whereClause = {
         OR: [
+          { artist: "" },
           { description: "" },
           { tags: { equals: [] } },
-          { AND: [{ name: { not: null } }, { description: "" }] }
         ],
-      },
+      };
+  }
+
+  try {
+    const maps = await prisma.mapArt.findMany({
+      where: whereClause,
       orderBy: {
         createdAt: 'desc',
       },
     });
     return maps;
   } catch (error) {
-    console.error('Error fetching maps missing critical information:', error);
+    console.error('Error fetching maps with missing information:', error);
     throw error;
   }
 };
