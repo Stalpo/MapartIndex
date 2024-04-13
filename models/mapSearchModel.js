@@ -1,6 +1,7 @@
 const prisma = require('../util/db').prisma;
 
-const createFilter = (user, artist, server, searchTerm, includeTags = false) => {
+// Helper function to create filter objects for queries
+function createFilter(user, artist, server, searchTerm, includeTags = false) {
   const filter = {};
   if (user) filter.username = user;
   if (artist) filter.artist = artist;
@@ -19,7 +20,39 @@ const createFilter = (user, artist, server, searchTerm, includeTags = false) => 
   return filter;
 }
 
-const getOrderBy = (sort) => {
+// Adjust the searchMaps function
+const searchMaps = async (page, perPage = 25, user, artist, sort, server, searchTerm) => {
+  try {
+    const whereMapArt = createFilter(user, artist, server, searchTerm, true);
+    const whereMapId = createFilter(user, artist, server, searchTerm);
+
+    // Fetch data from both models
+    const mapsArt = await prisma.mapArt.findMany({
+      where: whereMapArt,
+      orderBy: getOrderBy(sort)
+    });
+
+    const mapsId = await prisma.mapId.findMany({
+      where: whereMapId,
+      orderBy: getOrderBy(sort)
+    });
+
+    // Combine and sort the results from both models
+    const combinedMaps = [...mapsArt, ...mapsId].sort((a, b) => b.createdAt - a.createdAt);
+
+    // Manually apply pagination
+    const startIndex = (page - 1) * perPage;
+    const paginatedMaps = combinedMaps.slice(startIndex, startIndex + perPage);
+    const totalPages = Math.ceil(combinedMaps.length / perPage);
+
+    return { maps: paginatedMaps, totalPages };
+  } catch (error) {
+    console.error('Error fetching maps:', error);
+    throw error;
+  }
+};
+
+function getOrderBy(sort) {
   switch (sort) {
     case 'nameAsc': return { artist: 'asc' };
     case 'nameDesc': return { artist: 'desc' };
@@ -28,39 +61,5 @@ const getOrderBy = (sort) => {
     default: return { createdAt: 'desc' };
   }
 }
-
-const searchMaps = async (page = 1, perPage = 25, user, artist, sort, server, searchTerm) => {
-  try {
-    page = Number(page);
-    perPage = Number(perPage);
-
-    const whereMapArt = createFilter(user, artist, server, searchTerm, true);
-    const whereMapId = createFilter(user, artist, server, searchTerm);
-
-    const mapsArt = await prisma.mapArt.findMany({
-      where: whereMapArt,
-      orderBy: getOrderBy(sort),
-      skip: (page - 1) * perPage,
-      take: perPage
-    });
-
-    const mapsId = await prisma.mapId.findMany({
-      where: whereMapId,
-      orderBy: getOrderBy(sort),
-      skip: (page - 1) * perPage,
-      take: perPage
-    });
-
-    const combinedMaps = [...mapsArt, ...mapsId].sort((a, b) => b.createdAt - a.createdAt);
-
-    const totalItems = mapsArt.length + mapsId.length;
-    const totalPages = Math.ceil(totalItems / perPage);
-
-    return { maps: combinedMaps, totalPages };
-  } catch (error) {
-    console.error('Error fetching maps:', error);
-    throw error;
-  }
-};
 
 module.exports = { searchMaps };
