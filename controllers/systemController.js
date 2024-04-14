@@ -7,10 +7,10 @@ const runGitPull = async (req, res) => {
   try {
     const result = await systemModel.runGitPull(directoryPath);
     console.log('Git pull successful:', result);
-    res.send({ message: 'Git pull successful', data: result });
+    return `{ message: 'Git pull successful', data: ${result} }`;
   } catch (error) {
     console.error('Error in runGitPull:', error.message);
-    res.status(500).send({ error: 'Failed to run git pull', details: error.message });
+    return `{ error: 'Failed to run git pull', details: ${error.message} }`;
   }
 };
 
@@ -20,10 +20,10 @@ const restartPm2 = async (req, res) => {
   try {
     const result = await systemModel.restartPm2(directoryPath);
     console.log('PM2 restart successful:', result);
-    res.send({ message: 'PM2 restart successful', data: result });
+    return `{ message: 'PM2 restart successful', data: ${result} }`;
   } catch (error) {
     console.error('Error in restartPm2:', error.message);
-    res.status(500).send({ error: 'Failed to restart PM2', details: error.message });
+    return `{ error: 'Failed to restart PM2', details: ${error.message} }`;
   }
 };
 
