@@ -504,6 +504,7 @@ const fetchMapsMissingInfo = async (type) => {
           { tags: { equals: [] } },
         ],
       };
+      break;
   }
 
   try {
