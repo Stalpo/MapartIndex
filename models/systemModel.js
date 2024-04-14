@@ -1,10 +1,11 @@
+// systemModel.js
 const { exec } = require('child_process');
 
-const runGitPull = (directoryPath) => {
+const runCommand = (directoryPath, command) => {
   return new Promise((resolve, reject) => {
-    const command = `cd ${directoryPath} && git pull`;
+    const fullCommand = `cd ${directoryPath} && ${command}`;
 
-    exec(command, (error, stdout, stderr) => {
+    exec(fullCommand, (error, stdout, stderr) => {
       if (error) {
         console.error(`exec error: ${error}`);
         return reject(error);
@@ -19,6 +20,15 @@ const runGitPull = (directoryPath) => {
   });
 };
 
+const runGitPull = (directoryPath) => {
+  return runCommand(directoryPath, 'git pull');
+};
+
+const restartPm2 = (directoryPath) => {
+  return runCommand(directoryPath, 'pm2 restart index');
+};
+
 module.exports = {
   runGitPull,
+  restartPm2,
 };
