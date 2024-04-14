@@ -253,7 +253,8 @@ html
                 </div>
               </div>
             `;
-            if(username || !map.nsfw){
+            // only show nsfw if user is logged in
+            if(getCookie('token'); || !map.nsfw){
               gridContainer.appendChild(card);
             }
           });
@@ -289,7 +290,10 @@ html
                 </div>
               </div>
             `;
-            gridContainer.appendChild(card);
+            // only show nsfw if user is logged in
+            if(getCookie('token'); || !map.nsfw){
+              gridContainer.appendChild(card);
+            }
           });
         }
 
