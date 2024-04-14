@@ -466,6 +466,9 @@ const fetchMapsMissingInfo = async (type) => {
   let whereClause = {};
 
   switch (type) {
+    case 'name':
+      whereClause = { name: "" };
+      break;
     case 'artist':
       whereClause = { artist: "N/A" };
       break;
@@ -478,6 +481,7 @@ const fetchMapsMissingInfo = async (type) => {
     default:
       whereClause = {
         OR: [
+          { name: "" },
           { artist: "" },
           { description: "" },
           { tags: { equals: [] } },
