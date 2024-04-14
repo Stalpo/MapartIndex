@@ -483,16 +483,28 @@ const fetchMapsMissingInfo = async (type) => {
     case 'tags':
       whereClause = { tags: { equals: [] } };
       break;
-    default:
-      whereClause = {
+    case 'all':
+      whereClause = { 
         OR: [
           { name: "" },
           { name: { isSet: false } },
-          { artist: "" },
+          { artist: "N/A" },
           { description: "" },
           { tags: { equals: [] } },
         ],
       };
+      break;
+    default:
+      // all but desc
+      whereClause = {
+        OR: [
+          { name: "" },
+          { name: { isSet: false } },
+          { artist: "N/A" },
+          { tags: { equals: [] } },
+        ],
+      };
+      break;
   }
 
   try {
