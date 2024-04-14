@@ -102,6 +102,16 @@ const getUserByUsername = async (username) => {
   }
 };
 
+const getProfilesWithoutUser = async () => {
+  try {
+    const profiles = await userModel.getProfilesWithoutUser();
+    return profiles;
+  } catch (error) {
+    console.error('Error in getProfilesWithoutUser:', error);
+    return { error: 'Failed to fetch orphan profiles' };
+  }
+};
+
 const getAllUsers = async () => {
   try {
     return await userModel.getAllUsers();
@@ -301,6 +311,7 @@ module.exports = {
   getUserById,
   getUsernameById,
   getUserByUsername,
+  getProfilesWithoutUser,
   getAllUsers,
   registerUser,
   loginUser,

@@ -153,6 +153,38 @@ const getUserByDiscordId = async (discordId) => {
   }
 };
 
+const getProfilesWithoutUser = async () => {
+  try {
+    // Fetch all user IDs from the User table
+    const users = await prisma.user.findMany({
+      select: {
+        id: true  // Only fetch the 'id' field
+      }
+    });
+
+    // Map user IDs into an array for the query condition
+    const userIds = users.map(user => user.id);
+
+    console.log(userIds);
+
+    // Find profiles where the 'userId' is NOT in the fetched user IDs
+    const orphanProfiles = await prisma.profile.findMany({
+      where: {
+        userId: {
+          notIn: userIds
+        }
+      }
+    });
+
+    console.log(orphanProfiles);
+
+    return orphanProfiles;
+  } catch (error) {
+    console.error('Error in getProfilesWithoutUser:', error);
+    return null;
+  }
+};
+
 const getAllUsers = async () => {
   try {
     return await prisma.user.findMany();
@@ -283,6 +315,7 @@ module.exports = {
   getUsernameById,
   getUserById,
   getUserByDiscordId,
+  getProfilesWithoutUser,
   getAllUsers,
   createUser,
   createUserDiscord,

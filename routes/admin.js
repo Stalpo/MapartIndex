@@ -90,6 +90,21 @@ router.get('/users', async (req, res) => {
   }
 });
 
+router.get('/users/orphanProfiles', async (req, res) => {
+  try {
+    if (res.locals.admin) {
+      const orphans = await userController.getProfilesWithoutUser();
+      console.log(orphans);
+      res.json(orphans);
+    } else {
+      return res.status(403).send('Forbidden');
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 // GET user by ID
 router.get('/users/:userId', async (req, res) => {
   try {

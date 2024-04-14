@@ -359,18 +359,34 @@ const removeFavoriteMapArtId = async (userId, mapArtId) => {
 
 const likeMapArtId = async (userId, mapArtId) => {
   try {
-    const updatedMapArt = await prisma.mapArt.update({
+    // Retrieve the current mapArt item including its likedBy array
+    const mapArt = await prisma.mapArt.findUnique({
       where: { id: mapArtId },
-      data: {
-        likes: {
-          increment: 1
-        },
-        likedBy: {
-          push: userId
-        }
-      }
+      select: { likedBy: true }
     });
-    return updatedMapArt;
+
+    if (!mapArt) {
+      throw new Error('MapArt not found');
+    }
+
+    // Check if the userId is already in the likedBy array
+    if (!mapArt.likedBy.includes(userId)) {
+      // If not included, proceed with the update
+      const updatedMapArt = await prisma.mapArt.update({
+        where: { id: mapArtId },
+        data: {
+          likes: {
+            increment: 1
+          },
+          likedBy: {
+            push: userId
+          }
+        }
+      });
+      return updatedMapArt;
+    } else {
+      throw new Error('User has already liked this map art');
+    }
   } catch (error) {
     console.error('Error liking map art:', error);
     throw error;
