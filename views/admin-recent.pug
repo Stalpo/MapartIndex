@@ -15,7 +15,7 @@ html
           thead
             tr
               th Display Name
-              th Created At
+              th Updated At
               th Username
               th Image
               th Artist
@@ -107,7 +107,7 @@ html
 
               newRow.innerHTML = `
                 <td>${map.displayName}</td>
-                <td>${new Date(map.createdAt).toLocaleString('en-US')}</td>
+                <td>${new Date(map.updatedAt).toLocaleString('en-US')}</td>
                 <td>${map.username}</td>
                 <td><img src="${imgUrl}" alt="Map Image" style="max-width: 100px; max-height: 100px;"></td>
                 <td>${cleanedArtists}</td>
