@@ -488,7 +488,7 @@ const fetchMapsMissingInfo = async (type) => {
         OR: [
           { name: "" },
           { name: { isSet: false } },
-          { artist: "" },
+          { artist: "N/A" },
           { description: "" },
           { tags: { equals: [] } },
         ],
@@ -500,7 +500,7 @@ const fetchMapsMissingInfo = async (type) => {
         OR: [
           { name: "" },
           { name: { isSet: false } },
-          { artist: "" },
+          { artist: "N/A" },
           { tags: { equals: [] } },
         ],
       };
