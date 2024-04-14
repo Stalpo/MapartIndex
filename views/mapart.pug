@@ -27,7 +27,6 @@ html
               if (!response.ok) {
                 throw new Error('Failed to perform action');
               }
-              console.log(response);
               btn.textContent = isCurrentlyFavorite ? 'Favorite' : 'Unfavorite';
             })
             .catch(error => console.error('Error:', error));
@@ -46,8 +45,6 @@ html
               return response.json();
             })
             .then(data => {
-              console.log(data);
-              console.log();
               document.getElementById('likeCount').textContent = parseInt(data.mapArt.likedBy.length);
             })
             .catch(error => console.error('Error:', error));
@@ -62,7 +59,6 @@ html
               return response.json();
             })
             .then(data => {
-              console.log(data);
               const btn = document.querySelector('#favoriteButton');
               btn.textContent = data.isFavorite ? 'Unfavorite' : 'Favorite';
             })
@@ -78,7 +74,6 @@ html
               return response.json();
             })
             .then(data => {
-              console.log(data);
               const btn = document.querySelector('#likeButton');
               btn.textContent = data.isLiked ? 'Unlike' : 'Like';
             })
