@@ -107,7 +107,15 @@ html
                       <h5>${map.displayName}</h5>
                       <br> 
                       <ul class="list-group">
-                        <li class="list-group-item">Artist: ${map.artist || 'N/A'}</li>
+                        <li class="list-group-item">Artist: ${
+                          map.artist
+                            ? map.artist.split(',')
+                              .map(artist => artist.trim())
+                              .filter(artist => artist.length > 0)
+                              .map(artist => `<a href="/search?query=${artist}">${artist}</a>`)
+                              .join(', ')
+                            : 'N/A'
+                        }</li>
                         <li class="list-group-item">Description: ${map.description || 'N/A'}</li>
                         <li class="list-group-item">Size: ${map.size} (${map.width} x ${map.height})</li>
                         <li class="list-group-item">Uploader: <a href="/profile/user/${map.username}">${map.username}</a></li>
