@@ -1,19 +1,21 @@
 const prisma = require('../util/db').prisma;
 
 // Helper function to create filter objects for queries
-const createFilter = (user, artist, server, searchTerm, includeTags = false) => {
+const createFilter = (user, artist, server, searchTerm, includeTags = false, includeNames = false) => {
   const filter = {};
   if (user) filter.username = user;
   if (artist) filter.artist = artist;
   if (server) filter.server = server;
   if (searchTerm) {
     filter.OR = [
-      { name: { contains: searchTerm, mode: 'insensitive' } },
       { displayName: { contains: searchTerm, mode: 'insensitive' } },
       { username: { contains: searchTerm, mode: 'insensitive' } },
       { artist: { contains: searchTerm, mode: 'insensitive' } },
       { server: { contains: searchTerm, mode: 'insensitive' } },
     ];
+    if (includeNames) {
+      filter.OR.push({ name: { contains: searchTerm, mode: 'insensitive' } });
+    }
     if (includeTags) {
       filter.OR.push({ tags: { hasSome: [searchTerm] } });
     }
@@ -35,7 +37,7 @@ const getOrderBy = (sort) => {
 // searchMaps with pagination for search page
 const searchMaps = async (page = 1, perPage = 25, user, artist, sort, server, searchTerm) => {
   try {
-    const whereMapArt = createFilter(user, artist, server, searchTerm, true);
+    const whereMapArt = createFilter(user, artist, server, searchTerm, true, true);
     const whereMapId = createFilter(user, artist, server, searchTerm);
 
     // Fetch data from both models
