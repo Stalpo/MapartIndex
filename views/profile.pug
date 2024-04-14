@@ -57,9 +57,10 @@ html
 
             div.col
               h3.text-center Favorites
-              ul#favoriteMaps.list-group
+              div.gridContainer#favoriteMaps
                 each mapId in profile.favorites.slice(-5).reverse()
-                  li.list-group-item.text-center(class='favoriteMap' id=`${mapId}`)
+                  div.favoriteMap(id=mapId)
+                    img(src="", alt="Loading...", style="display: none;")
                     a(href="#") Loading map data...
 
             br
@@ -85,22 +86,55 @@ html
 
     include includes/scripts.pug
 
+      style.
+        .favoriteMap {
+          display: grid;
+          place-items: center;
+          gap: 10px;
+          padding-top: 10px;
+        }
+
+        .favoriteMap img {
+          width: 100%;
+          height: auto;
+        }
+
+        .favoriteMap a {
+          text-align: center;
+        }
+
       script.
         document.addEventListener('DOMContentLoaded', function () {
           const mapElements = document.querySelectorAll('.favoriteMap');
           mapElements.forEach(element => {
             const mapId = element.id;
-            console.log(mapId)
             fetch(`/api/mapArt/${mapId}`)
               .then(response => response.json())
               .then(data => {
+                const img = element.querySelector('img');
                 const link = element.querySelector('a');
+
+                // Update image source and display it
+                if (data.imgUrl) {
+                  img.src = `/public/uploads/mapart/${data.imgUrl}`;
+                  img.alt = data.name || data.displayName;
+                  img.style.display = 'block';
+                  img.style.width = "75px";
+                } else {
+                  img.alt = 'Image not available';
+                  img.style.display = 'none'; // Hide the image if not available
+                }
+
+                // Update link for text
+                link.style.display = 'block';
                 link.href = `/mapart/id/${mapId}`;
-                link.textContent = data.displayName || data.name;
+                link.textContent = data.name || data.displayName;
+
               })
               .catch(error => {
                 console.error('Error fetching map data:', error);
                 element.querySelector('a').textContent = 'Failed to load data';
+                element.querySelector('img').style.display = 'none'; // Hide the image on error
               });
           });
         });
