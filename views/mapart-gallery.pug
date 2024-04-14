@@ -253,7 +253,9 @@ html
                 </div>
               </div>
             `;
-            gridContainer.appendChild(card);
+            if(username || !map.nsfw){
+              gridContainer.appendChild(card);
+            }
           });
         };
 

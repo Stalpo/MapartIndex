@@ -255,7 +255,10 @@ html
                 </div>
               </div>
             `;
-            gridContainer.appendChild(card);
+            // only show nsfw if user is logged in
+            if(username || !map.nsfw){
+              gridContainer.appendChild(card);
+            }
           });
         }
 
