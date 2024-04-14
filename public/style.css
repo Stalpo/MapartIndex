@@ -1,6 +1,6 @@
 /* Navbar */
 .navbar-custom {
-  background-color: #dbcfba;
+  background-color: #cfcea8;
   color: #000000;
 }
 
@@ -11,7 +11,7 @@
 
 .navbar-custom .navbar-toggler-icon {
   color: #000000;
-  background-color: #dbcfba;
+  background-color: #cfcea8;
 }
 
 .navbar-custom .navbar-toggler {
@@ -19,16 +19,16 @@
 }
 
 .navbar-custom .nav-item.dropdown .dropdown-menu {
-  background-color: #dbcfba;
+  background-color: #cfcea8;
 }
 
 .navbar-custom .nav-item.dropdown:hover .dropdown-menu {
-  background-color: #dbcfba;
+  background-color: #cfcea8;
 }
 
 .navbar-custom .nav-item.dropdown:hover .dropdown-menu a.dropdown-item:hover {
   color: #000000;
-  background-color: #dbcfba;
+  background-color: #cfcea8;
 }
 
 /* NSFW */
