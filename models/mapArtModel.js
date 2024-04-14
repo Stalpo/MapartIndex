@@ -470,7 +470,7 @@ const fetchMapsMissingInfo = async (type) => {
       whereClause = { 
         OR: [
           { name: "" },
-          { name: null },
+          { name: { isSet: false } },
         ], 
       };
       break;
@@ -487,7 +487,7 @@ const fetchMapsMissingInfo = async (type) => {
       whereClause = {
         OR: [
           { name: "" },
-          { name: null },
+          { name: { isSet: false } },
           { artist: "" },
           { description: "" },
           { tags: { equals: [] } },
