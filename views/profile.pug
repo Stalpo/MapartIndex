@@ -32,15 +32,17 @@ html
           div.col-md-8
             div.row
               div.col-md-6
-                h3.text-center Recent Uploads
-                ul.list-group
-                each map in userMaps.slice(-5).reverse()
-                  li.list-group-item.text-center
-                    a(href="/mapid/id/" + map.id, target="_blank")
-                      | #{ map.displayName }
-              div.col-md-6
-                h3.text-center Upload Count
-                p.text-center(style="font-size: 2em; font-weight: bold; color: #4285f4;") #{ userMaps.length }
+                if userMaps.length > 0
+                  h3.text-center Recent Uploads
+                  ul.list-group
+                  each map in userMaps.slice(-5).reverse()
+                    li.list-group-item.text-center
+                      a(href="/mapid/id/" + map.id, target="_blank")
+                        | #{ map.name || map.displayName }
+              if userMaps.length > 0
+                div.col-md-6
+                  h3.text-center Upload Count
+                  p.text-center(style="font-size: 2em; font-weight: bold; color: #4285f4;") #{ userMaps.length }
             div.row.mt-4
               div.col-md-6
                 //h3.text-center Achievements
