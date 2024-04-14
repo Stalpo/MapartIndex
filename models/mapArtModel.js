@@ -59,10 +59,10 @@ const getMaps = async (page, perPage, user, artist, sort, server, tag) => {
         orderBy[0] = { artist: 'desc' };
         break;
       case 'dateAsc':
-        orderBy[0] = { createdAt: 'asc' };
+        orderBy = { createdAt: 'asc' };
         break;
       case 'dateDesc':
-        orderBy[0] = { createdAt: 'desc' };
+        orderBy = { createdAt: 'desc' };
         break;
       case 'sizeAsc':
         orderBy[0] = { size: 'asc' };
@@ -83,7 +83,7 @@ const getMaps = async (page, perPage, user, artist, sort, server, tag) => {
         orderBy[0] = { likes: 'desc' };
         break;
       default:
-        orderBy[0] = { createdAt: 'desc' };
+        orderBy = { createdAt: 'desc' };
         break;
     }
 
