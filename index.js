@@ -73,6 +73,10 @@ app.use('/discord', discord);
 const api = require('./routes/api');
 app.use('/api', api);
 
+// System Routes
+const system = require('./routes/system');
+app.use('/system', system);
+
 // Index route
 app.get('/', async (req, res) => {
   try {
