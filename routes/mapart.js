@@ -250,7 +250,7 @@ router.delete('/like/:id', async (req, res) => {
   }
 });
 
-router.get('/likes/:id', async (req, res) => {
+router.get('/like/:id', async (req, res) => {
   try {
     const mapId = req.params.id;
     const userId = res.locals.userId;

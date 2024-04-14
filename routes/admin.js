@@ -35,11 +35,22 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/recentUpdates', async (req, res) => {
+  try {
+    res.render('admin-recent');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 router.get('/mapart/recentUpdates', async (req, res) => {
+  let { limit } = req.query;
+  if (!limit) { limit = 10; }
   try {
     if (res.locals.admin) {
-      const latestUpdated = await mapArtController.fetchLatestUpdatedAt();
-      res.json(latestUpdated);
+      const result = await mapArtController.fetchLatestUpdatedAt(Number(limit));
+      res.json(result);
     } else {
       return res.status(403).send('Forbidden');
     }
@@ -50,10 +61,12 @@ router.get('/mapart/recentUpdates', async (req, res) => {
 });
 
 router.get('/mapid/recentUpdates', async (req, res) => {
+  let { limit } = req.query;
+  if (!limit) { limit = 10; }
   try {
     if (res.locals.admin) {
-      const latestUpdated = await mapIdController.fetchLatestUpdatedAt();
-      res.json(latestUpdated);
+      const result = await mapIdController.fetchLatestUpdatedAt(Number(limit));
+      res.json(result);
     } else {
       return res.status(403).send('Forbidden');
     }
@@ -68,6 +81,38 @@ router.get('/users', async (req, res) => {
     if (res.locals.admin) {
       const allUsers = await userController.getAllUsers();
       res.json(allUsers);
+    } else {
+      return res.status(403).send('Forbidden');
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+router.get('/users/orphanProfiles', async (req, res) => {
+  try {
+    if (res.locals.admin) {
+      const orphans = await userController.getProfilesWithoutUser();
+      console.log(orphans);
+      res.json(orphans);
+    } else {
+      return res.status(403).send('Forbidden');
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+router.delete('/users/orphanProfiles', async (req, res) => {
+  try {
+    if (res.locals.admin) {
+      const result = await userController.deleteOrphanProfiles();
+      if (result.error) {
+        return res.status(500).json({ message: 'Failed to delete orphan profiles', error: result.error });
+      }
+      res.json(result);
     } else {
       return res.status(403).send('Forbidden');
     }

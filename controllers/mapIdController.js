@@ -173,14 +173,14 @@ const getMapsByOwnerId = async (ownerId) => {
   }
 };
 
-const fetchLatestUpdatedAt = async () => {
+const fetchLatestUpdatedAt = async (limit) => {
   try {
-    return await mapIdModel.fetchLatestUpdatedAt();
+    return await mapIdModel.fetchLatestUpdatedAt(limit);
   } catch (error) {
     console.error('Error finding latest updated maps:', error);
     throw error;
   }
-}
+};
 
 const getLatestServerIdByServer = async (server) => {
   try {

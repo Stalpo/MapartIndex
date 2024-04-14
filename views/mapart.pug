@@ -4,19 +4,90 @@ html
   include includes/head.pug
   body
     include includes/navbar.pug
-    div.container
+    
+    .container
       h1.text-center Map Art
       hr
-
-      div#mapContainer.text-center
+      
+      #mapContainer.text-center
         i#loadingSpinner.fa.fa-spinner.fa-spin.fa-3x
         p Loading map data...
 
-      script(src="https://code.jquery.com/jquery-3.6.0.min.js")
+      if admin || mod
+        .text-center
+          a.btn.btn-primary(href=`/mapart/edit/${mapId}`) Visit Map Edit Page
+
       script.
+        function handleFavorite(mapId, action) {
+          const btn = document.querySelector('#favoriteButton');
+          const isCurrentlyFavorite = btn.textContent === 'Unfavorite';
+          const method = isCurrentlyFavorite ? 'DELETE' : 'POST';
+          fetch(`/mapart/favorite/${mapId}`, { method: method })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Failed to perform action');
+              }
+              console.log(response);
+              btn.textContent = isCurrentlyFavorite ? 'Favorite' : 'Unfavorite';
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function handleLike(mapId, action) {
+          const btn = document.querySelector('#likeButton');
+          const isCurrentlyLiked = btn.textContent === 'Unlike';
+          const method = isCurrentlyLiked ? 'DELETE' : 'POST';
+          fetch(`/mapart/like/${mapId}`, { method: method })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Failed to perform action');
+              }
+              btn.textContent = isCurrentlyLiked ? 'Like' : 'Unlike';
+              return response.json();
+            })
+            .then(data => {
+              console.log(data);
+              console.log();
+              document.getElementById('likeCount').textContent = parseInt(data.mapArt.likedBy.length);
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function checkFavorite(mapId) {
+          fetch(`/mapart/favorite/${mapId}`)
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Failed to perform action');
+              }
+              return response.json();
+            })
+            .then(data => {
+              console.log(data);
+              const btn = document.querySelector('#favoriteButton');
+              btn.textContent = data.isFavorite ? 'Unfavorite' : 'Favorite';
+            })
+            .catch(error => console.error('Error checking favorite status:', error));
+        }
+
+        function checkLike(mapId) {
+          fetch(`/mapart/like/${mapId}`)
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Failed to perform action');
+              }
+              return response.json();
+            })
+            .then(data => {
+              console.log(data);
+              const btn = document.querySelector('#likeButton');
+              btn.textContent = data.isLiked ? 'Unlike' : 'Like';
+            })
+            .catch(error => console.error('Error checking like status:', error));
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
-          const mapId = `#{mapId}`;
-          const userId = `#{userId}`;
+          const mapId = '#{mapId}';
+          const userId = '#{userId}';
           const mapContainer = document.getElementById('mapContainer');
 
           fetch(`/api/mapArt/${mapId}`)
@@ -27,106 +98,55 @@ html
               return response.json();
             })
             .then(map => {
-              if (map) {
-                const imageUrl = `/public/uploads/mapart/${map.imgUrl}`;
-                const dateUploaded = map.createdAt ? new Date(map.createdAt).toLocaleString('en-US', {
-                  year: 'numeric',
-                  month: '2-digit',
-                  day: '2-digit',
-                  hour: 'numeric',
-                  minute: 'numeric',
-                  hour12: true
-                }) : 'Unknown';
-
-                // Check if showNSFW cookie is true
-                const showNSFW = getCookie('showNSFW');
-
-                const mapContent = document.createElement('div');
-                const mapInfo = document.createElement('div');
-                mapInfo.innerHTML = `
-                  <div class="jumbotron">
-                    <div class="row">
-                      <div class="col-md-8">
-                        <img src="${imageUrl}" alt="${mapId}" class="pixelated-image img-fluid ${showNSFW === 'true' ? '' : (map.nsfw ? 'blurred' : '')}" style="width: 80%; max-width: none; height: auto; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); image-rendering: pixelated;">
-                      </div>
-                      <div class="col-md-4">
-                        ${map.name ? `<h2>${map.name}</h2>` : ''}
-                        <h5>${map.displayName}</h5>
-                        <br> 
-                        <ul class="list-group">
-                          <li class="list-group-item">Artist: ${
-                            map.artist
-                              ? map.artist.split(',')
-                                .map(artist => artist.trim())
-                                .filter(artist => artist.length > 0)
-                                .map(artist => `<a href="/search?query=${artist}">${artist}</a>`)
-                                .join(', ')
-                              : 'N/A'
-                          }</li>
-                          <li class="list-group-item">Description: ${map.description || 'N/A'}</li>
-                          <li class="list-group-item">Size: ${map.size} (${map.width} x ${map.height})</li>
-                          ${map.tags && map.tags[0] !== "" ? `<li class="list-group-item">Tags: ${map.tags.map(tag => `<a href="/search?query=${tag}"><span class="badge badge-secondary">${tag}</span></a>`).join(' ')}</li>` : ''}
-                          <li class="list-group-item">Uploader: <a href="/profile/user/${map.username}">${map.username}</a></li>
-                          <li class="list-group-item">Uploaded: ${dateUploaded}</li>
-                          <li class="list-group-item">NSFW: ${map.nsfw}</li>
-                          <li class="list-group-item">Views: ${map.views}</li>
-                          <li class="list-group-item">Likes: ${map.likes}</li>
-                        </ul>
-                        <br> 
-                        <h5><a href="javascript:void(0);" onclick="history.back()">Back</a></h5>
-                      </div>
+              const imageUrl = `/public/uploads/mapart/${map.imgUrl}`;
+              const dateUploaded = map.createdAt ? new Date(map.createdAt).toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', hour12: true }) : 'Unknown';
+              const showNSFW = getCookie('showNSFW');
+              const mapInfo = `
+                <div class="jumbotron">
+                  <div class="row">
+                    <div class="col-md-8">
+                      <img src="${imageUrl}" alt="${mapId}" class="pixelated-image img-fluid ${showNSFW === 'true' ? '' : (map.nsfw ? 'blurred' : '')}" style="width: 80%; max-width: none; height: auto; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); image-rendering: pixelated;">
                     </div>
-                  </div>`;
-                mapContent.appendChild(mapInfo);
-                mapContainer.innerHTML = ''; // Clear existing.
-                mapContainer.appendChild(mapContent);
-              } else {
-                mapContainer.innerHTML = '<div class="alert alert-danger" role="alert">MapArt not found!</div>';
-              }
+                    <div class="col-md-4">
+                      ${map.name ? `<h2>${map.name}</h2>` : ''}
+                      <h5>${map.displayName}</h5>
+                      <br> 
+                      <ul class="list-group">
+                        <li class="list-group-item">Artist: ${map.artist || 'N/A'}</li>
+                        <li class="list-group-item">Description: ${map.description || 'N/A'}</li>
+                        <li class="list-group-item">Size: ${map.size} (${map.width} x ${map.height})</li>
+                        <li class="list-group-item">Uploader: <a href="/profile/user/${map.username}">${map.username}</a></li>
+                        <li class="list-group-item">Uploaded: ${dateUploaded}</li>
+                        <li class="list-group-item">NSFW: ${map.nsfw}</li>
+                        <li class="list-group-item">Views: ${map.views}</li>
+                        <li class="list-group-item">Likes: <span id="likeCount">${map.likes}</span></li>
+                        <li class="list-group-item"><button class="btn btn-outline-success" id='likeButton' onclick="handleLike('${mapId}')">Like</button> <button class="btn btn-outline-primary" id='favoriteButton' onclick="handleFavorite('${mapId}', 'toggle')">Favorite</button></li>
+                      </ul>
+                      <br> 
+                      <h5><a href="javascript:void(0);" onclick="history.back()">Back</a></h5>
+                    </div>
+                  </div>
+                </div>`;
+              mapContainer.innerHTML = mapInfo;
+              checkFavorite(mapId);
+              checkLike(mapId);
             })
             .catch(error => {
               console.error('Error fetching data:', error);
               mapContainer.innerHTML = '<div class="alert alert-danger" role="alert">Error fetching data: ' + error.message + '</div>';
             });
 
-
-          function handleFavorite(mapId, action) {
-            fetch(`/mapart/favorite/${mapId}`, {
-              method: action === 'add' ? 'POST' : 'DELETE',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ userId: userId }),
-            })
-            .then(response => {
-              if (!response.ok) {
-                throw new Error('Failed to perform action');
-              }
-              return response.json();
-            })
-            .then(data => {
-              console.log(data);
-            })
-            .catch(error => {
-              console.error('Error:', error);
-            });
-          }
-
-          // Function to get cookie value by name
           function getCookie(name) {
             const cookies = document.cookie.split(';');
             for (let cookie of cookies) {
               const [cookieName, cookieValue] = cookie.split('=');
               if (cookieName.trim() === name) {
-                return cookieValue;
+                return decodeURIComponent(cookieValue);
               }
             }
             return '';
           }
+
         });
-
-      if admin || mod
-        div.text-center
-          a.btn.btn-primary(href=`/mapart/edit/${mapId}`) Visit Map Edit Page
-
-      include includes/scripts.pug
+  
+    include includes/scripts.pug

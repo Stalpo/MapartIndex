@@ -211,14 +211,14 @@ const fetchMapsMissingInfo = async (type) => {
   }
 }
 
-const fetchLatestUpdatedAt = async () => {
+const fetchLatestUpdatedAt = async (limit) => {
   try {
-    return await mapArtModel.fetchLatestUpdatedAt();
+    return await mapArtModel.fetchLatestUpdatedAt(limit);
   } catch (error) {
     console.error('Error finding latest updated maps:', error);
     throw error;
   }
-}
+};
 
 const deleteMapById = async (mapId) => {
   try {

@@ -102,6 +102,29 @@ const getUserByUsername = async (username) => {
   }
 };
 
+const getProfilesWithoutUser = async () => {
+  try {
+    const profiles = await userModel.getProfilesWithoutUser();
+    return profiles;
+  } catch (error) {
+    console.error('Error in getProfilesWithoutUser:', error);
+    return { error: 'Failed to fetch orphan profiles' };
+  }
+};
+
+const deleteOrphanProfiles = async () => {
+  try {
+    const deletedCount = await userModel.deleteOrphanProfiles();
+    if (deletedCount === null) {
+      throw new Error('Failed to delete orphan profiles.');
+    }
+    return { message: `${deletedCount} orphan profiles deleted successfully` };
+  } catch (error) {
+    console.error('Error in deleteOrphanProfiles:', error);
+    return { error: 'Failed to delete orphan profiles' };
+  }
+};
+
 const getAllUsers = async () => {
   try {
     return await userModel.getAllUsers();
@@ -301,6 +324,8 @@ module.exports = {
   getUserById,
   getUsernameById,
   getUserByUsername,
+  getProfilesWithoutUser,
+  deleteOrphanProfiles,
   getAllUsers,
   registerUser,
   loginUser,
