@@ -19,6 +19,7 @@ html
                 .input-group-text Type
               select#missingType.form-control(name='type')
                 option(value='all') All
+                option(value='name') Name
                 option(value='artist') Artist
                 option(value='description') Description
                 option(value='tags') Tags
@@ -55,6 +56,7 @@ html
                   img.card-img-top(src=`/public/uploads/mapart/${map.imgUrl}`, alt=`Image for ${map.name || 'Unnamed Map'}`)
                   .card-body
                     h5.card-title #{map.name || 'No Name'}
+                    p.card-text Arist: #{map.artist || 'N/A'}
                     p.card-text Description: #{map.description || 'N/A'}
                     p.card-text Tags: #{map.tags && map.tags.length ? map.tags.join(', ') : 'No Tags'}
                     div.d-flex.justify-content-between.align-items-center
