@@ -35,6 +35,15 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/recentUpdates', async (req, res) => {
+  try {
+    res.render('admin-recent');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 router.get('/mapart/recentUpdates', async (req, res) => {
   let { limit } = req.query;
   if (!limit) { limit = 10; }

@@ -1,0 +1,163 @@
+doctype html
+html
+  - const pageTitle = "Recently Updated Metadata"
+  include includes/head.pug
+  body
+    include includes/navbar.pug
+    div.container
+      h1.text-center= pageTitle
+      if !admin
+        div.alert.alert-danger(role="alert")
+          | You are not an administrator
+      else
+
+        table.table.table-striped#mapsTable
+          thead
+            tr
+              th Display Name
+              th Created At
+              th Username
+              th Image
+              th Artist
+              th NSFW
+              th Actions
+
+          tbody(id='mapsTableBody')
+
+        if admin
+          include includes/admin-menu.pug
+
+        script.
+          // Function to fetch data from the API
+          async function fetchData(url) {
+            try {
+              const response = await fetch(url);
+              if (!response.ok) {
+                if (response.status === 404) {
+                  // Set the corresponding flag if 404 status is encountered
+                  if (url.includes('/mapid/')) {
+                    mapId404 = true;
+                  } else if (url.includes('/mapart/')) {
+                    mapArt404 = true;
+                  }
+                  console.error('Likely last page of results');
+                  return null; // Return null when 404 status is encountered
+                } else {
+                  throw new Error('Network response was not ok');
+                }
+              }
+              return await response.json();
+            } catch (error) {
+              console.error('Error fetching map data:', error);
+              return null;
+            }
+          }
+
+          // Function to handle API call with updated parameters
+          async function fetchMaps() {
+
+            let mapIdData = [];
+            let mapArtData = [];
+
+            let mapIdUrl = `/admin/mapid/recentUpdates?limit=50`;
+            // Fetch data
+            const mapIdResponse = await fetchData(mapIdUrl);
+            if (mapIdResponse !== null) {
+              mapIdData = mapIdResponse;
+            }
+
+            let mapArtUrl = `/admin/mapart/recentUpdates?limit=50`;
+            // Fetch data
+            const mapArtResponse = await fetchData(mapArtUrl);
+            if (mapArtResponse !== null) {
+              mapArtData = mapArtResponse;
+            }
+            
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            loadingSpinner.style.display = 'none';
+            // Combine data into a unique array
+            const combinedData = [...mapIdData, ...mapArtData];
+            buildTable(combinedData);
+          }
+
+          // Function to handle selector and view selector change events
+          function handleSelectorChange() {
+            fetchMaps();
+          }
+
+          // Function to build the table
+          function buildTable(maps) {
+            const tableBody = document.getElementById('mapsTableBody');
+
+            // Build new rows
+            maps.forEach(map => {
+              const newRow = document.createElement('tr');
+              newRow.className = 'vertical-center';
+
+              const imgUrl = map.displayName.includes("MAPART") ? `/public/uploads/mapart/${map.imgUrl}` : `/public/uploads/${map.imgUrl}`;
+              const viewUrl = map.displayName.includes("MAPART") ? `/mapart/id/${map.id}` : `/mapid/id/${map.id}`;
+              const editUrl = map.displayName.includes("MAPART") ? `/mapart/edit/${map.id}` : `/mapid/edit/${map.id}`;
+              const deleteUrl = map.displayName.includes("MAPART") ? `/mapart/delete?mapId=${map.id}` : `/mapid/delete?mapId=${map.id}`;
+
+              // Clean up artist names
+              const cleanedArtists = map.artist.split(',')
+                .map(artist => artist.trim())
+                .filter(artist => artist.length > 0)
+                .join(', ');
+
+              newRow.innerHTML = `
+                <td>${map.displayName}</td>
+                <td>${new Date(map.createdAt).toLocaleString('en-US')}</td>
+                <td>${map.username}</td>
+                <td><img src="${imgUrl}" alt="Map Image" style="max-width: 100px; max-height: 100px;"></td>
+                <td>${cleanedArtists}</td>
+                <td>${map.nsfw}</td>
+                <td>
+                  <div class='btn-group' role='group' aria-label='Buttons'>
+                    <button class='btn btn-primary' type='button' onclick="location.href='${viewUrl}'"><i class='fa fa-eye'></i></button>
+                    <button class='btn btn-primary' type='button' onclick="location.href='${editUrl}'"><i class='fa fa-pencil-alt'></i></button>
+                    <button class='btn btn-danger' type='button' onclick="location.href='${deleteUrl}'"><i class='fa fa-trash'></i></button>
+                  </div>
+                </td>
+              `;
+              tableBody.appendChild(newRow);
+            });
+          }
+
+          // Call the function to populate selectors and fetch initial data when the page loads
+          document.addEventListener('DOMContentLoaded', () => {
+            fetchMaps();
+          });
+
+        // Grid container for images
+        div#gridContainer.row.mb-4
+
+        // Keep loadingSpinner at bottom of page
+        script.
+          function createLoadingSpinner() {
+            const loadingSpinner = document.createElement('div');
+            loadingSpinner.id = 'loadingSpinner';
+            loadingSpinner.className = 'text-center mt-4';
+            
+            const spinnerIcon = document.createElement('i');
+            spinnerIcon.className = 'fa fa-spinner fa-spin fa-3x';
+            
+            const loadingText = document.createElement('p');
+            loadingText.textContent = 'Loading...';
+            
+            loadingSpinner.appendChild(spinnerIcon);
+            loadingSpinner.appendChild(loadingText);
+            
+            return loadingSpinner;
+          }
+
+          const container = document.querySelector('.container');
+          const loadingSpinner = createLoadingSpinner();
+          container.appendChild(loadingSpinner);
+
+        style.
+          .pixelated-image {
+            image-rendering: pixelated;
+          };
+
+      include includes/scripts.pug
