@@ -212,9 +212,9 @@ html
           // Build grid
           maps.forEach(map => {
             const card = document.createElement('div');
-            card.className = `card mb-3 mx-auto`;
+            card.className = `mb-3 mx-auto`;
             card.innerHTML = `
-              <div class="card mb-3 mx-auto ${showNSFW === 'true' ? '' : (map.nsfw ? 'nsfw' : '')}">
+              <div class="mb-3 mx-auto ${showNSFW === 'true' ? '' : (map.nsfw ? 'nsfw' : '')}">
                 <div class="image-wrapper">
                   <a href="/mapid/id/${map.id}" class="image-link">
                     <img src="/public/uploads/${map.imgUrl}" class="pixelated-image ${showNSFW === 'true' ? '' : (map.nsfw ? '' : 'blurred')}" alt="Map Image">
