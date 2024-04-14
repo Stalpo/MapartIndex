@@ -53,7 +53,7 @@ html
             each map in missingInfo
               .col-md-4
                 .card.mb-4.box-shadow
-                  img.card-img-top(src=`/public/uploads/mapart/${map.imgUrl}`, alt=`Image for ${map.name || 'Unnamed Map'}`)
+                  img.card-img-top(class=`pixelated-image` src=`/public/uploads/mapart/${map.imgUrl}`, alt=`Image for ${map.name || 'Unnamed Map'}`)
                   .card-body
                     h5.card-title #{map.name || 'No Name'}
                     p.card-text Arist: #{map.artist || 'N/A'}
@@ -67,5 +67,11 @@ html
                       small.text-muted #{new Date(map.createdAt).toLocaleDateString()}
         else
           .alert.alert-warning Maps with complete info or no records found.
+
+
+    style.
+      .pixelated-image {
+        image-rendering: pixelated;
+      };
 
     include includes/scripts.pug
