@@ -36,10 +36,12 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/mapart/recentUpdates', async (req, res) => {
+  let { limit } = req.query;
+  if (!limit) { limit = 10; }
   try {
     if (res.locals.admin) {
-      const latestUpdated = await mapArtController.fetchLatestUpdatedAt();
-      res.json(latestUpdated);
+      const result = await mapArtController.fetchLatestUpdatedAt(Number(limit));
+      res.json(result);
     } else {
       return res.status(403).send('Forbidden');
     }
@@ -50,10 +52,12 @@ router.get('/mapart/recentUpdates', async (req, res) => {
 });
 
 router.get('/mapid/recentUpdates', async (req, res) => {
+  let { limit } = req.query;
+  if (!limit) { limit = 10; }
   try {
     if (res.locals.admin) {
-      const latestUpdated = await mapIdController.fetchLatestUpdatedAt();
-      res.json(latestUpdated);
+      const result = await mapIdController.fetchLatestUpdatedAt(Number(limit));
+      res.json(result);
     } else {
       return res.status(403).send('Forbidden');
     }

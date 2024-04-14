@@ -509,12 +509,13 @@ const fetchMapsMissingInfo = async (type) => {
   }
 };
 
-const fetchLatestUpdatedAt = async () => {
+const fetchLatestUpdatedAt = async (limit) => {
   try {
     return await prisma.mapArt.findMany({
       orderBy: {
         updatedAt: 'desc'
-      }
+      },
+      take: limit
     });
   } catch (error) {
     console.error('Error in fetchLatestUpdatedAt:', error);
