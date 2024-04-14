@@ -13,52 +13,25 @@ html
       form#selectorsForm(style={display: 'none'})
         div.row
           div.col
-            div.form-group
-              label.sr-only(for='userSelector') Select User:
-              div.input-group.mb-2.mr-sm-2
-                div.input-group-prepend
-                  div.input-group-text User
-                select#userSelector.form-control
+            select#userSelector.form-control(data-live-search='true')
           div.col
-            div.form-group
-              label.sr-only(for='artistSelector') Select Artist:
-              div.input-group.mb-2.mr-sm-2
-                div.input-group-prepend
-                  div.input-group-text Artist
-                select#artistSelector.form-control
+            select#artistSelector.form-control(data-live-search='true')
+        br
         div.row
           div.col
-            div.form-group
-              label.sr-only(for='serverSelector') Select Server:
-              div.input-group.mb-2.mr-sm-2
-                div.input-group-prepend
-                  div.input-group-text Server
-                select#serverSelector.form-control
+            select#serverSelector.form-control(data-live-search='true')
           div.col
-            div.form-group
-              label.sr-only(for='serverSelector') Select Tags:
-              div.input-group.mb-2.mr-sm-2
-                div.input-group-prepend
-                  div.input-group-text Tags
-                select#tagSelector.form-control
+            select#tagSelector.form-control(data-live-search='true')
+        br
         div.row
           div.col
-            div.form-group
-              label.sr-only(for='sortSelector') Sort By:
-              div.input-group.mb-2.mr-sm-2
-                div.input-group-prepend
-                  div.input-group-text Sort
-                select#sortSelector.form-control
+            select#sortSelector.form-control
           div.col
-            div.form-group
-              label.sr-only(for='viewSelector') View Type:
-              div.input-group.mb-2.mr-sm-2
-                div.input-group-prepend
-                  div.input-group-text View
-                select#viewSelector.form-control
-                  option(value='smallGrid' selected='true') Thumbnails
-                  option(value='grid') Cards
+            select#viewSelector.form-control
+              option(value='smallGrid' selected='true') Thumbnails
+              option(value='grid') Cards
 
+        hr
       script.
         // Function to fetch data from the API
         async function fetchData(url) {
@@ -83,6 +56,8 @@ html
             }
             select.appendChild(optElement);
           });
+
+          $(`#${selectId}`).selectpicker('refresh');
         }
 
         // Function to populate user selector
@@ -168,6 +143,7 @@ html
             }
             sortSelector.appendChild(sortOption);
           });
+          $(sortSelector).selectpicker('refresh');
         }
 
         // Function to handle API call with updated parameters
@@ -366,6 +342,8 @@ html
 
         // Call the function to populate selectors and fetch initial data when the page loads
         document.addEventListener('DOMContentLoaded', () => {
+          $('select').selectpicker();
+
           populateUserSelector();
           populateArtistSelector();
           populateSortSelector();
