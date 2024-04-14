@@ -165,8 +165,6 @@ const getProfilesWithoutUser = async () => {
     // Map user IDs into an array for the query condition
     const userIds = users.map(user => user.id);
 
-    console.log(userIds);
-
     // Find profiles where the 'userId' is NOT in the fetched user IDs
     const orphanProfiles = await prisma.profile.findMany({
       where: {
@@ -176,11 +174,39 @@ const getProfilesWithoutUser = async () => {
       }
     });
 
-    console.log(orphanProfiles);
-
     return orphanProfiles;
   } catch (error) {
     console.error('Error in getProfilesWithoutUser:', error);
+    return null;
+  }
+};
+
+const deleteOrphanProfiles = async () => {
+  try {
+    // Fetch all user IDs from the User table
+    const users = await prisma.user.findMany({
+      select: {
+        id: true  // Only fetch the 'id' field
+      }
+    });
+
+    // Map user IDs into an array for the query condition
+    const userIds = users.map(user => user.id);
+
+    // Delete profiles where the 'userId' is NOT in the fetched user IDs
+    const result = await prisma.profile.deleteMany({
+      where: {
+        userId: {
+          notIn: userIds
+        }
+      }
+    });
+
+    console.log(`Deleted ${result.count} orphan profiles.`);
+
+    return result.count;  // Return the count of deleted profiles
+  } catch (error) {
+    console.error('Error in deleteOrphanProfiles:', error);
     return null;
   }
 };
@@ -316,6 +342,7 @@ module.exports = {
   getUserById,
   getUserByDiscordId,
   getProfilesWithoutUser,
+  deleteOrphanProfiles,
   getAllUsers,
   createUser,
   createUserDiscord,

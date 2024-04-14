@@ -105,6 +105,23 @@ router.get('/users/orphanProfiles', async (req, res) => {
   }
 });
 
+router.delete('/users/orphanProfiles', async (req, res) => {
+  try {
+    if (res.locals.admin) {
+      const result = await userController.deleteOrphanProfiles();
+      if (result.error) {
+        return res.status(500).json({ message: 'Failed to delete orphan profiles', error: result.error });
+      }
+      res.json(result);
+    } else {
+      return res.status(403).send('Forbidden');
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 // GET user by ID
 router.get('/users/:userId', async (req, res) => {
   try {
