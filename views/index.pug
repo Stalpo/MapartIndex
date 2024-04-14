@@ -22,7 +22,12 @@ html
           p Registration is open! Join us now and be part of the Minecraft mapart community.
       else
         .alert.alert-info
-          p Welcome back, #{username}!
+          h4 Welcome back, #{username}!
+          if admin || mod
+            h6 Notes for moderators and admins
+            p New moderation helper tool for gathering 
+              a(href="/mapart/missingInfo") missing metadata
+            
           
       .jumbotron.text-center
         img(src='/public/largeicon.png')
