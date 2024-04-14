@@ -62,7 +62,7 @@ const getMaps = async (page, perPage, user, artist, sort, server, tag) => {
         orderBy[0] = { createdAt: 'asc' };
         break;
       case 'dateDesc':
-        orderBy = { createdAt: 'desc' };
+        orderBy[0] = { createdAt: 'desc' };
         break;
       case 'sizeAsc':
         orderBy[0] = { size: 'asc' };
@@ -509,6 +509,19 @@ const fetchMapsMissingInfo = async (type) => {
   }
 };
 
+const fetchLatestUpdatedAt = async () => {
+  try {
+    return await prisma.mapArt.findMany({
+      orderBy: {
+        updatedAt: 'desc'
+      }
+    });
+  } catch (error) {
+    console.error('Error in fetchLatestUpdatedAt:', error);
+    throw error;
+  }
+};
+
 const deleteMapById = async (mapId) => {
   try {
     return await prisma.mapArt.delete({ where: { id: mapId } });
@@ -539,5 +552,6 @@ module.exports = {
   countMapIdsByServer,
   getLatestServerIdByServer,
   fetchMapsMissingInfo,
+  fetchLatestUpdatedAt,
   deleteMapById,
 };

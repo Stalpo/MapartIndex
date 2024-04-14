@@ -211,6 +211,15 @@ const fetchMapsMissingInfo = async (type) => {
   }
 }
 
+const fetchLatestUpdatedAt = async () => {
+  try {
+    return await mapArtModel.fetchLatestUpdatedAt();
+  } catch (error) {
+    console.error('Error finding latest updated maps:', error);
+    throw error;
+  }
+}
+
 const deleteMapById = async (mapId) => {
   try {
     return await mapArtModel.deleteMapById(mapId);
@@ -250,6 +259,7 @@ module.exports = {
   isMapArtIdLiked,
   generateFilename,
   fetchMapsMissingInfo,
+  fetchLatestUpdatedAt,
   deleteMapById,
   getLatestServerIdByServer,
 }

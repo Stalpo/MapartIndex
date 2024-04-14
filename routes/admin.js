@@ -14,6 +14,7 @@ const { MongoClient } = require('mongodb');
 // Required controllers
 const userController = require('../controllers/userController');
 const mapIdController = require('../controllers/mapIdController');
+const mapArtController = require('../controllers/mapArtController');
 
 // Multer config
 const upload = multer({
@@ -28,6 +29,34 @@ const upload = multer({
 router.get('/', async (req, res) => {
   try {
     res.render('admin');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+router.get('/mapart/recentUpdates', async (req, res) => {
+  try {
+    if (res.locals.admin) {
+      const latestUpdated = await mapArtController.fetchLatestUpdatedAt();
+      res.json(latestUpdated);
+    } else {
+      return res.status(403).send('Forbidden');
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+router.get('/mapid/recentUpdates', async (req, res) => {
+  try {
+    if (res.locals.admin) {
+      const latestUpdated = await mapIdController.fetchLatestUpdatedAt();
+      res.json(latestUpdated);
+    } else {
+      return res.status(403).send('Forbidden');
+    }
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
