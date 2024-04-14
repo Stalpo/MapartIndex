@@ -10,29 +10,16 @@ html
         div.alert.alert-danger(role="alert")
           | You are not an administrator
       else
-        form
+        form#selectorsForm
           div.row
             div.col
-              div.form-group
-                label.sr-only(for='userSelector') Select User:
-                div.input-group.mb-2.mr-sm-2
-                  div.input-group-prepend
-                    div.input-group-text User
-                  select#userSelector.form-control
+              select#userSelector.form-control(data-live-search='true')
             div.col
-              div.form-group
-                label.sr-only(for='artistSelector') Select Artist:
-                div.input-group.mb-2.mr-sm-2
-                  div.input-group-prepend
-                    div.input-group-text Artist
-                  select#artistSelector.form-control
+              select#artistSelector.form-control(data-live-search='true')
             div.col
-              div.form-group
-                label.sr-only(for='sortSelector') Sort By:
-                div.input-group.mb-2.mr-sm-2
-                  div.input-group-prepend
-                    div.input-group-text Sort
-                  select#sortSelector.form-control
+              select#sortSelector.form-control
+
+        hr
 
         table.table.table-striped#mapsTable
           thead
@@ -65,6 +52,7 @@ html
               }
               select.appendChild(optElement);
             });
+            $(`#${selectId}`).selectpicker('refresh');
           }
 
           // Function to populate user selector
@@ -132,6 +120,7 @@ html
               }
               sortSelector.appendChild(sortOption);
             });
+            $(sortSelector).selectpicker('refresh');
           }
 
           // Function to fetch data from the API
@@ -310,6 +299,8 @@ html
 
           // Call the function to populate selectors and fetch initial data when the page loads
           document.addEventListener('DOMContentLoaded', () => {
+            $('select').selectpicker();
+
             populateUserSelector();
             populateArtistSelector();
             populateSortSelector();
