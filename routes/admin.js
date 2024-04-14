@@ -177,7 +177,8 @@ router.get('/db-stats', async (req, res) => {
 
 router.get('/download', (req, res) => {
   if (res.locals.admin) {
-    const uploadDir = './public/uploads';
+    const filepath = res.locals.filepath;
+    const uploadDir = filepath + '/public/uploads';
     const currentDate = new Date().toISOString().slice(0,10);
     const currentTime = new Date().toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' }).replace(/:/g, '-');
     const zipFileName = `uploads_${currentDate}_${currentTime}.zip`;
