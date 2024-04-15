@@ -9,7 +9,6 @@ const createFilter = (user, artist, server, searchTerm, includeTags = false, inc
   if (searchTerm) {
     filter.OR = [
       { displayName: { contains: searchTerm, mode: 'insensitive' } },
-      { username: { contains: searchTerm, mode: 'insensitive' } },
       { artist: { contains: searchTerm, mode: 'insensitive' } },
       { server: { contains: searchTerm, mode: 'insensitive' } },
     ];
