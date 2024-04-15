@@ -57,13 +57,14 @@ html
                     i.fa.fa-trophy.mr-2
                     | Museum Collector
 
-            div.col
-              h3.text-center Favorites
-              div.gridContainer#favoriteMaps
-                each mapId in profile.favorites.slice(-5).reverse()
-                  div.favoriteMap(id=mapId)
-                    img(src="", alt="Loading...", style="display: none;")
-                    a(href="#") Loading map data...
+            if profile.favorites.length > 0
+              div.col
+                h3.text-center Favorites
+                div.gridContainer#favoriteMaps
+                  each mapId in profile.favorites.slice(-5).reverse()
+                    div.favoriteMap(id=mapId)
+                      img(src="", alt="Loading...", style="display: none;")
+                      a(href="#") Loading map data...
 
             br
             if username === profile.username
