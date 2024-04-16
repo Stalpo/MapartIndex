@@ -122,6 +122,9 @@ html
                   img.alt = data.name || data.displayName;
                   img.style.display = 'block';
                   img.style.width = "75px";
+                  if (data.nsfw) {
+                    img.src = 'https://placewaifu.com/image/200/?blur';
+                  }
                 } else {
                   img.alt = 'Image not available';
                   img.style.display = 'none'; // Hide the image if not available
