@@ -111,7 +111,7 @@ html
                   <div class="row">
                     <div class="col-md-8 ${showNSFW === 'true' ? '' : (map.nsfw ? 'nsfw' : '')}">
                       <div class="image-wrapper">
-                        <img src="${imageUrl}" alt="${mapId}" class="pixelated-image ${showNSFW === 'true' ? '' : (map.nsfw ? 'blurred' : '')}" style="width: 80%; max-width: none; height: auto; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);">
+                        <img src="${imageUrl}" alt="${mapId}" class="pixelated-image ${showNSFW === 'true' ? '' : (map.nsfw ? 'blurred' : '')}" style="width: 80%; max-width: none; height: auto; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); image-rendering: pixelated;">
                       </div>
                     </div>
                     <div class="col-md-4">
