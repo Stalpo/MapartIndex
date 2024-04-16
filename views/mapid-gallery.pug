@@ -59,9 +59,9 @@ html
         async function populateUserSelector() {
           try {
             const uniqueUsernames = await fetchData('/mapid/uniqueUsernames');
-            uniqueUsernames.unshift("All Users");
+            uniqueUsernames.unshift("All Uploaders");
             uniqueUsernames.sort();
-            populateSelect('userSelector', uniqueUsernames, "All Users");
+            populateSelect('userSelector', uniqueUsernames, "All Uploaders");
           } catch (error) {
             console.error('Error fetching user data:', error);
           }
@@ -125,7 +125,7 @@ html
           const perPage = 25;
           let url = `/api/mapId/maps?page=${page}&perPage=${perPage}&sort=${sort}`;
           // Construct URL based on selected values
-          if (user && user !== "All Users") {
+          if (user && user !== "All Uploaders") {
             url += `&user=${user}`;
           }
           if (artist && artist !== "All Artists") {
