@@ -23,16 +23,15 @@ html
         .container.text-center
           .row
             each result in results.maps
-              if !result.nsfw
-                .col-md-3.col-sm-6.col-xs-12
-                  if result.displayName.includes("MAPART")
-                    a(href=`/mapart/id/${result.id}`)
-                      img.img-fluid(src=`/public/uploads/mapart/${result.displayName}.png`, alt=result.displayName)
-                      p #{result.name || result.displayName}
-                  else
-                    a(href=`/mapid/id/${result.id}`)
-                      img.img-fluid(src=`/public/uploads/${result.displayName}.png`, alt=result.displayName)
-                      p #{result.displayName}
+              .col-md-3.col-sm-6.col-xs-12
+                if result.displayName.includes("MAPART")
+                  a(href=`/mapart/id/${result.id}`)
+                    img.img-fluid(src=`/public/uploads/mapart/${result.displayName}.png`, alt=result.displayName)
+                    p #{result.name || result.displayName}
+                else
+                  a(href=`/mapid/id/${result.id}`)
+                    img.img-fluid(src=`/public/uploads/${result.displayName}.png`, alt=result.displayName)
+                    p #{result.displayName}
 
         // Pagination
         nav(aria-label="Pagination" class="d-flex justify-content-center")
