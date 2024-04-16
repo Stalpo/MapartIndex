@@ -79,7 +79,6 @@ html
               br
               div.col.text-center
                 button.btn.btn-primary(type="button", id="toggleNSFWButton", onclick="toggleNSFWCookie()")
-                  | Show NSFW
                   span#nsfwStatus
 
         else
@@ -157,9 +156,9 @@ html
           const showNSFW = getCookie('showNSFW');
 
           if (showNSFW === 'true') {
-            nsfwStatusSpan.textContent = ' (Enabled)';
+            nsfwStatusSpan.textContent = 'Hide NSFW';
           } else {
-            nsfwStatusSpan.textContent = ' (Disabled)';
+            nsfwStatusSpan.textContent = 'Show NSFW';
           }
         });
 
@@ -174,7 +173,7 @@ html
         // Function to update NSFW status text
         function updateNSFWStatusText(showNSFW) {
           const nsfwStatusSpan = document.getElementById('nsfwStatus');
-          nsfwStatusSpan.textContent = (showNSFW === 'true') ? ' (Enabled)' : ' (Disabled)';
+          nsfwStatusSpan.textContent = (showNSFW === 'true') ? 'Hide NSFW' : 'Show NSFW';
         }
 
         // Function to get cookie value
