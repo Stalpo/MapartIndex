@@ -11,25 +11,27 @@ html
         div.col-auto
           button#toggleSelectorsButton.btn.btn-primary.btn-sm.mb-3 Filtering and Sorting
       form#selectorsForm(style={display: 'none'})
-        div.row
-          div.col
-            select#userSelector.form-control(data-live-search='true')
-          div.col
-            select#artistSelector.form-control(data-live-search='true')
-        br
-        div.row
-          div.col
-            select#serverSelector.form-control(data-live-search='true')
-          div.col
-            select#tagSelector.form-control(data-live-search='true')
-        br
-        div.row
-          div.col
-            select#sortSelector.form-control
-          div.col
-            select#viewSelector.form-control
-              option(value='smallGrid' selected='true') Thumbnails
-              option(value='grid') Cards
+        div.row.justify-content-center
+          div.row
+            div.col
+              select#userSelector.form-control(data-live-search='true')
+          div.row
+            div.col
+              select#artistSelector.form-control(data-live-search='true')
+          div.row
+            div.col
+              select#serverSelector.form-control(data-live-search='true')
+          div.row
+            div.col
+              select#tagSelector.form-control(data-live-search='true')
+          div.row
+            div.col
+              select#sortSelector.form-control
+          div.row
+            div.col
+              select#viewSelector.form-control
+                option(value='smallGrid' selected='true') Thumbnails
+                option(value='grid') Cards
 
         hr
       script.
