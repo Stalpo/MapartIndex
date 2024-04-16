@@ -23,14 +23,13 @@ html
         .container.text-center
           .row
             each result in results.maps
-              .col-md-3.col-sm-6.col-xs-12
-                if result.displayName.includes("MAPART")
-                  if !result.nsfw
+              if !result.nsfw
+                .col-md-3.col-sm-6.col-xs-12
+                  if result.displayName.includes("MAPART")
                     a(href=`/mapart/id/${result.id}`)
                       img.img-fluid(src=`/public/uploads/mapart/${result.displayName}.png`, alt=result.displayName)
                       p #{result.name || result.displayName}
-                else
-                  if !result.nsfw
+                  else
                     a(href=`/mapid/id/${result.id}`)
                       img.img-fluid(src=`/public/uploads/${result.displayName}.png`, alt=result.displayName)
                       p #{result.displayName}
