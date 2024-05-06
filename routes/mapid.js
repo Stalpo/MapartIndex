@@ -99,6 +99,31 @@ router.post('/create', mapIdUpload.array('images', 4000), async (req, res) => {
   }
 });
 
+async function getImgData(imgUrl){
+  var response = await fetch(imgUrl);
+  var fileBlob = await response.blob();
+  var bitmap = await createImageBitmap(fileBlob);
+  var canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+  var context = canvas.getContext('2d');
+  context.drawImage(bitmap, 0, 0);
+  return myData = context.getImageData(0, 0, bitmap.width, bitmap.height);
+}
+
+function isDuplicate(imgData, checkImgDatas, maxWrong){
+  let wrong = 0;
+  checkImgDatas.forEach(checkImgData => {
+    for(let i = 0; i < 128 * 128; i++){
+      if(imgData.data[j * 4] != checkImgData.data[j * 4] || imgData.data[j * 4 + 1] != checkImgData.data[j * 4 + 1] || imgData.data[j * 4 + 2] != checkImgData.data[j * 4 + 2] || imgData.data[j * 4 + 3] != checkImgData.data[j * 4 + 3]){
+        wrong++;
+        if(wrong > maxWrong){
+          return false;
+        }
+      }
+    }
+  });
+  return true;
+}
+
 router.get('/id/:id', async (req, res) => {
   try {
     let mapId = req.params.id;
