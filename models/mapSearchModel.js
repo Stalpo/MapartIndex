@@ -2,7 +2,7 @@ const prisma = require('../util/db').prisma;
 
 // Helper function to create filter objects for queries
 const createFilter = (user, artist, server, searchTerm, includeTags = false, includeNames = false) => {
-  const filter = {};
+  const filter = { nsfw: false }; // Ensure NSFW items are excluded
   if (user) filter.username = user;
   if (artist) filter.artist = artist;
   if (server) filter.server = server;

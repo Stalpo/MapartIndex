@@ -50,7 +50,12 @@ html
             .catch(error => console.error('Error:', error));
         }
 
-        function checkFavorite(mapId) {
+        function checkFavorite(userId, mapId) {
+          const btn = document.querySelector('#favoriteButton');
+          if (!userId) {
+            btn.parentElement.style.display = 'none';
+            return 
+          };
           fetch(`/mapart/favorite/${mapId}`)
             .then(response => {
               if (!response.ok) {
@@ -65,7 +70,12 @@ html
             .catch(error => console.error('Error checking favorite status:', error));
         }
 
-        function checkLike(mapId) {
+        function checkLike(userId, mapId) {
+          const btn = document.querySelector('#likeButton');
+          if (!userId) {
+            btn.parentElement.style.display = 'none';
+            return 
+          };
           fetch(`/mapart/like/${mapId}`)
             .then(response => {
               if (!response.ok) {
@@ -99,8 +109,10 @@ html
               const mapInfo = `
                 <div class="jumbotron">
                   <div class="row">
-                    <div class="col-md-8">
-                      <img src="${imageUrl}" alt="${mapId}" class="pixelated-image img-fluid ${showNSFW === 'true' ? '' : (map.nsfw ? 'blurred' : '')}" style="width: 80%; max-width: none; height: auto; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); image-rendering: pixelated;">
+                    <div class="col-md-8 ${showNSFW === 'true' ? '' : (map.nsfw ? 'nsfw' : '')}">
+                      <div class="image-wrapper">
+                        <img src="${imageUrl}" alt="${mapId}" class="pixelated-image ${showNSFW === 'true' ? '' : (map.nsfw ? 'blurred' : '')}" style="width: 80%; max-width: none; height: auto; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); image-rendering: pixelated;">
+                      </div>
                     </div>
                     <div class="col-md-4">
                       ${map.name ? `<h2>${map.name}</h2>` : ''}
@@ -131,8 +143,8 @@ html
                   </div>
                 </div>`;
               mapContainer.innerHTML = mapInfo;
-              checkFavorite(mapId);
-              checkLike(mapId);
+              checkFavorite(userId, mapId);
+              checkLike(userId, mapId);
             })
             .catch(error => {
               console.error('Error fetching data:', error);

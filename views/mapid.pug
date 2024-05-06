@@ -17,6 +17,7 @@ html
         document.addEventListener('DOMContentLoaded', () => {
           const mapId = `#{mapId}`;
           const mapContainer = document.getElementById('mapContainer');
+          const showNSFW = getCookie('showNSFW');
 
           fetch(`/api/mapId/id/${mapId}`)
             .then(response => {
@@ -42,8 +43,10 @@ html
                 mapInfo.innerHTML = `
                   <div class="jumbotron">
                     <div class="row">
-                      <div class="col-md-8">
-                        <img src="${imageUrl}" alt="${mapId}" class="pixelated-image img-fluid" style="width: 80%; max-width: none; height: auto; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); image-rendering: pixelated;">
+                      <div class="col-md-8 ${showNSFW === 'true' ? '' : (map.nsfw ? 'nsfw' : '')}">
+                        <div class="image-wrapper">
+                          <img src="${imageUrl}" alt="${mapId}" class="pixelated-image ${showNSFW === 'true' ? '' : (map.nsfw ? 'blurred' : '')}" style="width: 80%; max-width: none; height: auto; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); image-rendering: pixelated;">
+                        </div>
                       </div>
                       <div class="col-md-4">
                         <h3>${map.displayName}</h3>
@@ -80,6 +83,18 @@ html
               console.error('Error fetching data:', error);
               mapContainer.innerHTML = '<div class="alert alert-danger" role="alert">Error fetching data: ' + error.message + '</div>';
             });
+
+          function getCookie(name) {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+              const [cookieName, cookieValue] = cookie.split('=');
+              if (cookieName.trim() === name) {
+                return decodeURIComponent(cookieValue);
+              }
+            }
+            return '';
+          }
+
 
         });
 

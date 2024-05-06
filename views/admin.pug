@@ -11,13 +11,16 @@ html
           | You are not an administrator
       else
         form#selectorsForm
-          div.row
-            div.col
-              select#userSelector.form-control(data-live-search='true')
-            div.col
-              select#artistSelector.form-control(data-live-search='true')
-            div.col
-              select#sortSelector.form-control
+          div.row.justify-content-center
+            div.row
+              div.col
+                select#userSelector.form-control(data-live-search='true')
+            div.row
+              div.col
+                select#artistSelector.form-control(data-live-search='true')
+            div.row    
+              div.col
+                select#sortSelector.form-control
 
         hr
 

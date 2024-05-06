@@ -57,13 +57,14 @@ html
                     i.fa.fa-trophy.mr-2
                     | Museum Collector
 
-            div.col
-              h3.text-center Favorites
-              div.gridContainer#favoriteMaps
-                each mapId in profile.favorites.slice(-5).reverse()
-                  div.favoriteMap(id=mapId)
-                    img(src="", alt="Loading...", style="display: none;")
-                    a(href="#") Loading map data...
+            if profile.favorites.length > 0
+              div.col
+                h3.text-center Favorites
+                div.gridContainer#favoriteMaps
+                  each mapId in profile.favorites.slice(-5).reverse()
+                    div.favoriteMap(id=mapId)
+                      img(src="", alt="Loading...", style="display: none;")
+                      a(href="#") Loading map data...
 
             br
             if username === profile.username
@@ -78,7 +79,6 @@ html
               br
               div.col.text-center
                 button.btn.btn-primary(type="button", id="toggleNSFWButton", onclick="toggleNSFWCookie()")
-                  | Show NSFW
                   span#nsfwStatus
 
         else
@@ -122,6 +122,9 @@ html
                   img.alt = data.name || data.displayName;
                   img.style.display = 'block';
                   img.style.width = "75px";
+                  if (data.nsfw) {
+                    img.src = 'https://placewaifu.com/image/200/?blur';
+                  }
                 } else {
                   img.alt = 'Image not available';
                   img.style.display = 'none'; // Hide the image if not available
@@ -156,9 +159,9 @@ html
           const showNSFW = getCookie('showNSFW');
 
           if (showNSFW === 'true') {
-            nsfwStatusSpan.textContent = ' (Enabled)';
+            nsfwStatusSpan.textContent = 'Hide NSFW';
           } else {
-            nsfwStatusSpan.textContent = ' (Disabled)';
+            nsfwStatusSpan.textContent = 'Show NSFW';
           }
         });
 
@@ -173,7 +176,7 @@ html
         // Function to update NSFW status text
         function updateNSFWStatusText(showNSFW) {
           const nsfwStatusSpan = document.getElementById('nsfwStatus');
-          nsfwStatusSpan.textContent = (showNSFW === 'true') ? ' (Enabled)' : ' (Disabled)';
+          nsfwStatusSpan.textContent = (showNSFW === 'true') ? 'Hide NSFW' : 'Show NSFW';
         }
 
         // Function to get cookie value

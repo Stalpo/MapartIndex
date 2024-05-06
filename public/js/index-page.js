@@ -11,14 +11,16 @@ fetch(`/api/mapArt/maps?page=${randomPage}&perPage=${maparts}`)
     carouselInner.innerHTML = '';
 
     images.forEach((image, index) => {
-      const activeClass = index === 0 ? 'active' : '';
-      const carouselItem = document.createElement('div');
-      carouselItem.className = `carousel-item ${activeClass}`;
-      const imgUrl = `/public/uploads/mapart/${image.imgUrl}`;
-      const opacity = 50; // Opacity %
-
-      carouselItem.innerHTML = `<img src="${imgUrl}" class="d-block w-100" style="image-rendering: pixelated; opacity: ${opacity}%;" alt="Map Image">`;
-      carouselInner.appendChild(carouselItem);
+      if (!image.nsfw) {
+        const activeClass = index === 0 ? 'active' : '';
+        const carouselItem = document.createElement('div');
+        carouselItem.className = `carousel-item ${activeClass}`;
+        const imgUrl = `/public/uploads/mapart/${image.imgUrl}`;
+        const opacity = 50; // Opacity %
+  
+        carouselItem.innerHTML = `<img src="${imgUrl}" class="d-block w-100" style="image-rendering: pixelated; opacity: ${opacity}%;" alt="Map Image">`;
+        carouselInner.appendChild(carouselItem);
+      }
     });
   });
 

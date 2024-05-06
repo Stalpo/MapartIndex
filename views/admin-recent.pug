@@ -77,6 +77,10 @@ html
             loadingSpinner.style.display = 'none';
             // Combine data into a unique array
             const combinedData = [...mapIdData, ...mapArtData];
+            
+            // Sort combined data by updatedAt in descending order
+            combinedData.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+
             buildTable(combinedData);
           }
 
