@@ -28,6 +28,8 @@ const mapIdUpload = multer({
 // get all image data for duplicate checking
 const checkImgDatas = [];
 
+/* DOES NOT FINISH WHEN RUNNING ON SERVER PLEASE FIX :(
+
 fs.readdir(`${__dirname.slice(0, -7)}/public/uploads`, function (err, files) {
   //handling error
   if (err) {
@@ -50,6 +52,7 @@ fs.readdir(`${__dirname.slice(0, -7)}/public/uploads`, function (err, files) {
     }
   });
 });
+*/
 
 router.get('/gallery', async (req, res) => {
   res.render('mapid-gallery');
