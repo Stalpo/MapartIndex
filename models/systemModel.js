@@ -28,7 +28,12 @@ const restartPm2 = (directoryPath) => {
   return runCommand(directoryPath, 'pm2 restart index');
 };
 
+const stopPm2 = (directoryPath) => {
+  return runCommand(directoryPath, 'pm2 stop index');
+};
+
 module.exports = {
   runGitPull,
   restartPm2,
+  stopPm2,
 };

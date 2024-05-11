@@ -33,4 +33,18 @@ router.get('/restart', async (req, res) => {
   }
 });
 
+router.get('/stop', async (req, res) => {
+  try {
+    if (res.locals.admin) {
+      const stopResult = await systemController.stopPm2(req, res);
+      res.json(stopResult);
+    } else {
+      res.status(403).send('Forbidden');
+    }
+  } catch (error) {
+    console.error('Error during system restart:', error);
+    res.status(500).json({ error: 'System update restart', details: error.message });
+  }
+});
+
 module.exports = router;

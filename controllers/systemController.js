@@ -27,7 +27,21 @@ const restartPm2 = async (req, res) => {
   }
 };
 
+const stopPm2 = async (req, res) => {
+  const directoryPath = res.locals.filepath;
+
+  try {
+    const result = await systemModel.stopPm2(directoryPath);
+    console.log('PM2 stop successful:', result);
+    return `{ message: 'PM2 stop successful', data: ${result} }`;
+  } catch (error) {
+    console.error('Error in stopPm2:', error.message);
+    return `{ error: 'Failed to stop PM2', details: ${error.message} }`;
+  }
+};
+
 module.exports = {
   runGitPull,
   restartPm2,
+  stopPm2,
 };
