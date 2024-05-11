@@ -4,6 +4,7 @@ const validator = require('validator');
 const multer = require('multer');
 const fs = require('fs');
 const crypto = require('crypto');
+const getPixels = require("get-pixels")
 
 // Required controllers
 const userController = require('../controllers/userController');
@@ -24,6 +25,32 @@ const mapIdUpload = multer({
   },
 });
 
+// get all image data for duplicate checking
+const checkImgDatas = [];
+
+fs.readdir(`${__dirname.slice(0, -7)}/public/uploads`, function (err, files) {
+  //handling error
+  if (err) {
+    return console.log('Unable to scan directory: ' + err);
+  } 
+  //listing all files using forEach
+  files.forEach(function (file) {
+    // Do whatever you want to do with the file
+    if(file === "mapart" || file === "tmp" || file === ".placeholder"){
+      
+    }else{
+      loadImg(`${__dirname.slice(0, -7)}/public/uploads/${file}`).then(data => {
+        if(!(data == null)){
+          checkImgDatas.push({
+            data: data,
+            name: file
+          }); 
+        }
+      });
+    }
+  });
+});
+
 router.get('/gallery', async (req, res) => {
   res.render('mapid-gallery');
 });
@@ -39,7 +66,7 @@ router.post('/create', mapIdUpload.array('images', 4000), async (req, res) => {
       return res.status(403).send('Forbidden');
     }
 
-    const { files } = req;
+    const { files, maxWrong } = req;
 
     if (!files || files.length === 0) {
       // If no files are provided
@@ -67,6 +94,20 @@ router.post('/create', mapIdUpload.array('images', 4000), async (req, res) => {
 
       // Rename the file
       fs.renameSync(path, newFilepath);
+
+      // check if duplicate
+      let imgData = await loadImg(newFilepath);
+      let duplicateOf = isDuplicate(imgData, 10);
+      console.log(duplicateOf);
+      if(duplicateOf != null){
+        return res.status(500).json({ error: `${originalname} is a duplicate of ${duplicateOf}` });
+      }
+
+      // add to checkImgs
+      checkImgDatas.push({
+        data: imgData,
+        name: newFilename
+      });
 
       // Read the image file and convert it to base64
       const base64 = fs.readFileSync(newFilepath, { encoding: 'base64' });
@@ -99,29 +140,36 @@ router.post('/create', mapIdUpload.array('images', 4000), async (req, res) => {
   }
 });
 
-async function getImgData(imgUrl){
-  var response = await fetch(imgUrl);
-  var fileBlob = await response.blob();
-  var bitmap = await createImageBitmap(fileBlob);
-  var canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
-  var context = canvas.getContext('2d');
-  context.drawImage(bitmap, 0, 0);
-  return myData = context.getImageData(0, 0, bitmap.width, bitmap.height);
+function loadImg(path) {
+  return new Promise((resolve, reject) => {
+    getPixels(path, function(err, data) {
+      if(err) {
+        reject(err)
+      } else {
+        resolve(data);
+      }
+    })
+  });
 }
 
-function isDuplicate(imgData, checkImgDatas, maxWrong){
-  let wrong = 0;
+function isDuplicate(imgData, maxWrong){
+  let dupName = null;
   checkImgDatas.forEach(checkImgData => {
-    for(let i = 0; i < 128 * 128; i++){
-      if(imgData.data[j * 4] != checkImgData.data[j * 4] || imgData.data[j * 4 + 1] != checkImgData.data[j * 4 + 1] || imgData.data[j * 4 + 2] != checkImgData.data[j * 4 + 2] || imgData.data[j * 4 + 3] != checkImgData.data[j * 4 + 3]){
-        wrong++;
-        if(wrong > maxWrong){
-          return false;
+    let wrong = 0;
+
+    for(let x = 0; x < 128; x++){
+      for(let y = 0; y < 128; y++){
+        if(!(checkImgData.data.get(x, y, 0) == imgData.get(x, y, 0) && checkImgData.data.get(x, y, 1) == imgData.get(x, y, 1) && checkImgData.data.get(x, y, 2) == imgData.get(x, y, 2) && checkImgData.data.get(x, y, 3) == imgData.get(x, y, 3))){
+          wrong++;
+          if(wrong > maxWrong){
+            continue;
+          }
         }
       }
     }
+    dupName = checkImgData.name;
   });
-  return true;
+  return dupName;
 }
 
 router.get('/id/:id', async (req, res) => {

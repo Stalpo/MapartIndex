@@ -14,6 +14,7 @@
     "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.6",
     "express": "^4.17.1",
+    "get-pixels": "^3.3.3",
     "gitlog": "^4.0.8",
     "jsonwebtoken": "^9.0.2",
     "moment": "^2.30.1",
