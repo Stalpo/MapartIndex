@@ -23,6 +23,9 @@ html
                 option(value='2b2t') 2b2t
                 option(value='constantium') constantium
                 // Add more options as needed
+            .form-group
+              label(for='maxWrong', class='mb-2') Select a max wrong pixels for duplicate (default is 10, set negative to skip check):
+              input(type="text", name="maxWrong", id="maxWrong", value="10", class='form-control')
 
             button.btn.btn-primary(type='submit')
               i.fas.fa-cloud-upload-alt

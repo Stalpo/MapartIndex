@@ -69,7 +69,6 @@ function loadImg(path) {
             if(pixelDict[short] == null){
               pixelDict[short] = s;
               s++;
-              console.log(s);
             }
             shortData.push(pixelDict[short]);
           }
@@ -95,7 +94,7 @@ router.post('/create', mapIdUpload.array('images', 4000), async (req, res) => {
       return res.status(403).send('Forbidden');
     }
 
-    const { files, maxWrong } = req;
+    const { files } = req;
 
     if (!files || files.length === 0) {
       // If no files are provided
@@ -124,12 +123,14 @@ router.post('/create', mapIdUpload.array('images', 4000), async (req, res) => {
       // Rename the file
       fs.renameSync(path, newFilepath);
 
-      // check if duplicate
+      // check if duplicate (if maxwrong neg skip)
       const imgData = new Uint8Array(await loadImg(newFilepath));
-      const duplicateOf = isDuplicate(imgData, 10);
-      if(duplicateOf != null){
-        fs.unlinkSync(newFilepath);
-        return res.status(500).json({ error: `${originalname} is a duplicate of ${duplicateOf}` });
+      if(req.body.maxWrong >= 0){
+        const duplicateOf = isDuplicate(imgData, req.body.maxWrong);
+        if(duplicateOf != null){
+          fs.unlinkSync(newFilepath);
+          return res.status(500).json({ error: `${originalname} is a duplicate of ${duplicateOf}! all maps before ${originalname} have been uploaded` });
+        }
       }
 
       // add to checkImgs
