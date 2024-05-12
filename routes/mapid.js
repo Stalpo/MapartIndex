@@ -40,14 +40,13 @@ fs.readdir(`${__dirname.slice(0, -7)}/public/uploads`, async function (err, file
     if(files[i] === "mapart" || files[i] === "tmp" || files[i] === ".placeholder"){
       
     }else{
-      let data = await loadImg(`${__dirname.slice(0, -7)}/public/uploads/${files[i]}`);
+      const data = await loadImg(`${__dirname.slice(0, -7)}/public/uploads/${files[i]}`);
       if(data != null){
-        checkImgDatas.push({
+        /*checkImgDatas.push({
           data: data,
           name: files[i]
-        });
+        });*/
         console.log(`loaded img ${checkImgDatas.length}`);
-        data = null;
       }
     }
   };
