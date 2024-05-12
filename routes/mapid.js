@@ -28,8 +28,6 @@ const mapIdUpload = multer({
 // get all image data for duplicate checking
 const checkImgDatas = [];
 
-/* DOES NOT FINISH WHEN RUNNING ON SERVER PLEASE FIX :(
-
 fs.readdir(`${__dirname.slice(0, -7)}/public/uploads`, function (err, files) {
   //handling error
   if (err) {
@@ -46,13 +44,13 @@ fs.readdir(`${__dirname.slice(0, -7)}/public/uploads`, function (err, files) {
           checkImgDatas.push({
             data: data,
             name: file
-          }); 
+          });
+          console.log(`loaded img ${checkImgDatas.length}`);
         }
       });
     }
   });
 });
-*/
 
 router.get('/gallery', async (req, res) => {
   res.render('mapid-gallery');
@@ -103,6 +101,7 @@ router.post('/create', mapIdUpload.array('images', 4000), async (req, res) => {
       let duplicateOf = isDuplicate(imgData, 10);
       console.log(duplicateOf);
       if(duplicateOf != null){
+        fs.unlinkSync(newFilepath);
         return res.status(500).json({ error: `${originalname} is a duplicate of ${duplicateOf}` });
       }
 
