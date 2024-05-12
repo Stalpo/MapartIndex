@@ -99,7 +99,6 @@ router.post('/create', mapIdUpload.array('images', 4000), async (req, res) => {
       // check if duplicate
       let imgData = await loadImg(newFilepath);
       let duplicateOf = isDuplicate(imgData, 10);
-      console.log(duplicateOf);
       if(duplicateOf != null){
         fs.unlinkSync(newFilepath);
         return res.status(500).json({ error: `${originalname} is a duplicate of ${duplicateOf}` });
@@ -148,7 +147,15 @@ function loadImg(path) {
       if(err) {
         reject(err)
       } else {
-        resolve(data);
+        const shortData = [];
+        for(let x = 0; x < 128; x++){
+          for(let y = 0; y < 128; y++){
+            // compress pixel 2d array with 3rd array for RGBA to just one array of RGBA bit shifted into one int :D
+            let short = data.get(x, y, 0) + (data.get(x, y, 1) << 8) + (data.get(x, y, 2) << 16) + (data.get(x, y, 3) << 24);
+            shortData.push(short);
+          }
+        }
+        resolve(shortData);
       }
     })
   });
@@ -157,19 +164,22 @@ function loadImg(path) {
 function isDuplicate(imgData, maxWrong){
   let dupName = null;
   checkImgDatas.forEach(checkImgData => {
-    let wrong = 0;
+    if(dupName == null){
+      let wrong = 0;
+      let dup = true;
 
-    for(let x = 0; x < 128; x++){
-      for(let y = 0; y < 128; y++){
-        if(!(checkImgData.data.get(x, y, 0) == imgData.get(x, y, 0) && checkImgData.data.get(x, y, 1) == imgData.get(x, y, 1) && checkImgData.data.get(x, y, 2) == imgData.get(x, y, 2) && checkImgData.data.get(x, y, 3) == imgData.get(x, y, 3))){
+      for(let x = 0; x < 128 * 128; x++){
+        if(checkImgData.data[x] != imgData[x]){
           wrong++;
           if(wrong > maxWrong){
-            continue;
+            dup = false;
           }
         }
       }
+      if(dup){
+        dupName = checkImgData.name;
+      }
     }
-    dupName = checkImgData.name;
   });
   return dupName;
 }
