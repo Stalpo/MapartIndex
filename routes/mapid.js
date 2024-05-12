@@ -33,6 +33,7 @@ fs.readdir(`${__dirname.slice(0, -7)}/public/uploads`, function (err, files) {
   if (err) {
     return console.log('Unable to scan directory: ' + err);
   } 
+  console.log("starting image loading");
   //listing all files using forEach
   files.forEach(function (file) {
     // Do whatever you want to do with the file
