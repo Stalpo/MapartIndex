@@ -40,8 +40,8 @@ fs.readdir(`${__dirname.slice(0, -7)}/public/uploads`, async function (err, file
     if(files[i] === "mapart" || files[i] === "tmp" || files[i] === ".placeholder"){
       
     }else{
-      let data = await loadImg(`${__dirname.slice(0, -7)}/public/uploads/${files[i]}`);
-      if(!(data == null)){
+      const data = await loadImg(`${__dirname.slice(0, -7)}/public/uploads/${files[i]}`);
+      if(data != null){
         checkImgDatas.push({
           data: data,
           name: files[i]
@@ -97,8 +97,8 @@ router.post('/create', mapIdUpload.array('images', 4000), async (req, res) => {
       fs.renameSync(path, newFilepath);
 
       // check if duplicate
-      let imgData = await loadImg(newFilepath);
-      let duplicateOf = isDuplicate(imgData, 10);
+      const imgData = await loadImg(newFilepath);
+      const duplicateOf = isDuplicate(imgData, 10);
       if(duplicateOf != null){
         fs.unlinkSync(newFilepath);
         return res.status(500).json({ error: `${originalname} is a duplicate of ${duplicateOf}` });
@@ -151,7 +151,7 @@ function loadImg(path) {
         for(let x = 0; x < 128; x++){
           for(let y = 0; y < 128; y++){
             // compress pixel 2d array with 3rd array for RGBA to just one array of RGBA bit shifted into one int :D
-            let short = data.get(x, y, 0) + (data.get(x, y, 1) << 8) + (data.get(x, y, 2) << 16) + (data.get(x, y, 3) << 24);
+            const short = data.get(x, y, 0) + (data.get(x, y, 1) << 8) + (data.get(x, y, 2) << 16) + (data.get(x, y, 3) << 24);
             shortData.push(short);
           }
         }
