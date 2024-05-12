@@ -44,7 +44,8 @@ fs.readdir(`${__dirname.slice(0, -7)}/public/uploads`, async function (err, file
       if(data != null){
         checkImgDatas.push({
           data: data,
-          name: files[i]
+          name: files[i],
+          server: files[i].split("_")[0]
         });
         console.log(`loaded img ${checkImgDatas.length}`);
       }
@@ -126,7 +127,7 @@ router.post('/create', mapIdUpload.array('images', 4000), async (req, res) => {
       // check if duplicate (if maxwrong neg skip)
       const imgData = new Uint8Array(await loadImg(newFilepath));
       if(req.body.maxWrong >= 0){
-        const duplicateOf = isDuplicate(imgData, req.body.maxWrong);
+        const duplicateOf = isDuplicate(imgData, req.body.maxWrong, req.body.server);
         if(duplicateOf != null){
           fs.unlinkSync(newFilepath);
           return res.status(500).json({ error: `${originalname} is a duplicate of ${duplicateOf}! all maps before ${originalname} have been uploaded` });
@@ -136,7 +137,8 @@ router.post('/create', mapIdUpload.array('images', 4000), async (req, res) => {
       // add to checkImgs
       checkImgDatas.push({
         data: imgData,
-        name: newFilename
+        name: newFilename,
+        server: req.body.server
       });
 
       // Read the image file and convert it to base64
@@ -170,10 +172,10 @@ router.post('/create', mapIdUpload.array('images', 4000), async (req, res) => {
   }
 });
 
-function isDuplicate(imgData, maxWrong){
+function isDuplicate(imgData, maxWrong, server){
   let dupName = null;
   checkImgDatas.forEach(checkImgData => {
-    if(dupName == null){
+    if(dupName == null && checkImgData.server == server){
       let wrong = 0;
       let dup = true;
 
