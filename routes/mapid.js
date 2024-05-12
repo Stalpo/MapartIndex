@@ -40,17 +40,45 @@ fs.readdir(`${__dirname.slice(0, -7)}/public/uploads`, async function (err, file
     if(files[i] === "mapart" || files[i] === "tmp" || files[i] === ".placeholder"){
       
     }else{
-      const data = await loadImg(`${__dirname.slice(0, -7)}/public/uploads/${files[i]}`);
+      const data = new Uint8Array(await loadImg(`${__dirname.slice(0, -7)}/public/uploads/${files[i]}`));
       if(data != null){
-        /*checkImgDatas.push({
+        checkImgDatas.push({
           data: data,
           name: files[i]
-        });*/
+        });
         console.log(`loaded img ${checkImgDatas.length}`);
       }
     }
   };
 });
+
+const pixelDict = {};
+let s = 0;
+
+function loadImg(path) {
+  return new Promise((resolve, reject) => {
+    getPixels(path, function(err, data) {
+      if(err) {
+        reject(err)
+      } else {
+        const shortData = [];
+        for(let x = 0; x < 128; x++){
+          for(let y = 0; y < 128; y++){
+            // compress pixel 2d array with 3rd array for RGBA to just array of what color id it is
+            const short = data.get(x, y, 0) + (data.get(x, y, 1) << 8) + (data.get(x, y, 2) << 16) + (data.get(x, y, 3) << 24);
+            if(pixelDict[short] == null){
+              pixelDict[short] = s;
+              s++;
+              console.log(s);
+            }
+            shortData.push(pixelDict[short]);
+          }
+        }
+        resolve(shortData);
+      }
+    })
+  });
+}
 
 router.get('/gallery', async (req, res) => {
   res.render('mapid-gallery');
@@ -97,7 +125,7 @@ router.post('/create', mapIdUpload.array('images', 4000), async (req, res) => {
       fs.renameSync(path, newFilepath);
 
       // check if duplicate
-      const imgData = await loadImg(newFilepath);
+      const imgData = new Uint8Array(await loadImg(newFilepath));
       const duplicateOf = isDuplicate(imgData, 10);
       if(duplicateOf != null){
         fs.unlinkSync(newFilepath);
@@ -140,26 +168,6 @@ router.post('/create', mapIdUpload.array('images', 4000), async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
-function loadImg(path) {
-  return new Promise((resolve, reject) => {
-    getPixels(path, function(err, data) {
-      if(err) {
-        reject(err)
-      } else {
-        const shortData = [];
-        for(let x = 0; x < 128; x++){
-          for(let y = 0; y < 128; y++){
-            // compress pixel 2d array with 3rd array for RGBA to just one array of RGBA bit shifted into one int :D
-            const short = data.get(x, y, 0) + (data.get(x, y, 1) << 8) + (data.get(x, y, 2) << 16) + (data.get(x, y, 3) << 24);
-            shortData.push(short);
-          }
-        }
-        resolve(shortData);
-      }
-    })
-  });
-}
 
 function isDuplicate(imgData, maxWrong){
   let dupName = null;
