@@ -28,29 +28,28 @@ const mapIdUpload = multer({
 // get all image data for duplicate checking
 const checkImgDatas = [];
 
-fs.readdir(`${__dirname.slice(0, -7)}/public/uploads`, function (err, files) {
+fs.readdir(`${__dirname.slice(0, -7)}/public/uploads`, async function (err, files) {
   //handling error
   if (err) {
     return console.log('Unable to scan directory: ' + err);
   } 
   console.log("starting image loading");
   //listing all files using forEach
-  files.forEach(function (file) {
+  for(let i = 0; i < files.length; i++) {
     // Do whatever you want to do with the file
-    if(file === "mapart" || file === "tmp" || file === ".placeholder"){
+    if(files[i] === "mapart" || files[i] === "tmp" || files[i] === ".placeholder"){
       
     }else{
-      loadImg(`${__dirname.slice(0, -7)}/public/uploads/${file}`).then(data => {
-        if(!(data == null)){
-          checkImgDatas.push({
-            data: data,
-            name: file
-          });
-          console.log(`loaded img ${checkImgDatas.length}`);
-        }
-      });
+      let data = await loadImg(`${__dirname.slice(0, -7)}/public/uploads/${files[i]}`);
+      if(!(data == null)){
+        checkImgDatas.push({
+          data: data,
+          name: files[i]
+        });
+        console.log(`loaded img ${checkImgDatas.length}`);
+      }
     }
-  });
+  };
 });
 
 router.get('/gallery', async (req, res) => {
