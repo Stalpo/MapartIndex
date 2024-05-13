@@ -250,7 +250,7 @@ html
               <div class="card mb-3 mx-auto ${showNSFW === 'true' ? '' : (map.nsfw ? 'nsfw' : '')}">
                 <div class="image-wrapper">
                   <a href="/mapart/id/${map.id}" class="image-link">
-                    <img src="/public/uploads/mapart/${map.imgUrl}" class="pixelated-image ${showNSFW === 'true' ? '' : (map.nsfw ? 'blurred' : '')}" alt="Map Image">
+                    <img src="/public/uploads/mapart/${map.imgUrl}" class="${map.width > 8 ? '' : 'pixelated-image'} ${showNSFW === 'true' ? '' : (map.nsfw ? 'blurred' : '')}" alt="Map Image">
                   </a>
                 </div>
               </div>
@@ -277,7 +277,7 @@ html
             card.innerHTML = `
               <div class="card mb-3 mx-auto ${showNSFW === 'true' ? '' : (map.nsfw ? 'nsfw' : '')}">
                 <div class="image-wrapper">
-                  <img src="/public/uploads/mapart/${map.imgUrl}" class="pixelated-image ${showNSFW === 'true' ? '' : (map.nsfw ? 'blurred' : '')}" alt="Map Image">
+                  <img src="/public/uploads/mapart/${map.imgUrl}" class="${map.width > 2 ? '' : 'pixelated-image'} ${showNSFW === 'true' ? '' : (map.nsfw ? 'blurred' : '')}" alt="Map Image">
                 </div>
                 <div class="card-body">
                   <h5 class="card-title">${map.name ? map.name : map.displayName}</h5>
