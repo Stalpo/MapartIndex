@@ -28,21 +28,34 @@ html
             p New moderation helper tool for gathering 
               a(href="/mapart/missingInfo") missing metadata
             
-          
       .jumbotron.text-center
         img(src='/public/largeicon.png')
-        h1.display-4 Welcome to the Mapart Index!
-        p.lead
-          | The #1 Minecraft mapart archive
-          span
-            a.nav-link(href="https://discord.gg/4qKFjbUFuZ")
-              | Join our discord!
-          span
-            a.nav-link(href="/about")
-              | About
-          span
-            a.nav-link(href="/changelog")
-              | Changelog
+        if !server
+          h1.display-4 Welcome to the Mapart Index!
+          p.lead
+            | The #1 Minecraft mapart archive
+            span
+              a.nav-link(href="https://discord.gg/4qKFjbUFuZ")
+                | Join our discord!
+            span
+              a.nav-link(href="/about")
+                | About
+            span
+              a.nav-link(href="/changelog")
+                | Changelog
+        else 
+          h1.display-4 Welcome to the #{server} Mapart Index!
+          p.lead
+            | A collection hosted by the Mapart Index
+            span
+              a.nav-link(href="https://discord.gg/4qKFjbUFuZ")
+                | Join our discord!
+            span
+              a.nav-link(href="/about")
+                | About
+            span
+              a.nav-link(href="/changelog")
+                | Changelog
 
       // Stats Section
       .row.justify-content-center

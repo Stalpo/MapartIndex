@@ -80,11 +80,18 @@ app.use('/system', system);
 // Index route
 app.get('/', async (req, res) => {
   try {
-    const totalMaps = (await mapIdController.countMapIds());
-    const totalMaparts = (await mapArtController.countAllMapArts());
-    const totalUsers = (await userController.getAllUsers()).length;
-    const totalServers = (await mapIdController.getUniqueServers()).length;
-    res.render('index', { totalMaps, totalUsers, totalMaparts, totalServers });
+    if(req.subdomains.length == 0){
+      const totalMaps = (await mapIdController.countMapIds());
+      const totalMaparts = (await mapArtController.countAllMapArts());
+      const totalUsers = (await userController.getAllUsers()).length;
+      const totalServers = (await mapIdController.getUniqueServers()).length;
+      res.render('index', { totalMaps, totalUsers, totalMaparts, totalServers });
+    }else{
+      const server = req.subdomains[0];
+      const totalMaps = (await mapIdController.countMapIdsByServer(server));
+      const totalMaparts = (await mapArtController.countMapIdsByServer(server));
+      res.render('index', { server, totalMaps, totalMaparts });
+    }
   } catch {
     console.error('Error fetching statistics:', error);
     res.render('index');
