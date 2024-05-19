@@ -26,7 +26,7 @@ html
                 option(value='og-network') og-network
                 option(value='minetexas') minetexas
                 option(value='6b6t') 6b6t
-                option(value='purity vanilla') purity vanilla
+                option(value='purity-vanilla') purity vanilla
                 option(value='oldfag') oldfag
                 option(value='3b3france') 3b3france
                 option(value='minewind') minewind
@@ -38,6 +38,9 @@ html
             .form-group
               label(for='nsfw', class='mb-2') nsfw:
               input(type='checkbox', name='nsfw', id='nsfw')
+            .form-group
+              label(for='singles', class='mb-2') auto make maparts (all 1x1s):
+              input(type='checkbox', name='singles', id='singles')
 
             button.btn.btn-primary(type='submit')
               i.fas.fa-cloud-upload-alt

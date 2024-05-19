@@ -82,7 +82,7 @@ router.post('/create', mapArtUpload.single('file'), async (req, res) => {
     const parsedTags = JSON.parse(tags.toLowerCase());
 
     let nsfwBool = false;
-    if(req.body.nsfw === "true"){
+    if(nsfw === "true"){
       nsfwBool = true;
     }
 

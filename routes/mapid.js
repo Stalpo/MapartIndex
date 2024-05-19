@@ -9,6 +9,7 @@ const getPixels = require("get-pixels")
 // Required controllers
 const userController = require('../controllers/userController');
 const mapIdController = require('../controllers/mapIdController');
+const mapArtController = require('../controllers/mapArtController');
 
 // Multer config
 const mapIdUpload = multer({
@@ -170,7 +171,7 @@ router.post('/create', mapIdUpload.array('images', 4000), async (req, res) => {
         nsfw = true;
       }
 
-      await mapIdController.createMapId({
+      const mapid = await mapIdController.createMapId({
         userId: res.locals.userId,
         username: res.locals.username,
         imgUrl: newFilename,
@@ -180,6 +181,39 @@ router.post('/create', mapIdUpload.array('images', 4000), async (req, res) => {
         serverId: serverId,
         nsfw: nsfw,
       });
+
+      // upload also as maparts if all 1x1s
+      if(req.body.singles === "on"){
+        const newFilename2 = await mapArtController.generateFilename(req.body.server);
+        const serverId2 = await mapArtController.getLatestServerIdByServer(req.body.server) + 1;
+        const newFilepath2 = `${res.locals.filepath}/public/uploads/mapart/${newFilename2}`;
+
+        let displayName2 = newFilename2.endsWith(".png") ? newFilename2.slice(0, -4) : undefined;
+
+        if (!path) {
+          return res.status(400).json({ error: 'File path missing' });
+        }
+    
+        fs.copyFileSync(newFilepath, newFilepath2);
+    
+        const base642 = fs.readFileSync(newFilepath2, { encoding: 'base64' });
+        const hash2 = crypto.createHash('md5').update(base642).digest('hex');
+
+        const result = await mapArtController.createMapId({
+          userId: res.locals.userId,
+          username: res.locals.username,
+          imgUrl: newFilename2,
+          description: "",
+          mapIds: [mapid.id],
+          width: 1,
+          height: 1,
+          displayName: displayName2,
+          hash: hash2,
+          server: req.body.server,
+          serverId: serverId2,
+          nsfw: nsfw,
+        });
+      }
 
       uploadedFiles.push({
         originalname,
