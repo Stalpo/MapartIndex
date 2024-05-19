@@ -81,16 +81,23 @@ function loadImg(path) {
 }
 
 router.get('/gallery', async (req, res) => {
-  if(req.subdomains.length == 0){
+  let server = "";
+  if(req.subdomains.length != 0){
+    server = req.subdomains[0];
+  }
+  if(req.subdomains.length == 0 || server === "www"){
     res.render('mapid-gallery');
   }else{
-    const server = req.subdomains[0];
     res.render('mapid-gallery', { server });
   }
 });
 
 router.get('/create', async (req, res) => {
-  if(req.subdomains.length == 0){
+  let server = "";
+  if(req.subdomains.length != 0){
+    server = req.subdomains[0];
+  }
+  if(req.subdomains.length == 0 || server === "www"){
     res.render('mapid-create');
   }else{
     const server = req.subdomains[0];

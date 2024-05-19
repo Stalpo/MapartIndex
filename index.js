@@ -85,14 +85,17 @@ app.use('/system', system);
 // Index route
 app.get('/', async (req, res) => {
   try {
-    if(req.subdomains.length == 0){
+    let server = "";
+    if(req.subdomains.length != 0){
+      server = req.subdomains[0];
+    }
+    if(req.subdomains.length == 0 || server === "www"){
       const totalMaps = (await mapIdController.countMapIds());
       const totalMaparts = (await mapArtController.countAllMapArts());
       const totalUsers = (await userController.getAllUsers()).length;
       const totalServers = (await mapIdController.getUniqueServers()).length;
       res.render('index', { totalMaps, totalUsers, totalMaparts, totalServers });
     }else{
-      const server = req.subdomains[0];
       const totalMaps = (await mapIdController.countMapIdsByServer(server));
       const totalMaparts = (await mapArtController.countMapIdsByServer(server));
       res.render('index', { server, totalMaps, totalMaparts });
