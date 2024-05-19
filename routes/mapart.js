@@ -79,7 +79,7 @@ router.post('/create', mapArtUpload.single('file'), async (req, res) => {
     const hash = crypto.createHash('md5').update(base64).digest('hex');
 
     const parsedMapIds = JSON.parse(mapIds);
-    const parsedTags = JSON.parse(tags);
+    const parsedTags = JSON.parse(tags.toLowerCase());
 
     let nsfwBool = false;
     if(req.body.nsfw === "true"){
