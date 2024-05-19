@@ -55,6 +55,10 @@ html
         widthSelector.addEventListener('change', generateInputs);
         heightSelector.addEventListener('change', generateInputs);
 
+        // catch vars for server and if nsfw
+        let idsServer;
+        let idsNsfw;
+
         // Function to generate text input boxes based on selected dimensions
         function generateInputs() {
           const width = parseInt(widthSelector.value);
@@ -115,6 +119,8 @@ html
                     return response.json();
                   })
                   .then(data => {
+                    idsServer = data.server;
+                    idsNsfw = data.nsfw;
                     if (data && data.id && data.imgUrl) {
                       return { id: data.id, imgUrl: `/public/uploads/${data.imgUrl}`, rotation };
                     } else {
@@ -214,12 +220,6 @@ html
               tagsInput.placeholder = 'Tags (comma-seperated)';
               tagsInputGroup.appendChild(tagsInput);
 
-              const serverInputGroup = document.createElement('div');
-              serverInputGroup.classList.add('form-group');
-              const serverSelect = document.createElement('select');
-              serverSelect.classList.add('form-control');
-              serverSelect.placeholder = 'Unique Servers';
-
               fetch(resultImageUrl)
                 .then(response => response.blob())
                 .then(resultBlob => {
@@ -240,27 +240,10 @@ html
                 console.log('Selected file:', file);
               });
 
-              fetch('/mapid/uniqueServers')
-                .then(response => response.json())
-                .then(data => {
-                  data.forEach(server => {
-                    const option = document.createElement('option');
-                    option.value = server;
-                    option.textContent = server;
-                    serverSelect.appendChild(option);
-                  });
-                })
-                .catch(error => {
-                  console.error('Error fetching unique servers:', error);
-                });
-
-              serverInputGroup.appendChild(serverSelect);
-
               formContainer.appendChild(nameInputGroup);
               formContainer.appendChild(descriptionInputGroup);
               formContainer.appendChild(artistInputGroup);
               formContainer.appendChild(tagsInputGroup);
-              formContainer.appendChild(serverInputGroup);
               formContainer.appendChild(fileInput);
 
               const addButton = document.createElement('button');
@@ -272,7 +255,8 @@ html
                 formData.append('name', nameInput.value);
                 formData.append('description', descriptionInput.value);
                 formData.append('artist', artistInput.value);
-                formData.append('server', serverSelect.value);
+                formData.append('server', idsServer);
+                formData.append('nsfw', idsNsfw);
                 formData.append('file', blobObj);
                 formData.append('mapIds', JSON.stringify(mapIds));
                 formData.append('width', parseInt(widthSelector.value));

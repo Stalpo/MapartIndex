@@ -174,7 +174,7 @@ const countMapIds = async () => {
   }
 };
 
-const createMapId = async ({ userId, username, mapId, imgUrl, displayName, hash, server, serverId }) => {
+const createMapId = async ({ userId, username, mapId, imgUrl, displayName, hash, server, serverId, nsfw }) => {
   try {
     return await prisma.mapId.create({
       data: {
@@ -190,6 +190,7 @@ const createMapId = async ({ userId, username, mapId, imgUrl, displayName, hash,
         hash: hash,
         server: server,
         serverId: serverId,
+        nsfw: nsfw,
       }
     });
   } catch (error) {

@@ -165,6 +165,11 @@ router.post('/create', mapIdUpload.array('images', 4000), async (req, res) => {
       const hash = crypto.createHash('md5').update(base64).digest('hex');
 
       // Add metadata to the db
+      let nsfw = false;
+      if(req.body.nsfw === "on"){
+        nsfw = true;
+      }
+
       await mapIdController.createMapId({
         userId: res.locals.userId,
         username: res.locals.username,
@@ -173,6 +178,7 @@ router.post('/create', mapIdUpload.array('images', 4000), async (req, res) => {
         hash: hash,
         server: req.body.server,
         serverId: serverId,
+        nsfw: nsfw,
       });
 
       uploadedFiles.push({

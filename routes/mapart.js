@@ -60,7 +60,7 @@ router.post('/create', mapArtUpload.single('file'), async (req, res) => {
       return res.status(400).json({ error: 'No files uploaded' });
     }
 
-    const { name, description, artist, server, mapIds, width, height, tags } = req.body;
+    const { name, description, artist, server, mapIds, width, height, tags, nsfw } = req.body;
     const { filename, path, originalname } = req.file;
 
     const newFilename = await mapArtController.generateFilename(server);
@@ -81,6 +81,11 @@ router.post('/create', mapArtUpload.single('file'), async (req, res) => {
     const parsedMapIds = JSON.parse(mapIds);
     const parsedTags = JSON.parse(tags);
 
+    let nsfwBool = false;
+    if(req.body.nsfw === "true"){
+      nsfwBool = true;
+    }
+
     const result = await mapArtController.createMapId({
       userId: res.locals.userId,
       username: res.locals.username,
@@ -96,6 +101,7 @@ router.post('/create', mapArtUpload.single('file'), async (req, res) => {
       hash,
       server,
       serverId,
+      nsfw: nsfwBool,
     });
 
     res.send(result);

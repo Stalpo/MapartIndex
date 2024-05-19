@@ -77,7 +77,7 @@ const generateFilename = async (server) => {
   }
 };
 
-const createMapId = async ({ userId, username, mapId, imgUrl, displayName, hash, server, serverId }) => {
+const createMapId = async ({ userId, username, mapId, imgUrl, displayName, hash, server, serverId, nsfw }) => {
   try {
     return await mapIdModel.createMapId({
       userId,
@@ -88,6 +88,7 @@ const createMapId = async ({ userId, username, mapId, imgUrl, displayName, hash,
       hash,
       server,
       serverId,
+      nsfw,
     });
   } catch (error) {
     console.error('Error creating map ID:', error);
