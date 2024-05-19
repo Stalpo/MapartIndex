@@ -5,7 +5,10 @@ html
   body
     include includes/navbar.pug
     div.container
-      h1.text-center= pageTitle
+      if !server
+        h1.text-center #{pageTitle}
+      else 
+        h1.text-center #{server} #{pageTitle}
       hr
       div.row.justify-content-center
         div.col-auto
@@ -18,7 +21,7 @@ html
           div.row
             div.col
               select#artistSelector.form-control(data-live-search='true')
-          div.row
+          div.row(style=`${!server ? '' : 'display:none'}`)
             div.col
               select#serverSelector.form-control(data-live-search='true')
           div.row
@@ -95,7 +98,12 @@ html
             const uniqueServers = await fetchData('/mapid/uniqueServers');
             uniqueServers.unshift("All Servers");
             uniqueServers.sort();
-            populateSelect('serverSelector', uniqueServers, "All Servers");
+            let server = "#{server}";
+            if(!server){
+              populateSelect('serverSelector', uniqueServers, "All Servers");
+            }else{
+              populateSelect('serverSelector', uniqueServers, server);
+            }
           } catch (error) {
             console.error('Error fetching server data:', error);
           }
@@ -134,7 +142,9 @@ html
           if (artist && artist !== "All Artists") {
             url += `&artist=${artist}`;
           }
-          if (server && server !== "All Servers") {
+          if ("#{server}") {
+            url += `&server=#{server}`;
+          } else if (server && server !== "All Servers") {
             url += `&server=${server}`;
           }
 
@@ -285,7 +295,7 @@ html
         let currentPage = 1;
         let user = "";
         let artist = "";
-        let server = "";
+        let server = "#{server}";
         let sort = "dateDesc";
 
         function startObservingIntersection() {

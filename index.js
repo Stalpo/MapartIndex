@@ -20,6 +20,7 @@ const PORT = 3000;
 
 // Controllers
 const userController = require('./controllers/userController');
+const serverController = require('./controllers/serverController');
 const mapIdController = require('./controllers/mapIdController');
 const mapArtController = require('./controllers/mapArtController');
 
@@ -48,6 +49,10 @@ app.use('/user', userRoutes);
 // Profile Routes
 const profileRoutes = require('./routes/profile');
 app.use('/profile', profileRoutes);
+
+// Server Routes
+const serverRoutes = require('./routes/server');
+app.use('/server', serverRoutes);
 
 // MapId Routes
 const mapIdRoutes = require('./routes/mapid');

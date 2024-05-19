@@ -25,12 +25,22 @@ const mapArtUpload = multer({
 });
 
 router.get('/gallery', async (req, res) => {
-  res.render('mapart-gallery');
+  if(req.subdomains.length == 0){
+    res.render('mapart-gallery');
+  }else{
+    const server = req.subdomains[0];
+    res.render('mapart-gallery', { server });
+  }
 });
 
 // MapArt route
 router.get('/create', async (req, res) => {
-  res.render('mapart-create');
+  if(req.subdomains.length == 0){
+    res.render('mapart-create');
+  }else{
+    const server = req.subdomains[0];
+    res.render('mapart-create', { server });
+  }
 });
 
 router.post('/create', mapArtUpload.single('file'), async (req, res) => {

@@ -37,7 +37,7 @@ fs.readdir(`${__dirname.slice(0, -7)}/public/uploads`, async function (err, file
   //listing all files using forEach
   for(let i = 0; i < files.length; i++) {
     // Do whatever you want to do with the file
-    if(files[i] === "mapart" || files[i] === "tmp" || files[i] === ".placeholder"){
+    if(files[i] === "mapart" || files[i] === "server" || files[i] === "tmp" || files[i] === ".placeholder"){
       
     }else{
       const data = new Uint8Array(await loadImg(`${__dirname.slice(0, -7)}/public/uploads/${files[i]}`));
@@ -81,11 +81,21 @@ function loadImg(path) {
 }
 
 router.get('/gallery', async (req, res) => {
-  res.render('mapid-gallery');
+  if(req.subdomains.length == 0){
+    res.render('mapid-gallery');
+  }else{
+    const server = req.subdomains[0];
+    res.render('mapid-gallery', { server });
+  }
 });
 
 router.get('/create', async (req, res) => {
-  res.render('mapid-create');
+  if(req.subdomains.length == 0){
+    res.render('mapid-create');
+  }else{
+    const server = req.subdomains[0];
+    res.render('mapid-create', { server });
+  }
 });
 
 router.post('/create', mapIdUpload.array('images', 4000), async (req, res) => {

@@ -29,6 +29,8 @@ html
               a(href="/mapart/missingInfo") missing metadata
             
       .jumbotron.text-center
+        if logo
+          img(src=logo)
         img(src='/public/largeicon.png')
         if !server
           h1.display-4 Welcome to the Mapart Index!
@@ -47,9 +49,13 @@ html
           h1.display-4 Welcome to the #{server} Mapart Index!
           p.lead
             | A collection hosted by the Mapart Index
+            if discord
+              span
+                a.nav-link(href=discord)
+                  | Join the #{server} Mapart discord!
             span
               a.nav-link(href="https://discord.gg/4qKFjbUFuZ")
-                | Join our discord!
+                | Join the Mapart Index discord!
             span
               a.nav-link(href="/about")
                 | About
