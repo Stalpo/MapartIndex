@@ -36,7 +36,15 @@ fs.readdir(`${__dirname.slice(0, -7)}/public/uploads`, async function (err, file
   } 
   console.log("starting image loading");
   //listing all files using forEach
+  const percentReport = .05;
+  let reportNumber = 1;
   for(let i = 0; i < files.length; i++) {
+    // log percent done
+    if(i >= Math.floor(files.length * percentReport * reportNumber)){
+      console.log(`${reportNumber * Math.floor(percentReport * 100)}% done loading images`);
+      reportNumber++;
+    }
+
     // Do whatever you want to do with the file
     if(files[i] === "mapart" || files[i] === "server" || files[i] === "tmp" || files[i] === ".placeholder"){
       
@@ -48,10 +56,11 @@ fs.readdir(`${__dirname.slice(0, -7)}/public/uploads`, async function (err, file
           name: files[i],
           server: files[i].split("_")[0]
         });
-        console.log(`loaded img ${checkImgDatas.length}`);
+        //console.log(`loaded img ${checkImgDatas.length}`);
       }
     }
   };
+  console.log("finished image loading");
 });
 
 const pixelDict = {};
@@ -63,6 +72,9 @@ function loadImg(path) {
       if(err) {
         reject(err)
       } else {
+        if(data.shape[0] != 128 || data.shape[1] != 128){
+          resolve([]);
+        }
         const shortData = [];
         for(let x = 0; x < 128; x++){
           for(let y = 0; y < 128; y++){
@@ -142,8 +154,13 @@ router.post('/create', mapIdUpload.array('images', 4000), async (req, res) => {
       // Rename the file
       fs.renameSync(path, newFilepath);
 
-      // check if duplicate (if maxwrong neg skip)
+      // check if duplicate (if maxwrong neg skip) or if img size not right
       const imgData = new Uint8Array(await loadImg(newFilepath));
+      if(imgData.length == 0){
+        fs.unlinkSync(newFilepath);
+        return res.status(500).json({ error: `${originalname} is not correct img dimensions (128x128)! all maps before ${originalname} have been uploaded` });
+      }
+
       if(req.body.maxWrong >= 0){
         const duplicateOf = isDuplicate(imgData, req.body.maxWrong, req.body.server);
         if(duplicateOf != null){
