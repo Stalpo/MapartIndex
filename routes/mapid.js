@@ -29,7 +29,8 @@ const mapIdUpload = multer({
 // get all image data for duplicate checking
 const checkImgDatas = [];
 
-fs.readdir(`${__dirname.slice(0, -7)}/public/uploads`, async function (err, files) {
+// depricated load all at once
+/*fs.readdir(`${__dirname.slice(0, -7)}/public/uploads`, async function (err, files) {
   //handling error
   if (err) {
     return console.log('Unable to scan directory: ' + err);
@@ -61,7 +62,43 @@ fs.readdir(`${__dirname.slice(0, -7)}/public/uploads`, async function (err, file
     }
   };
   console.log("finished image loading");
-});
+});*/
+
+function loadServerImgDatas(server){
+  fs.readdir(`${__dirname.slice(0, -7)}/public/uploads`, async function (err, files) {
+    //handling error
+    if (err) {
+      return console.log('Unable to scan directory: ' + err);
+    } 
+    console.log("starting image loading");
+    //listing all files using forEach
+    const percentReport = .05;
+    let reportNumber = 1;
+    for(let i = 0; i < files.length; i++) {
+      // log percent done
+      if(i >= Math.floor(files.length * percentReport * reportNumber)){
+        console.log(`${reportNumber * Math.floor(percentReport * 100)}% done loading images`);
+        reportNumber++;
+      }
+  
+      // Do whatever you want to do with the file
+      if(files[i] === "mapart" || files[i] === "server" || files[i] === "tmp" || files[i] === ".placeholder"){
+        
+      }else{
+        const data = new Uint8Array(await loadImg(`${__dirname.slice(0, -7)}/public/uploads/${files[i]}`));
+        if(data != null && files[i].split("_")[0] === server){
+          checkImgDatas.push({
+            data: data,
+            name: files[i],
+            server: files[i].split("_")[0]
+          });
+          //console.log(`loaded img ${checkImgDatas.length}`);
+        }
+      }
+    };
+    console.log("finished image loading");
+  });
+}
 
 const pixelDict = {};
 let s = 0;
@@ -162,11 +199,17 @@ router.post('/create', mapIdUpload.array('images', 4000), async (req, res) => {
       }
 
       if(req.body.maxWrong >= 0){
+        // load server images first
+        loadServerImgDatas(server);
+
         const duplicateOf = isDuplicate(imgData, req.body.maxWrong, req.body.server);
         if(duplicateOf != null){
           fs.unlinkSync(newFilepath);
           return res.status(500).json({ error: `${originalname} is a duplicate of ${duplicateOf}! all maps before ${originalname} have been uploaded` });
         }
+
+        // remove server images from memory after
+        checkImgDatas = [];
       }
 
       // add to checkImgs
