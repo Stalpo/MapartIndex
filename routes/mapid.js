@@ -139,7 +139,7 @@ router.get('/gallery', async (req, res) => {
   if(req.subdomains.length == 0 || server === "www"){
     res.render('mapid-gallery');
   }else{
-    const { displayName } = serverController.getServerByName(server);
+    const { displayName } = await serverController.getServerByName(server);
     res.render('mapid-gallery', { server, displayName });
   }
 });

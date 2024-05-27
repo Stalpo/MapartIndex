@@ -33,7 +33,7 @@ router.get('/gallery', async (req, res) => {
   if(req.subdomains.length == 0 || server === "www"){
     res.render('mapart-gallery');
   }else{
-    const { displayName } = serverController.getServerByName(server);
+    const { displayName } = await serverController.getServerByName(server);
     res.render('mapart-gallery', { server, displayName });
   }
 });
