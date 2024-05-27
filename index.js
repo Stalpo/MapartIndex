@@ -101,7 +101,7 @@ app.get('/', async (req, res) => {
       const { displayName, discord } = (await serverController.getServerByName(server));
       res.render('index', { server, displayName, discord, totalMaps, totalMaparts });
     }
-  } catch {
+  } catch(error) {
     console.error('Error fetching statistics:', error);
     res.render('index');
   }
