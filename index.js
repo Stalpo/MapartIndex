@@ -98,7 +98,8 @@ app.get('/', async (req, res) => {
     }else{
       const totalMaps = (await mapIdController.countMapIdsByServer(server));
       const totalMaparts = (await mapArtController.countMapIdsByServer(server));
-      const { displayName, discord } = (await serverController.getServerByName(server));
+      const serverObj = (await serverController.getServerByName(server));
+      const { displayName, discord } = serverObj;
       res.render('index', { server, displayName, discord, totalMaps, totalMaparts });
     }
   } catch(error) {
