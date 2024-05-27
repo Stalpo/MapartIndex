@@ -54,7 +54,7 @@ model Server {
   name        String   @unique
   displayName String   
   discord     String
-  logoUrl     String
+  logoUrl     String?
 }
 
 model MapArt {
