@@ -11,7 +11,7 @@ script.
   });
 
 nav.navbar.navbar-expand-lg.navbar-custom
-  a.h1.navbar-brand(href="/") MapartIndex
+  a.h1.navbar-brand(href="https://www.mapartindex.com/" id="home") MapartIndex
   button.navbar-toggler(type="button", data-toggle="collapse", data-target="#navbarNav", aria-controls="navbarNav", aria-expanded="false", aria-label="Toggle navigation")
     span.navbar-toggler-icon(style="display: flex; justify-content: center; align-items: center;")
       i.fa.fa-bars
@@ -65,3 +65,10 @@ nav.navbar.navbar-expand-lg.navbar-custom
             a.dropdown-item(href="/user/login")
               i.fa.fa-sign-in-alt.mr-1
               | Login
+
+script.
+  let host = window.location.host;
+  let server = host.split('.')[0];
+  if(!(server === "www") && !(server === "mapartindex")){
+    document.getElementById("home").innerHTML = "MapartIndex Full Collection";
+  }
