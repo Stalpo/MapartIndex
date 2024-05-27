@@ -98,7 +98,8 @@ app.get('/', async (req, res) => {
     }else{
       const totalMaps = (await mapIdController.countMapIdsByServer(server));
       const totalMaparts = (await mapArtController.countMapIdsByServer(server));
-      res.render('index', { server, totalMaps, totalMaparts });
+      const { displayName, discord } = serverController.getServerByName(server);
+      res.render('index', { server, displayName, discord, totalMaps, totalMaparts });
     }
   } catch {
     console.error('Error fetching statistics:', error);

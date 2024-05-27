@@ -48,12 +48,13 @@ model Profile {
 }
 
 model Server {
-  id        String   @id @default(uuid()) @map("_id")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  name      String   @unique
-  discord   String
-  logoUrl   String
+  id          String   @id @default(uuid()) @map("_id")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  name        String   @unique
+  displayName String   
+  discord     String
+  logoUrl     String
 }
 
 model MapArt {

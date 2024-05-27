@@ -10,6 +10,7 @@ const getPixels = require("get-pixels")
 const userController = require('../controllers/userController');
 const mapIdController = require('../controllers/mapIdController');
 const mapArtController = require('../controllers/mapArtController');
+const serverController = require('../controllers/serverController');
 
 // Multer config
 const mapIdUpload = multer({
@@ -138,7 +139,8 @@ router.get('/gallery', async (req, res) => {
   if(req.subdomains.length == 0 || server === "www"){
     res.render('mapid-gallery');
   }else{
-    res.render('mapid-gallery', { server });
+    const { displayName } = serverController.getServerByName(server);
+    res.render('mapid-gallery', { server, displayName });
   }
 });
 
@@ -150,7 +152,6 @@ router.get('/create', async (req, res) => {
   if(req.subdomains.length == 0 || server === "www"){
     res.render('mapid-create');
   }else{
-    const server = req.subdomains[0];
     res.render('mapid-create', { server });
   }
 });

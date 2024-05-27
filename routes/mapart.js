@@ -8,6 +8,7 @@ const crypto = require('crypto');
 // Required controllers
 const userController = require('../controllers/userController');
 const mapArtController = require('../controllers/mapArtController');
+const serverController = require('../controllers/serverController');
 
 // Multer config
 const mapArtUpload = multer({
@@ -32,7 +33,8 @@ router.get('/gallery', async (req, res) => {
   if(req.subdomains.length == 0 || server === "www"){
     res.render('mapart-gallery');
   }else{
-    res.render('mapart-gallery', { server });
+    const { displayName } = serverController.getServerByName(server);
+    res.render('mapart-gallery', { server, displayName });
   }
 });
 
