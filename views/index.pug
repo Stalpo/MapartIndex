@@ -89,6 +89,17 @@ html
               .card-header Total Servers
               .card-body.text-success
                 h5.card-title #{totalServers}
+      if !server
+        .jumbotron.text-center
+          h1.display-4 Partnered Servers
+          br
+          .row.justify-content-center
+            .col-md-3.mb-3
+              .card.border-success.text-center
+                .card-header
+                  h3
+                    a.nav-link(href="https://2b2t.mapartindex.com/")
+                      | 2b2t
 
     // include includes/footer.pug
     script(src='/public/js/index-page.js')
