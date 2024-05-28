@@ -77,25 +77,40 @@ html
               .card-header Total Maparts
               .card-body.text-primary
                 h5.card-title #{totalMaparts}
-        if totalUsers
-          .col-md-3.mb-3
-            .card.border-success.text-center
-              .card-header Total Users
-              .card-body.text-success
-                h5.card-title #{totalUsers}
         if totalServers
           .col-md-3.mb-3
-            .card.border-success.text-center
+            .card.border-primary.text-center
               .card-header Total Servers
-              .card-body.text-success
+              .card-body.text-primary
                 h5.card-title #{totalServers}
+      .row.justify-content-center
+        .col-md-3.mb-3
+          .card.border-success.text-center
+            .card-header Total Visits
+            .card-body.text-success
+              h5.card-title #{totalVisits ? `${totalVisits}` : "0"}
+        .col-md-3.mb-3
+          .card.border-success.text-center
+            .card-header Daily Visits
+            .card-body.text-success
+              h5.card-title #{dailyVisits ? `${dailyVisits}` : "0"}
+        .col-md-3.mb-3
+          .card.border-success.text-center
+            .card-header Total Users
+            .card-body.text-success
+              h5.card-title #{totalUsers ? `${totalUsers}` : "0"}
+        .col-md-3.mb-3
+          .card.border-success.text-center
+            .card-header Daily Users
+            .card-body.text-success
+              h5.card-title #{dailyUsers ? `${dailyUsers}` : "0"}
       if !server
         .jumbotron.text-center
           h1.display-4 Partnered Servers
           br
           .row.justify-content-center
             .col-md-3.mb-3
-              .card.border-success.text-center
+              .card.border-primary.text-center
                 .card-header
                   h3
                     a.nav-link(href="https://2b2t.mapartindex.com/")

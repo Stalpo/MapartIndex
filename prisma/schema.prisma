@@ -57,6 +57,13 @@ model Server {
   logoUrl     String?
 }
 
+model Visit {
+  id        String   @id @default(uuid()) @map("_id")
+  createdAt DateTime @default(now())
+  username  String?
+  servers   String[]
+}
+
 model MapArt {
   id           String   @id @default(uuid()) @map("_id")
   createdAt    DateTime @default(now())

@@ -12,6 +12,7 @@ const {
   checkAdminStatus,
   checkModStatus,
   requestLogger,
+  updateVisitStats,
 } = require('./middleware');
 
 // Init express
@@ -21,6 +22,7 @@ const PORT = 3000;
 // Controllers
 const userController = require('./controllers/userController');
 const serverController = require('./controllers/serverController');
+const visitController = require('./controllers/visitController');
 const mapIdController = require('./controllers/mapIdController');
 const mapArtController = require('./controllers/mapArtController');
 
@@ -41,6 +43,7 @@ app.use(checkUserStatus);
 app.use(checkAdminStatus);
 app.use(checkModStatus);
 app.use(requestLogger);
+app.use(updateVisitStats);
 
 // User Routes
 const userRoutes = require('./routes/user');
@@ -92,15 +95,26 @@ app.get('/', async (req, res) => {
     if(req.subdomains.length == 0 || server === "www"){
       const totalMaps = (await mapIdController.countMapIds());
       const totalMaparts = (await mapArtController.countAllMapArts());
-      const totalUsers = (await userController.getAllUsers()).length;
       const totalServers = (await mapIdController.getUniqueServers()).length;
-      res.render('index', { totalMaps, totalUsers, totalMaparts, totalServers });
+      
+      const totalVisits = (await visitController.countVisits());
+      const dailyVisits = (await visitController.countDailyVisits());
+      const totalUsers = (await userController.getAllUsers()).length;
+      const dailyUsers = (await visitController.countDailyUserVisits());
+
+      res.render('index', { totalMaps, totalMaparts, totalServers, totalVisits, dailyVisits, totalUsers, dailyUsers });
     }else{
       const totalMaps = (await mapIdController.countMapIdsByServer(server));
       const totalMaparts = (await mapArtController.countMapIdsByServer(server));
       const serverObj = (await serverController.getServerByName(server));
       const { displayName, discord } = serverObj;
-      res.render('index', { server, displayName, discord, totalMaps, totalMaparts });
+
+      const totalVisits = (await visitController.countVisitsByServer(server));
+      const dailyVisits = (await visitController.countDailyVisitsByServer(server));
+      const totalUsers = (await visitController.countUserVisitsByServer(server));
+      const dailyUsers = (await visitController.countDailyUserVisitsByServer(server));
+
+      res.render('index', { server, displayName, discord, totalMaps, totalMaparts, totalVisits, dailyVisits, totalUsers, dailyUsers });
     }
   } catch(error) {
     console.error('Error fetching statistics:', error);

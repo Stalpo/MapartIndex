@@ -5,6 +5,10 @@ const multer = require('multer');
 const fs = require('fs');
 const crypto = require('crypto');
 
+//
+// THIS IS COPY PASTE RN COMPLETELY NOT WORKING AT ALL WILL FIX LATER!
+//
+
 // Required controllers
 const serverController = require('../controllers/serverController');
 

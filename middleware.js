@@ -5,6 +5,7 @@ const path = require('path');
 // Required controllers
 const userController = require('./controllers/userController');
 const profileController = require('./controllers/profileController');
+const visitController = require('./controllers/visitController');
 
 // File path middleware
 const setFilePath = async (req, res, next) => {
@@ -106,10 +107,34 @@ const requestLogger = (req, res, next) => {
   next();
 };
 
+const updateVisitStats = async (req, res, next) => {
+  let visit;
+
+  // visited at all
+  if(!req.cookies.visitId){
+    visit = await visitController.createVisit();
+    res.cookie("visitId", visit.id);
+  }else{
+    visit = await visitController.getVisitById(req.cookies.visitId);
+  }
+
+  // visited specific subdomain
+  let server = "";
+  if(req.subdomains.length != 0){
+    server = req.subdomains[0];
+  }
+  if(!visit.servers.includes(server)){
+    visitController.addServerToVisit(visit.id, server);
+  }
+
+  next();
+}
+
 module.exports = {
   setFilePath,
   checkAdminStatus,
   checkModStatus,
   checkUserStatus,
   requestLogger,
+  updateVisitStats,
 };
