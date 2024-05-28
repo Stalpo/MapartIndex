@@ -68,7 +68,7 @@ nav.navbar.navbar-expand-lg.navbar-custom
 
 script.
   let host = window.location.host;
-  let server = host.split('.')[0];
-  if(!(server === "www") && !(server === "mapartindex")){
+  let subdomain = host.split('.')[0];
+  if(!(subdomain === "www") && !(subdomain === "mapartindex")){
     document.getElementById("home").innerHTML = "MapartIndex Full Collection";
   }
