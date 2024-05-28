@@ -1,7 +1,12 @@
 // Fetch random images from /api/mapId/maps
+let host2 = window.location.host;
+let subdomain2 = host.split('.')[0];
+if(subdomain2 === "www" || subdomain2 === "mapartindex"){
+  subdomain2 = null;
+}
 const maparts = 20;
 const randomPage = Math.floor(Math.random() * 50);
-fetch(`/api/mapArt/maps?page=${randomPage}&perPage=${maparts}`)
+fetch(`/api/mapArt/maps?page=${randomPage}&perPage=${maparts}${!subdomain2 ? "" : `&server=${subdomain2}`}`)
   .then(response => response.json())
   .then(images => {
     // Shuffle the array of images
