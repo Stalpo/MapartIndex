@@ -213,7 +213,7 @@ const verifyToken = (token) => {
   }
 };
 
-const loginDiscordUser = async (userId, discordId, username, avatar, email) => {
+const loginDiscordUser = async (userId, discordId, username, avatar, email, visitId) => {
   try {
     let user;
 
@@ -254,7 +254,7 @@ const loginDiscordUser = async (userId, discordId, username, avatar, email) => {
     // Generate JWT token for the user
     const token = jwt.sign({ username }, process.env.SECRET_KEY, { expiresIn: '24h' });
 
-    visitController.setVisitUsername(req.cookies.visitId, username);
+    visitController.setVisitUsername(visitId, username);
 
     return { token };
   } catch (error) {

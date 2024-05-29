@@ -59,8 +59,9 @@ async function handleUserData(req, res, data, userId) {
     let username = data.username;
     let avatar = "https://cdn.discordapp.com/avatars/" + discordId + "/" + data.avatar + ".png";
     let email = data.email;
+    let visitId = req.cookies.visitId
 
-    let token = await userController.loginDiscordUser(userId, discordId, username, avatar, email);
+    let token = await userController.loginDiscordUser(userId, discordId, username, avatar, email, visitId);
     if (token.error) {
         return res.status(409).render('500', { errorMessage: token.error });
     } else {
