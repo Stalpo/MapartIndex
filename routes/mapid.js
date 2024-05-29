@@ -28,9 +28,10 @@ const mapIdUpload = multer({
 });
 
 // get all image data for duplicate checking
-const checkImgDatas = [];
+let checkImgDatas = [];
 
 // depricated load all at once
+
 /*fs.readdir(`${__dirname.slice(0, -7)}/public/uploads`, async function (err, files) {
   //handling error
   if (err) {
@@ -83,11 +84,11 @@ function loadServerImgDatas(server){
       }
   
       // Do whatever you want to do with the file
-      if(files[i] === "mapart" || files[i] === "server" || files[i] === "tmp" || files[i] === ".placeholder"){
+      if(files[i] === "mapart" || files[i] === "server" || files[i] === "tmp" || files[i] === ".placeholder" || files[i].split("_")[0] !== server){
         
       }else{
         const data = new Uint8Array(await loadImg(`${__dirname.slice(0, -7)}/public/uploads/${files[i]}`));
-        if(data != null && files[i].split("_")[0] === server){
+        if(data != null){
           checkImgDatas.push({
             data: data,
             name: files[i],
@@ -201,7 +202,7 @@ router.post('/create', mapIdUpload.array('images', 4000), async (req, res) => {
       }
 
       if(req.body.maxWrong >= 0){
-        // load server images first
+        // load server images first (while all loaded is depricated due to too much RAM usage)
         loadServerImgDatas(server);
 
         const duplicateOf = isDuplicate(imgData, req.body.maxWrong, req.body.server);
@@ -210,7 +211,7 @@ router.post('/create', mapIdUpload.array('images', 4000), async (req, res) => {
           return res.status(500).json({ error: `${originalname} is a duplicate of ${duplicateOf}! all maps before ${originalname} have been uploaded` });
         }
 
-        // remove server images from memory after
+        // remove server images from memory after see prev comment
         checkImgDatas = [];
       }
 
