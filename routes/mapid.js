@@ -67,7 +67,7 @@ let checkImgDatas = [];
 });*/
 
 function loadServerImgDatas(server){
-  fs.readdir(`${__dirname.slice(0, -7)}/public/uploads`, async function (err, files) {
+  fs.readdirSync(`${__dirname.slice(0, -7)}/public/uploads`, async function (err, files) {
     //handling error
     if (err) {
       return console.log('Unable to scan directory: ' + err);
