@@ -39,6 +39,8 @@ html
 
               // Submit button
               button#saveBtn.btn.btn-primary(type='button') Save Changes
+              if admin
+                button#deleteBtn.btn.btn-primary(type='button') Delete
 
             .alert.alert-success#successMessage(style='text-align: center; display: none; margin-top: 10px;')
             .alert.alert-danger#errorMessage(style='text-align: center; display: none; margin-top: 10px;')
@@ -118,6 +120,33 @@ html
           xhr.send(formData);
       }
 
+      function deleteMap(){
+          var url = window.location.href;
+          var mapId = url.substring(url.lastIndexOf('/') + 1);
+
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', `/mapid/delete?mapId=${mapId}`, true);
+          xhr.onreadystatechange = function () {
+              if (xhr.readyState === XMLHttpRequest.DONE) {
+                  if (xhr.status === 200) {
+                      // Send back to gallary
+                      window.location.href = "/mapid/gallery/";
+                  } else {
+                      // Show error message
+                      var errorMessage = document.getElementById('errorMessage');
+                      errorMessage.style.display = 'block';
+                      errorMessage.innerText = 'Failed to delete. Please try again.';
+
+                      // Hide success message if it's shown
+                      var successMessage = document.getElementById('successMessage');
+                      successMessage.style.display = 'none';
+                  }
+              }
+          };
+          xhr.send(formData);
+      }
+
       document.getElementById('saveBtn').addEventListener('click', saveChanges);
+      document.getElementById('deleteBtn').addEventListener('click', deleteMap);
       
     include includes/scripts.pug
