@@ -108,7 +108,19 @@ html
             const promises = [];
 
             inputs.forEach((input, index) => {
-              const displayName = input.value;
+              let displayName = input.value;
+              // new code to backcheck for last prev defined DN and count up from that (autofill range basically)
+              if(!input.value){
+                for(let i = index - 1; i >= 0; i--){
+                  if(inputs[i].value){
+                    const tokens = inputs[i].value.split("_");
+                    const newNum = parseInt(tokens[tokens.length - 1]) + (index - i);
+                    displayName = inputs[i].value.substring(0, inputs[i].value.length - tokens[tokens.length - 1].length) + newNum.toString();
+                    break;
+                  }
+                }
+              }
+
               const rotation = rotations[index].value;
               if (displayName) {
                 const promise = fetch(`/api/mapId/name/${displayName}`)
