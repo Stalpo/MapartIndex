@@ -1,5 +1,5 @@
 // send images as array of urls
-const joinImages = (width, height, imgUrls, rotations) => {
+const joinImages = (width, height, imgUrls, rotations, vertfirst, flipx, flipy) => {
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
 
@@ -13,12 +13,26 @@ const joinImages = (width, height, imgUrls, rotations) => {
         for (let i = 0; i < imgs.length; i++) {
           const rotation = rotations[i];
           const rotatedImage = rotateImage(imgs[i], rotation);
-          if(width == 56){
-            // exception for Narnia which is top-down then left-right
-            ctx.drawImage(rotatedImage, Math.floor(i / height) * 128, (i % height) * 128);
+          let x = 0;
+          let y = 0;
+
+          // do order shit
+          if(vertfirst){
+            x = Math.floor(i / height) * 128;
+            y = (i % height) * 128;
           }else{
-            ctx.drawImage(rotatedImage, (i % width) * 128, Math.floor(i / width) * 128);
+            x = (i % width) * 128;
+            y = Math.floor(i / width) * 128;
           }
+
+          if(flipx){
+            x = width - 1 - x;
+          }
+          if(flipy){
+            y = height - 1 - y;
+          }
+
+          ctx.drawImage(rotatedImage, x, y);
         }
         const url = canvas.toDataURL();
         resolve(url);

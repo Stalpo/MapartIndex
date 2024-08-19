@@ -32,6 +32,18 @@ html
                   select#height.form-control
                     for i in [...Array(32).keys()]
                       option(value=`${i+1}`)= `${i+1}`
+            .col
+              div.form-group
+                label(for='vertfirst', class='mb-2') read vertical before horizontal:
+                input(type='checkbox', name='vertfirst', id='vertfirst')
+            .col
+              div.form-group
+                label(for='flipx', class='mb-2') read right to left:
+                input(type='checkbox', name='flipx', id='flipx')
+            .col
+              div.form-group
+                label(for='flipy', class='mb-2') read bottom to top:
+                input(type='checkbox', name='flipy', id='flipy')
 
           div#inputContainer
 
@@ -48,6 +60,11 @@ html
         const widthSelector = document.getElementById('width');
         const heightSelector = document.getElementById('height');
         const fetchButton = document.getElementById('fetchImages');
+
+        // Get references to reading order checkboxes
+        const vertfirstSelector = document.getElementById('vertfirst');
+        const flipxSelector = document.getElementById('flipx');
+        const flipySelector = document.getElementById('flipy');
 
         let blobObj = undefined;
 
@@ -188,7 +205,13 @@ html
                 throw new Error('No map data fetched or map IDs found');
               }
               
-              return joinImages(parseInt(widthSelector.value), parseInt(heightSelector.value), mapData.map(map => map.imgUrl), mapData.map(map => map.rotation));
+              const width = parseInt(widthSelector.value);
+              const height = parseInt(heightSelector.value);
+              const vertfirst = vertfirstSelector.checked;
+              const flipx = flipxSelector.checked;
+              const flipy = flipySelector.checked;
+              
+              return joinImages(width, height, mapData.map(map => map.imgUrl), mapData.map(map => map.rotation), vertfirst, flipx, flipy);
             })
             .then(resultImageUrl => {
               const outputContainer = document.getElementById('outputContainer');
