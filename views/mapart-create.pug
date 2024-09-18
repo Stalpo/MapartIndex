@@ -140,7 +140,7 @@ html
 
               const rotation = rotations[index].value;
               if (displayName) {
-                const promise = fetch(`/api/mapId/name/${displayName}`)
+                const promise = () => fetch(`/api/mapId/name/${displayName}`)
                   .then(response => {
                     if (!response.ok) {
                       throw new Error('Network response was not ok');
@@ -165,7 +165,7 @@ html
               }
             });
 
-            Promise.all(promises)
+            fetchImagesByBatch(promises)
               .then(results => {
                 // Filter out null results
                 const validResults = results.filter(result => result !== null);
@@ -181,6 +181,27 @@ html
           });
         }
 
+        function fetchImagesByBatch(promises){
+          return new Promise((resolve, reject) => {
+            if(promises.length <= 1000){
+              Promise.all(promises.map(p => p()))
+                .then(r => {
+                  resolve(r);
+                });
+            }else{
+              Promise.all(promises.slice(0, 1000).map(p => p()))
+                .then(r => {
+                  // wait until next batch
+                  setTimeout(function(){
+                    fetchImagesByBatch(promises.slice(1000))
+                      .then(r2 => {
+                        resolve([...r, ...r2]);
+                      });
+                  }, 1000);
+                });
+            }
+          });
+        }
 
         fetchButton.addEventListener('click', () => {
           const mapIds = []; // Array to store map IDs
