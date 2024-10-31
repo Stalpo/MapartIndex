@@ -21,7 +21,7 @@ const mapArtUpload = multer({
     }
   },
   limits: {
-    fileSize: 1024 * 1024 * 40, // 40 MB limit for mapArt images
+    fileSize: 1024 * 1024 * 80, // 80 MB limit for mapArt images
   },
 });
 
