@@ -30,7 +30,7 @@ const mapIdUpload = multer({
 // get all image data for duplicate checking (super ram intensive so depricate as needed)
 let checkImgDatas = [];
 
-fs.readdir(`${__dirname.slice(0, -7)}/public/uploads`, async function (err, files) {
+/*fs.readdir(`${__dirname.slice(0, -7)}/public/uploads`, async function (err, files) {
   //handling error
   if (err) {
     return console.log('Unable to scan directory: ' + err);
@@ -61,7 +61,7 @@ fs.readdir(`${__dirname.slice(0, -7)}/public/uploads`, async function (err, file
     }
   };
   console.log("finished image loading");
-});
+});*/
 
 function loadServerImgDatas(server){
   fs.readdirSync(`${__dirname.slice(0, -7)}/public/uploads`, async function (err, files) {
@@ -91,7 +91,6 @@ function loadServerImgDatas(server){
             name: files[i],
             server: files[i].split("_")[0]
           });
-          //console.log(`loaded img ${checkImgDatas.length}`);
         }
       }
     };
@@ -207,7 +206,7 @@ router.post('/create', mapIdUpload.array('images', 4000), async (req, res) => {
           return res.status(500).json({ error: `${originalname} is a duplicate of ${duplicateOf}! all maps before ${originalname} have been uploaded` });
         }
 
-        //checkImgDatas = [];
+        checkImgDatas = [];
       }
 
       // add to checkImgs
