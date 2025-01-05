@@ -26,10 +26,10 @@ const joinImages = (width, height, imgUrls, rotations, vertfirst, flipx, flipy) 
           }
 
           if(flipx){
-            x = width - 1 - x;
+            x = (width - 1) * 128 - x;
           }
           if(flipy){
-            y = height - 1 - y;
+            y = (height - 1) * 128 - y;
           }
 
           ctx.drawImage(rotatedImage, x, y);
