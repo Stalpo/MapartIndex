@@ -197,7 +197,7 @@ router.post('/create', mapIdUpload.array('images', 4000), async (req, res) => {
         return res.status(500).json({ error: `${originalname} is not correct img dimensions (128x128)! all maps before ${originalname} have been uploaded` });
       }
 
-      if(req.body.maxWrong >= 0){
+      /*if(req.body.maxWrong >= 0){
         //loadServerImgDatas(server);
 
         const duplicateOf = isDuplicate(imgData, req.body.maxWrong, req.body.server);
@@ -214,13 +214,22 @@ router.post('/create', mapIdUpload.array('images', 4000), async (req, res) => {
         data: imgData,
         name: newFilename,
         server: req.body.server
-      });
+      });*/
 
       // Read the image file and convert it to base64
       const base64 = fs.readFileSync(newFilepath, { encoding: 'base64' });
 
       // Calculate a hash of the base64 data
       const hash = crypto.createHash('md5').update(base64).digest('hex');
+      
+      // Check if the image already exists in the database based on the hash
+      if(req.body.maxWrong >= 0){
+        const existingMap = await mapIdController.getMapIdByHash(hash, req.body.server);
+        if(existingMap){
+          fs.unlinkSync(newFilepath);
+          return res.status(500).json({ error: `${originalname} is a duplicate of ${existingMap.displayName}! all maps before ${originalname} have been uploaded` });
+        }
+      }
 
       // Add metadata to the db
       let nsfw = false;

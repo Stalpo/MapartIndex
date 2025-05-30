@@ -156,9 +156,9 @@ const getUniqueServers = async () => {
   }
 };
 
-const getMapIdByHash = async (hash) => {
+const getMapIdByHash = async (hash, server) => {
   try {
-    return await mapIdModel.getMapIdByHash(hash);
+    return await mapIdModel.getMapIdByHash(hash, server);
   } catch (error) {
     console.error('Error fetching map ID by hash:', error);
     throw error;

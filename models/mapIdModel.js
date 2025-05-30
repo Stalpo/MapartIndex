@@ -11,10 +11,10 @@ const getMapIdById = async (mapId) => {
   }
 };
 
-const getMapIdByHash = async (hash) => {
+const getMapIdByHash = async (hash, server) => {
   try {
     return await prisma.mapId.findFirst({
-      where: { hash }
+      where: { hash, server }
     });
   } catch (error) {
     console.error('Error in getMapIdByHash:', error);
