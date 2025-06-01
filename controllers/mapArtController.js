@@ -28,9 +28,9 @@ const countAllMapArts = async () => {
   }
 };
 
-const getMaps = async (page, perPage, user, artist, sort, server, tag) => {
+const getMaps = async (page, perPage, user, artist, sort, server, tag, collected, userId) => {
   try {
-    const maps = await mapArtModel.getMaps(page, perPage, user, artist, sort, server, tag);
+    const maps = await mapArtModel.getMaps(page, perPage, user, artist, sort, server, tag, collected, userId);
     return maps;
   } catch (error) {
     console.error('Error fetching maps:', error);

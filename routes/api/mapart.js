@@ -55,14 +55,15 @@ const mapArtController = require('../../controllers/mapArtController');
 router.get('/maps', async (req, res) => {
   try {
       // Extract query parameters
-      const { page, perPage, user, artist, sort, server, tag } = req.query;
+      const { page, perPage, user, artist, sort, server, tag, collected } = req.query;
+      const userId = res.locals.userId;
 
       // Convert page and perPage to integers (if provided)
       const pageNumber = page ? parseInt(page) : undefined;
       const mapsPerPage = perPage ? parseInt(perPage) : undefined;
 
       // Fetch maps based on pagination, filtering, and sorting criteria
-      const maps = await mapArtController.getMaps(pageNumber, mapsPerPage, user, artist, sort, server, tag);
+      const maps = await mapArtController.getMaps(pageNumber, mapsPerPage, user, artist, sort, server, tag, collected, userId);
 
       if (maps.length > 0) {
           return res.status(200).json(maps);

@@ -20,7 +20,7 @@ const getAllMapArts = async () => {
   }
 };
 
-const getMaps = async (page, perPage, user, artist, sort, server, tag) => {
+const getMaps = async (page, perPage, user, artist, sort, server, tag, collected, userId) => {
   try {
     const where = {};
 
@@ -41,6 +41,22 @@ const getMaps = async (page, perPage, user, artist, sort, server, tag) => {
       where.tags = {
         has: tag
       };
+    }
+    if (collected && userId) {
+      const profile = await prisma.profile.findUnique({
+        where: { userId }
+      });
+      const collectedMaps = profile.collected || [];
+
+      if (collected === "collected") {
+        where.id = {
+          in: collectedMaps
+        }
+      } else if (collected === "notcollected") {
+        where.id = {
+          notIn: collectedMaps
+        }
+      }
     }
 
     // Apply sorting criteria

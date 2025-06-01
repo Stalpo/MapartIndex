@@ -32,6 +32,9 @@ html
               select#sortSelector.form-control
           div.row
             div.col
+              select#collectedSelector.form-control
+          div.row
+            div.col
               select#viewSelector.form-control
                 option(value='smallGrid' selected='true') Thumbnails
                 option(value='grid') Cards
@@ -156,8 +159,30 @@ html
           $(sortSelector).selectpicker('refresh');
         }
 
+        async function populateCollectedSelector() {
+          const collectedSelector = document.getElementById('collectedSelector');
+
+          const collectedOptionNone = document.createElement('option');
+          collectedOptionNone.value = undefined;
+          collectedOptionNone.textContent = 'None';
+          collectedOptionNone.setAttribute('selected', true);
+          collectedSelector.appendChild(collectedOptionNone);
+
+          const collectedOptionCollected = document.createElement('option');
+          collectedOptionCollected.value = "collected";
+          collectedOptionCollected.textContent = 'Collected';
+          collectedSelector.appendChild(collectedOptionCollected);
+
+          const collectedOptionNotCollected = document.createElement('option');
+          collectedOptionNotCollected.value = 'notcollected';
+          collectedOptionNotCollected.textContent = 'Not Collected';
+          collectedSelector.appendChild(collectedOptionNotCollected);
+
+          $(sortSelector).selectpicker('refresh');
+        }
+
         // Function to handle API call with updated parameters
-        async function fetchMaps(page = 1, user = "", artist = "", sort = "dateDesc", view, server, tag) {
+        async function fetchMaps(page = 1, user = "", artist = "", sort = "dateDesc", view, server, tag, collected) {
           const perPage = 25;
           let url = `/api/mapArt/maps?page=${page}&perPage=${perPage}&sort=${sort}`;
           // Construct URL based on selected values
@@ -174,6 +199,9 @@ html
           }
           if (tag && tag !== "All Tags") {
             url += `&tag=${tag}`;
+          }
+          if (collected) {
+            url += `&collected=${collected}`;
           }
 
           // Show loading spinner
@@ -223,12 +251,13 @@ html
           const view = document.getElementById('viewSelector').value;
           const server = document.getElementById('serverSelector').value;
           const tag = document.getElementById('tagSelector').value;
+          const collected = document.getElementById('collectedSelector').value;
 
           // Clear the grid before fetching new data
           clearGrid();
 
           // Pass selected view type to fetchMaps
-          fetchMaps(1, user, artist, sort, view, server, tag);
+          fetchMaps(1, user, artist, sort, view, server, tag, collected);
         }
 
         // Function to clear the grid
@@ -355,7 +384,7 @@ html
           tag = document.getElementById('tagSelector').value;
           const lastGridElement = document.getElementById('gridContainer').lastElementChild;
           observer.unobserve(lastGridElement);
-          fetchMaps(currentPage, user, artist, sort, view, server, tag);
+          fetchMaps(currentPage, user, artist, sort, view, server, tag, collected);
         }
 
         // Call the function to populate selectors and fetch initial data when the page loads
@@ -365,6 +394,7 @@ html
           populateUserSelector();
           populateArtistSelector();
           populateSortSelector();
+          populateCollectedSelector();
           populateServerSelector();
           populateTagSelector();
           // Initial API call on page load
