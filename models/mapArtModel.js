@@ -343,7 +343,7 @@ const removeFavoriteMapArtId = async (userId, mapArtId) => {
   }
 };
 
- const isMapArtFavorite = async (userId, mapArtId) => {
+const isMapArtFavorite = async (userId, mapArtId) => {
   try {
     const profile = await prisma.profile.findUnique({ where: { userId: userId } });
     if (profile) {
@@ -354,6 +354,86 @@ const removeFavoriteMapArtId = async (userId, mapArtId) => {
     }
   } catch (error) {
     console.error('Error checking favorite status:', error);
+    throw error;
+  }
+}
+
+const setCollectedMapArtId = async (userId, mapArtId) => {
+  try {
+    const profile = await prisma.profile.findUnique({ where: { userId: userId } });
+    if (profile) {
+      let collected = profile.collected || [];
+
+      if (!collected.includes(mapArtId)) {
+        collected.push(mapArtId);
+
+        const updatedProfile = await prisma.user.update({
+          where: { id: userId },
+          data: {
+            Profile: {
+              update: {
+                collected: collected,
+              }
+            }
+          },
+        });
+
+        return updatedProfile;
+      } else {
+        throw new Error('That collected has already been saved');
+      }
+
+    } else {
+      throw new Error('That profile does not exist');
+    }
+  } catch (error) {
+    console.error('Error in setCollectedMapArtId:', error);
+  }
+};
+
+const removeCollectedMapArtId = async (userId, mapArtId) => {
+  try {
+    const profile = await prisma.profile.findUnique({ where: { userId: userId } });
+    if (profile) {
+      let collected = profile.collected || [];
+
+      if (collected.includes(mapArtId)) {
+        collected = collected.filter(fav => fav !== mapArtId);
+
+        const updatedProfile = await prisma.user.update({
+          where: { id: userId },
+          data: {
+            Profile: {
+              update: {
+                collected: collected,
+              }
+            }
+          },
+        });
+
+        return updatedProfile;
+      } else {
+        throw new Error('That collected does not exist');
+      }
+    } else {
+      throw new Error('That profile does not exist');
+    }
+  } catch (error) {
+    console.error('Error in removeCollectedMapArtId:', error);
+  }
+};
+
+const isMapArtCollected = async (userId, mapArtId) => {
+  try {
+    const profile = await prisma.profile.findUnique({ where: { userId: userId } });
+    if (profile) {
+      const collected = profile.collected || [];
+      return collected.includes(mapArtId);
+    } else {
+      throw new Error('Profile not found');
+    }
+  } catch (error) {
+    console.error('Error checking collected status:', error);
     throw error;
   }
 }
@@ -576,6 +656,9 @@ module.exports = {
   setFavoriteMapArtId,
   removeFavoriteMapArtId,
   isMapArtFavorite,
+  setCollectedMapArtId,
+  removeCollectedMapArtId,
+  isMapArtCollected,
   likeMapArtId,
   unlikeMapArtId,
   isMapArtIdLiked,

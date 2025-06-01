@@ -163,6 +163,33 @@ const isMapArtFavorite = async (userId, mapArtId) => {
   }
 }
 
+const setCollectedMapArtId = async (userId, mapId) => {
+  try {
+    return await mapArtModel.setCollectedMapArtId(userId, mapId);
+  } catch (error) {
+    console.error('Error setting collected mapart:', error);
+    throw error;
+  }
+};
+
+const removeCollectedMapArtId = async (userId, mapId) => {
+  try {
+    return await mapArtModel.removeCollectedMapArtId(userId, mapId);
+  } catch (error) {
+    console.error('Error setting collected mapart:', error);
+    throw error;
+  }
+};
+
+const isMapArtCollected = async (userId, mapArtId) => {
+  try {
+    return await mapArtModel.isMapArtCollected(userId, mapArtId);
+  } catch (error) {
+    console.error('Error checking collected status:', error);
+    throw error;
+  }
+}
+
 const likeMapArtId = async (userId, mapArtId) => {
   try {
     return await mapArtModel.likeMapArtId(userId, mapArtId);
@@ -255,6 +282,9 @@ module.exports = {
   setFavoriteMapArtId,
   removeFavoriteMapArtId,
   isMapArtFavorite,
+  setCollectedMapArtId,
+  removeCollectedMapArtId,
+  isMapArtCollected,
   likeMapArtId,
   unlikeMapArtId,
   isMapArtIdLiked,

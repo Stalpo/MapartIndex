@@ -45,6 +45,7 @@ model Profile {
   mcUuid    String?
   views     Int      @default(0)
   favorites String[]
+  collected String[]
 }
 
 model Server {

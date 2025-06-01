@@ -245,6 +245,57 @@ router.delete('/favorite/:id', async (req, res) => {
   }
 });
 
+router.get('/collect/:id', async (req, res) => {
+  try {
+    const mapId = req.params.id;
+    const userId = res.locals.userId;
+
+    // Check if the mapId is a collected for the user
+    const isCollected = await mapArtController.isMapArtCollected(userId, mapId);
+
+    res.status(200).json({ isCollected: isCollected });
+  } catch (error) {
+    console.error('Error checking collected status:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+router.post('/collect/:id', async (req, res) => {
+  try {
+    const mapId = req.params.id;
+    const userId = res.locals.userId;
+
+    // Sanitize mapId
+    const sanitizedMapId = validator.escape(validator.trim(mapId));
+
+    // Add collected
+    await mapArtController.setCollectedMapArtId(userId, sanitizedMapId);
+
+    res.status(200).send('Collected added successfully');
+  } catch (error) {
+    console.error('Error adding collected:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+router.delete('/collect/:id', async (req, res) => {
+  try {
+    const mapId = req.params.id;
+    const userId = res.locals.userId;
+
+    // Sanitize mapId
+    const sanitizedMapId = validator.escape(validator.trim(mapId));
+
+    // Remove collected
+    await mapArtController.removeCollectedMapArtId(userId, sanitizedMapId);
+
+    res.status(200).send('Collected removed successfully');
+  } catch (error) {
+    console.error('Error removing collected:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 router.post('/like/:id', async (req, res) => {
   try {
     const mapId = req.params.id;

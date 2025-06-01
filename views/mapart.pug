@@ -18,20 +18,6 @@ html
           a.btn.btn-primary(href=`/mapart/edit/${mapId}`) Visit Map Edit Page
 
       script.
-        function handleFavorite(mapId, action) {
-          const btn = document.querySelector('#favoriteButton');
-          const isCurrentlyFavorite = btn.textContent === 'Unfavorite';
-          const method = isCurrentlyFavorite ? 'DELETE' : 'POST';
-          fetch(`/mapart/favorite/${mapId}`, { method: method })
-            .then(response => {
-              if (!response.ok) {
-                throw new Error('Failed to perform action');
-              }
-              btn.textContent = isCurrentlyFavorite ? 'Favorite' : 'Unfavorite';
-            })
-            .catch(error => console.error('Error:', error));
-        }
-
         function handleLike(mapId, action) {
           const btn = document.querySelector('#likeButton');
           const isCurrentlyLiked = btn.textContent === 'Unlike';
@@ -48,6 +34,54 @@ html
               document.getElementById('likeCount').textContent = parseInt(data.mapArt.likedBy.length);
             })
             .catch(error => console.error('Error:', error));
+        }
+
+        function handleFavorite(mapId, action) {
+          const btn = document.querySelector('#favoriteButton');
+          const isCurrentlyFavorite = btn.textContent === 'Unfavorite';
+          const method = isCurrentlyFavorite ? 'DELETE' : 'POST';
+          fetch(`/mapart/favorite/${mapId}`, { method: method })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Failed to perform action');
+              }
+              btn.textContent = isCurrentlyFavorite ? 'Favorite' : 'Unfavorite';
+            })
+            .catch(error => console.error('Error:', error));
+        }
+        
+        function handleCollect(mapId, action) {
+          const btn = document.querySelector('#collectButton');
+          const isCurrentlyCollected = btn.textContent === 'Uncollect';
+          const method = isCurrentlyCollected ? 'DELETE' : 'POST';
+          fetch(`/mapart/collect/${mapId}`, { method: method })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Failed to perform action');
+              }
+              btn.textContent = isCurrentlyCollected ? 'Collect' : 'Uncollect';
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function checkLike(userId, mapId) {
+          const btn = document.querySelector('#likeButton');
+          if (!userId) {
+            btn.parentElement.style.display = 'none';
+            return 
+          };
+          fetch(`/mapart/like/${mapId}`)
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Failed to perform action');
+              }
+              return response.json();
+            })
+            .then(data => {
+              const btn = document.querySelector('#likeButton');
+              btn.textContent = data.isLiked ? 'Unlike' : 'Like';
+            })
+            .catch(error => console.error('Error checking like status:', error));
         }
 
         function checkFavorite(userId, mapId) {
@@ -70,13 +104,13 @@ html
             .catch(error => console.error('Error checking favorite status:', error));
         }
 
-        function checkLike(userId, mapId) {
-          const btn = document.querySelector('#likeButton');
+        function checkCollected(userId, mapId) {
+          const btn = document.querySelector('#collectButton');
           if (!userId) {
             btn.parentElement.style.display = 'none';
             return 
           };
-          fetch(`/mapart/like/${mapId}`)
+          fetch(`/mapart/collect/${mapId}`)
             .then(response => {
               if (!response.ok) {
                 throw new Error('Failed to perform action');
@@ -84,10 +118,10 @@ html
               return response.json();
             })
             .then(data => {
-              const btn = document.querySelector('#likeButton');
-              btn.textContent = data.isLiked ? 'Unlike' : 'Like';
+              const btn = document.querySelector('#collectButton');
+              btn.textContent = data.isCollected ? 'Uncollect' : 'Collect';
             })
-            .catch(error => console.error('Error checking like status:', error));
+            .catch(error => console.error('Error checking collected status:', error));
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -135,7 +169,7 @@ html
                         <li class="list-group-item">NSFW: ${map.nsfw}</li>
                         <li class="list-group-item">Views: ${map.views}</li>
                         <li class="list-group-item">Likes: <span id="likeCount">${map.likes}</span></li>
-                        <li class="list-group-item"><button class="btn btn-outline-success" id='likeButton' onclick="handleLike('${mapId}')">Like</button> <button class="btn btn-outline-primary" id='favoriteButton' onclick="handleFavorite('${mapId}', 'toggle')">Favorite</button></li>
+                        <li class="list-group-item"><button class="btn btn-outline-success" id='likeButton' onclick="handleLike('${mapId}')">Like</button> <button class="btn btn-outline-primary" id='favoriteButton' onclick="handleFavorite('${mapId}', 'toggle')">Favorite</button> <button class="btn btn-outline-success" id='collectButton' onclick="handleCollect('${mapId}', 'toggle')">Collect</button></li>
                       </ul>
                       <br> 
                       <h5><a href="javascript:void(0);" onclick="history.back()">Back</a></h5>
@@ -143,8 +177,9 @@ html
                   </div>
                 </div>`;
               mapContainer.innerHTML = mapInfo;
-              checkFavorite(userId, mapId);
               checkLike(userId, mapId);
+              checkFavorite(userId, mapId);
+              checkCollected(userId, mapId);
             })
             .catch(error => {
               console.error('Error fetching data:', error);
