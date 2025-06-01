@@ -58,9 +58,6 @@ router.get('/maps', async (req, res) => {
       const { page, perPage, user, artist, sort, server, tag, collected } = req.query;
       const userId = res.locals.userId;
 
-      console.log(collected);
-      console.log(userId);
-
       // Convert page and perPage to integers (if provided)
       const pageNumber = page ? parseInt(page) : undefined;
       const mapsPerPage = perPage ? parseInt(perPage) : undefined;
