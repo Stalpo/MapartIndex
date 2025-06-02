@@ -30,9 +30,10 @@ html
           div.row
             div.col
               select#sortSelector.form-control
-          div.row
-            div.col
-              select#collectedSelector.form-control
+          if username
+            div.row
+              div.col
+                select#collectedSelector.form-control
           div.row
             div.col
               select#viewSelector.form-control
@@ -251,7 +252,9 @@ html
           const view = document.getElementById('viewSelector').value;
           const server = document.getElementById('serverSelector').value;
           const tag = document.getElementById('tagSelector').value;
-          const collected = document.getElementById('collectedSelector').value;
+
+          const collectedSelector = document.getElementById('collectedSelector');
+          const collected = (collectedSelector !== null) ? collectedSelector.value : undefined;
 
           // Clear the grid before fetching new data
           clearGrid();
@@ -383,7 +386,10 @@ html
           view = document.getElementById('viewSelector').value;
           server = document.getElementById('serverSelector').value;
           tag = document.getElementById('tagSelector').value;
-          collected = document.getElementById('collectedSelector').value;
+          
+          collectedSelector = document.getElementById('collectedSelector');
+          collected = (collectedSelector !== null) ? collectedSelector.value : undefined;
+
           const lastGridElement = document.getElementById('gridContainer').lastElementChild;
           observer.unobserve(lastGridElement);
           fetchMaps(currentPage, user, artist, sort, view, server, tag, collected);
