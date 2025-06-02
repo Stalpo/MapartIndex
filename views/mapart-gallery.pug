@@ -161,7 +161,7 @@ html
         }
 
         async function populateCollectedSelector() {
-          const collectedSelector = document.getElementById('collectedSelector');
+          collectedSelector = document.getElementById('collectedSelector');
           if(collectedSelector === null) return;
 
           const collectedOptionNone = document.createElement('option');
@@ -278,7 +278,7 @@ html
         document.getElementById('serverSelector').addEventListener('change', handleSelectorsChange);
         document.getElementById('tagSelector').addEventListener('change', handleSelectorsChange);
 
-        const collectedSelector = document.getElementById('collectedSelector');
+        collectedSelector = document.getElementById('collectedSelector');
         if(collectedSelector) collectedSelector.addEventListener('change', handleSelectorsChange);
 
         // Function to build the grid
