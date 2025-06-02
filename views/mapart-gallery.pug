@@ -383,6 +383,7 @@ html
           view = document.getElementById('viewSelector').value;
           server = document.getElementById('serverSelector').value;
           tag = document.getElementById('tagSelector').value;
+          collected = document.getElementById('collectedSelector').value;
           const lastGridElement = document.getElementById('gridContainer').lastElementChild;
           observer.unobserve(lastGridElement);
           fetchMaps(currentPage, user, artist, sort, view, server, tag, collected);
