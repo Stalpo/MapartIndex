@@ -162,6 +162,7 @@ html
 
         async function populateCollectedSelector() {
           const collectedSelector = document.getElementById('collectedSelector');
+          if(collectedSelector === null) return;
 
           const collectedOptionNone = document.createElement('option');
           collectedOptionNone.value = undefined;
@@ -253,8 +254,8 @@ html
           const server = document.getElementById('serverSelector').value;
           const tag = document.getElementById('tagSelector').value;
 
-          const collectedSelector = document.getElementById('collectedSelector');
-          const collected = (collectedSelector !== null) ? collectedSelector.value : undefined;
+          collectedSelector = document.getElementById('collectedSelector');
+          collected = (collectedSelector !== null) ? collectedSelector.value : undefined;
 
           // Clear the grid before fetching new data
           clearGrid();
