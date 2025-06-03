@@ -407,16 +407,17 @@ router.get('/delete', async (req, res) => {
 
 router.post('/delete', async (req, res) => {
   try {
-    // Check if user is an admin and a moderator
-    if (!res.locals.admin && !res.locals.mod) {
-      return res.status(403).send('Forbidden');
-    }
-
     let mapId = req.query.mapId || req.body.mapId;
 
     // Sanitize mapId
     mapId = validator.trim(mapId);
     mapId = validator.escape(mapId);
+
+    // Check if user is an admin and a moderator
+    const map = await mapArtController.getMapById(mapId);
+    if (!res.locals.admin || (res.locals.mod && map.userId === res.locals.userId)) {
+      return res.status(403).send('Forbidden');
+    }
 
     // Delete the map
     await mapArtController.deleteMapById(mapId);

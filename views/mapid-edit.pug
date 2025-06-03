@@ -39,7 +39,7 @@ html
 
               // Submit button
               button#saveBtn.btn.btn-primary(type='button') Save Changes
-              if admin
+              if admin || (mod && map.userId === userId)
                 button#deleteBtn.btn.btn-primary(type='button') Delete
 
             .alert.alert-success#successMessage(style='text-align: center; display: none; margin-top: 10px;')

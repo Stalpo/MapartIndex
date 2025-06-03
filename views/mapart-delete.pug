@@ -6,7 +6,7 @@ html(lang="en")
     div.container.d-flex.align-items-center.justify-content-center
       div.col-md-8
         h1.text-center= pageTitle
-        if !admin && !mod
+        if !(admin || (mod && map.userId === userId))
           div.alert.alert-danger(role="alert")
             | You are not an administrator or a moderator
         else
