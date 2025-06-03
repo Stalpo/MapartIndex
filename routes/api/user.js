@@ -52,11 +52,11 @@ router.get('/maps', async (req, res) => {
  *      - User
  */
 router.get("/:id", async (req, res) => {
-    let { id } = req.params;
-    id = validator.trim(validator.escape(id)); // Sanitize id
-    const result = await profileController.getProfileById(id);
-    if (result) return res.status(200).json(result);
-    res.status(404).json({ error: "User id not found" });
+  let { id } = req.params;
+  id = validator.trim(validator.escape(id)); // Sanitize id
+  const result = await profileController.getProfileById(id);
+  if (result) return res.status(200).json(result);
+  res.status(404).json({ error: "User id not found" });
 });
 
 module.exports = router;

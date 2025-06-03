@@ -54,25 +54,75 @@ const mapArtController = require('../../controllers/mapArtController');
  */
 router.get('/maps', async (req, res) => {
   try {
-      // Extract query parameters
-      const { page, perPage, user, artist, sort, server, tag, collected } = req.query;
-      const userId = res.locals.userId;
+    // Extract query parameters
+    const { page, perPage, user, artist, sort, server, tag, collected } = req.query;
+    const userId = res.locals.userId;
 
-      // Convert page and perPage to integers (if provided)
-      const pageNumber = page ? parseInt(page) : undefined;
-      const mapsPerPage = perPage ? parseInt(perPage) : undefined;
+    // Convert page and perPage to integers (if provided)
+    const pageNumber = page ? parseInt(page) : undefined;
+    const mapsPerPage = perPage ? parseInt(perPage) : undefined;
 
-      // Fetch maps based on pagination, filtering, and sorting criteria
-      const maps = await mapArtController.getMaps(pageNumber, mapsPerPage, user, artist, sort, server, tag, collected, userId);
+    // Fetch maps based on pagination, filtering, and sorting criteria
+    const maps = await mapArtController.getMaps(pageNumber, mapsPerPage, user, artist, sort, server, tag, collected, userId);
 
-      if (maps.length > 0) {
-          return res.status(200).json(maps);
-      } else {
-          return res.status(404).json({ error: 'Maps not found' });
-      }
+    if (maps.length > 0) {
+      return res.status(200).json(maps);
+    } else {
+      return res.status(404).json({ error: 'Maps not found' });
+    }
   } catch (error) {
-      console.error('Error fetching maps:', error);
-      res.status(500).json({ error: 'Internal server error' });
+    console.error('Error fetching maps:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * @swagger
+ * /api/mapArt/mapscount:
+ *   get:
+ *     description: Returns the count of maps with filtering.
+ *     parameters:
+ *       - in: query
+ *         name: user
+ *         schema:
+ *           type: string
+ *         description: Filter maps by username.
+ *       - in: query
+ *         name: artist
+ *         schema:
+ *           type: string
+ *         description: Filter maps by artist.
+ *       - in: query
+ *         name: server
+ *         schema:
+ *           type: string
+ *         description: Filter maps by server.
+ *       - in: query
+ *         name: tag
+ *         schema:
+ *           type: string
+ *         description: Filter maps by tag.
+ *     responses:
+ *       200:
+ *         description: Returns the count of maps with filtering.
+ *       404:
+ *         description: Maps not found.
+ *     tags:
+ *     - Map Art
+ */
+router.get('/mapscount', async (req, res) => {
+  try {
+    // Extract query parameters
+    const { user, artist, server, tag, collected } = req.query;
+    const userId = res.locals.userId;
+
+    // Fetch maps based on pagination, filtering, and sorting criteria
+    const maps = await mapArtController.countMapArts(user, artist, server, tag, collected, userId);
+
+    return res.status(200).json(maps);
+  } catch (error) {
+    console.error('Error fetching maps count:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 

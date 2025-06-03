@@ -28,6 +28,16 @@ const countAllMapArts = async () => {
   }
 };
 
+const countMapArts = async (user, artist, server, tag, collected, userId) => {
+  try {
+    const count = await mapArtModel.countMapArts(user, artist, server, tag, collected, userId);
+    return count;
+  } catch (error) {
+    console.error('Error counting map arts:', error);
+    throw error;
+  }
+};
+
 const getMaps = async (page, perPage, user, artist, sort, server, tag, collected, userId) => {
   try {
     const maps = await mapArtModel.getMaps(page, perPage, user, artist, sort, server, tag, collected, userId);
@@ -271,6 +281,7 @@ module.exports = {
   getMaps,
   getMapById,
   countAllMapArts,
+  countMapArts,
   getUniqueArtists,
   getUniqueUsernames,
   getUniqueServers,

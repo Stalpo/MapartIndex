@@ -136,6 +136,35 @@ const getMaps = async (page, perPage, user, artist, sort, server) => {
   }
 };
 
+const countMaps = async (user, artist, server) => {
+  try {
+    const where = {};
+
+    // Apply filtering criteria
+    if (user) {
+      where.username = user;
+    }
+    if (artist) {
+      where.artist = {
+        contains: artist,
+        mode: 'insensitive'
+      };
+    }
+    if (server) {
+      where.server = server;
+    }
+
+    const count = await prisma.mapId.count({
+      where,
+    });
+
+    return count;
+  } catch (error) {
+    console.error('Error counting map IDs:', error);
+    throw error;
+  }
+};
+
 const countMapIdsByServer = async (server) => {
   try {
     const count = await prisma.mapId.count({
@@ -337,6 +366,7 @@ module.exports = {
   getAllMaps,
   getAllMapsForUserId,
   getMaps,
+  countMaps,
   countMapIdsByServer,
   countMapIdsByUserId,
   countMapIds,

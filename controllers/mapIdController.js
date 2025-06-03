@@ -37,6 +37,15 @@ const getMapByDisplayName = async (displayName) => {
   }
 };
 
+const countMaps = async (user, artist, server) => {
+  try {
+    return await mapIdModel.countMaps(user, artist, server);
+  } catch (error) {
+    console.error('Error counting map IDs:', error);
+    throw error;
+  }
+};
+
 const countMapIdsByServer = async (server) => {
   try {
     return await mapIdModel.countMapIdsByServer(server);
@@ -197,6 +206,7 @@ module.exports = {
   getMapByDisplayName,
   getAllMaps,
   getMaps,
+  countMaps,
   countMapIdsByServer,
   countMapIdsByUserId,
   countMapIds,

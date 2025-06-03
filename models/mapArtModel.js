@@ -141,6 +141,56 @@ const countAllMapArts = async () => {
   }
 };
 
+const countMapArts = async (user, artist, server, tag, collected, userId) => {
+  try {
+    const where = {};
+
+    // Apply filtering criteria
+    if (user) {
+      where.username = user;
+    }
+    if (artist) {
+      where.artist = {
+        contains: artist,
+        mode: 'insensitive'
+      };
+    }
+    if (server) {
+      where.server = server;
+    }
+    if (tag) {
+      where.tags = {
+        has: tag
+      };
+    }
+    if (collected && userId) {
+      const profile = await prisma.profile.findUnique({
+        where: { userId }
+      });
+      const collectedMaps = profile.collected || [];
+
+      if (collected === "collected") {
+        where.id = {
+          in: collectedMaps
+        }
+      } else if (collected === "notcollected") {
+        where.id = {
+          notIn: collectedMaps
+        }
+      }
+    }
+
+    const count = await prisma.mapArt.count({
+      where,
+    });
+
+    return count;
+  } catch (error) {
+    console.error('Error counting map arts:', error);
+    throw error;
+  }
+};
+
 const getMapById = async (mapId) => {
   try {
     return await prisma.mapArt.findUnique({
@@ -661,6 +711,7 @@ module.exports = {
   getAllMapArts,
   getMaps,
   countAllMapArts,
+  countMapArts,
   getMapById,
   getUniqueArtists,
   getUniqueUsernames,

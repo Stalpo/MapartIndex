@@ -41,6 +41,12 @@ html
                 option(value='grid') Cards
 
         hr
+
+      div.row.justify-content-center
+        div.col-auto
+          p#countDisplay Count: 0
+      hr
+
       script.
         // Function to fetch data from the API
         async function fetchData(url) {
@@ -244,6 +250,39 @@ html
           }
         }
 
+        async function fetchMapsCount(user = "", artist = "", server, tag, collected) {
+          let url = `/api/mapArt/mapscount?thing=1`;
+          // Construct URL based on selected values
+          if (user && user !== "All Uploaders") {
+            url += `&user=${user}`;
+          }
+          if (artist && artist !== "All Artists") {
+            url += `&artist=${artist}`;
+          }
+          if ("#{server}") {
+            url += `&server=#{server}`;
+          } else if (server && server !== "All Servers") {
+            url += `&server=${server}`;
+          }
+          if (tag && tag !== "All Tags") {
+            url += `&tag=${tag}`;
+          }
+          if (collected) {
+            url += `&collected=${collected}`;
+          }
+
+          try {
+            const response = await fetch(url);
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            document.getElementById('countDisplay').textContent = `Count: ${data}`;
+          } catch (error) {
+            console.error('Error fetching map count data:', error);
+          }
+        } 
+
         // Function to handle selector and view selector change events
         function handleSelectorsChange() {
           currentPage = 1; // Reset currentPage to 1
@@ -262,6 +301,7 @@ html
 
           // Pass selected view type to fetchMaps
           fetchMaps(1, user, artist, sort, view, server, tag, collected);
+          fetchMapsCount(user, artist, server, tag, collected);
         }
 
         // Function to clear the grid
@@ -410,6 +450,7 @@ html
           populateTagSelector();
           // Initial API call on page load
           fetchMaps();
+          fetchMapsCount();
         });
 
       // Grid container for images
