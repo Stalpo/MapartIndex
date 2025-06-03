@@ -415,7 +415,7 @@ router.post('/delete', async (req, res) => {
 
     // Check if user is an admin and a moderator
     const map = await mapArtController.getMapById(mapId);
-    if (!res.locals.admin || (res.locals.mod && map.userId === res.locals.userId)) {
+    if (!(res.locals.admin || (res.locals.mod && map.userId === res.locals.userId))) {
       return res.status(403).send('Forbidden');
     }
 
