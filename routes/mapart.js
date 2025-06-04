@@ -176,7 +176,7 @@ router.post('/edit/:id', mapArtUpload.none(), async (req, res) => {
     const sanitizedNsfw = validator.toBoolean(nsfw);
     const sanitizedName = validator.trim(name);
     const sanitizeDescription = validator.trim(description);
-    tags = JSON.parse(tags);
+    tags = JSON.parse(tags.toLowerCase());
 
     // Update map details, including MapArt data
     await mapArtController.updateMapById(mapId, {
