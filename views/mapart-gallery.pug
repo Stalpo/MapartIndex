@@ -325,6 +325,9 @@ html
 
           const imageColumn = document.querySelector('#tableContainer th:nth-child(4)');
           imageColumn.style.display = view === 'compactTable' ? 'none' : 'block';
+
+          const tableContainer = document.getElementById('tableContainer');
+          tableContainer.style.display = (view === 'table' || view === 'compactTable') ? 'block' : 'none';
         }
 
         // Attach event listeners to input selectors
@@ -465,7 +468,9 @@ html
           });
 
           const lastGridElement = document.getElementById('gridContainer').lastElementChild;
-          observer.observe(lastGridElement);
+          const lastTableElement = document.getElementById('tableContainerBody').lastElementChild;
+          if(lastGridElement) observer.observe(lastGridElement);
+          else if(lastTableElement) observer.observe(lastTableElement);
         }
 
         async function fetchNextPage() {
