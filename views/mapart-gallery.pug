@@ -423,7 +423,7 @@ html
               <td>${mapnumber}</td>
               <td><a href="/mapart/id/${map.id}" style="display: inline-block; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${map.name ? map.name : map.displayName}</a></td>
               <td>${map.server}</td>
-              ${compact ? "" : `<td><img src="/public/uploads/mapart/${map.imgUrl}" alt="Map Image" style="max-width: 100px; max-height: 100px;"></td>`}
+              ${compact ? "" : `<td><img src="/public/uploads/mapart/${map.imgUrl}" alt="Map Image" style="max-width: 100px; max-height: 100px;" class="${showNSFW === 'true' ? '' : (map.nsfw ? 'blurred' : '')}"></td>`}
               <td><a href="/search?query=${map.artist}" style="display: inline-block; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${map.artist}</a></td>
               <td>${map.size} (${map.width} x ${map.height})</td>
               <td style="max-width: 150px;">${map.tags.map(tag => `<a href="/search?query=${tag}"><span class="badge badge-secondary">${tag}</span></a>`).join(' ')}</td>
