@@ -112,8 +112,8 @@ html
         async function populateServerSelector() {
           try {
             const uniqueServers = await fetchData('/mapart/uniqueServers');
-            uniqueServers.unshift("All Servers");
             uniqueServers.sort();
+            uniqueServers.unshift("All Servers");
             let server = "#{server}";
             if(!server){
               populateSelect('serverSelector', uniqueServers, "All Servers");
