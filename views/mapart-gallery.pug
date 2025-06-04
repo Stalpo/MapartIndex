@@ -469,8 +469,8 @@ html
 
           const lastGridElement = document.getElementById('gridContainer').lastElementChild;
           const lastTableElement = document.getElementById('tableContainerBody').lastElementChild;
-          if(lastGridElement) observer.observe(lastGridElement);
-          else if(lastTableElement) observer.observe(lastTableElement);
+          if (lastGridElement) observer.observe(lastGridElement);
+          else if (lastTableElement) observer.observe(lastTableElement);
         }
 
         async function fetchNextPage() {
@@ -486,7 +486,9 @@ html
           collected = (collectedSelector !== null) ? collectedSelector.value : undefined;
 
           const lastGridElement = document.getElementById('gridContainer').lastElementChild;
-          observer.unobserve(lastGridElement);
+          const lastTableElement = document.getElementById('tableContainerBody').lastElementChild;
+          if (lastGridElement) observer.unobserve(lastGridElement);
+          else if (lastTableElement) observer.unobserve(lastTableElement);
           fetchMaps(currentPage, user, artist, sort, view, server, tag, collected);
         }
 
