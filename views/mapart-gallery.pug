@@ -39,6 +39,8 @@ html
               select#viewSelector.form-control
                 option(value='smallGrid' selected='true') Thumbnails
                 option(value='grid') Cards
+                option(value='table') Table
+                option(value='compactTable') Compact Table
       hr
 
       div.row.justify-content-center
@@ -234,6 +236,12 @@ html
               case 'grid':
                 buildGrid(data);
                 break;
+              case 'table':
+                buildTable(data, false);
+                break;
+              case 'compactTable':
+                buildTable(data, true);
+                break;
               default:
                 buildSmallGrid(data);
                 break;
@@ -297,6 +305,7 @@ html
 
           // Clear the grid before fetching new data
           clearGrid();
+          clearTable(view);
 
           // Pass selected view type to fetchMaps
           fetchMaps(1, user, artist, sort, view, server, tag, collected);
@@ -307,6 +316,15 @@ html
         function clearGrid() {
           const gridContainer = document.getElementById('gridContainer');
           gridContainer.innerHTML = '';
+        }
+
+        // Function to clear the table
+        function clearTable(view) {
+          const tableContainerBody = document.getElementById('tableContainerBody');
+          tableContainerBody.innerHTML = '';
+
+          const imageColumn = document.querySelector('#tableContainer th:nth-child(4)');
+          imageColumn.style.display = view === 'compactTable' ? 'none' : 'block';
         }
 
         // Attach event listeners to input selectors
@@ -384,6 +402,36 @@ html
           });
         }
 
+        // Function to build the table
+        function buildTable(maps, compact) {
+          const tableContainerBody = document.getElementById('tableContainerBody');
+
+          // Check if showNSFW cookie is true
+          const showNSFW = getCookie('showNSFW');
+
+          // Build table
+          maps.forEach(map => {
+            const newRow = document.createElement('tr');
+            newRow.className = 'vertical-center';
+            newRow.innerHTML = `
+              <td><a href="/mapart/id/${map.id}" class="card-link">${map.displayName}</a></td>
+              <td>${new Date(map.createdAt).toLocaleString('en-US')}</td>
+              <td>${map.username}</td>
+              ${compact ? "" : `<td><img src="${imgUrl}" alt="Map Image" style="max-width: 100px; max-height: 100px;"></td>`}
+              <td>${cleanedArtists}</td>
+              <td>${map.size} (${map.width} x ${map.height}</td>
+              <td>${map.tags.map(tag => `<a href="/search?query=${tag}"><span class="badge badge-secondary">${tag}</span></a>`).join(' ')}</td>
+              <td>${map.nsfw}</td>
+              <td>${map.views}</td>
+              <td>${map.likes}</td>
+            `;
+            // only show nsfw if user is logged in
+            if(getCookie('token') !== '' || !map.nsfw){
+              tableContainerBody.appendChild(newRow);
+            }
+          });
+        }
+
         // Function to get cookie value by name
         function getCookie(name) {
           const cookies = document.cookie.split(';');
@@ -454,6 +502,22 @@ html
 
       // Grid container for images
       div#gridContainer.row.mb-4
+
+      table#tableContainer.table.table-striped(style={display: 'none'})
+        thead
+          tr
+            th Display Name
+            th Created At
+            th Username
+            th Image
+            th Artist
+            th Size
+            th Tags
+            th NSFW
+            th Views
+            th Likes
+
+        tbody(id='tableContainerBody')
 
       // Keep loadingSpinner at bottom of page
       script.
