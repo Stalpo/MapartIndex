@@ -421,7 +421,7 @@ html
               <td>${new Date(map.createdAt).toLocaleString('en-US')}</td>
               <td>${map.username}</td>
               ${compact ? "" : `<td><img src="/public/uploads/mapart/${map.imgUrl}" alt="Map Image" style="max-width: 100px; max-height: 100px;"></td>`}
-              <td><a href="/search?query=${map.artist}">${map.artist} style="display: inline-block; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"</a></td>
+              <td><a href="/search?query=${map.artist}" style="display: inline-block; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${map.artist}</a></td>
               <td>${map.size} (${map.width} x ${map.height}</td>
               <td>${map.tags.map(tag => `<a href="/search?query=${tag}"><span class="badge badge-secondary">${tag}</span></a>`).join(' ')}</td>
               <td>${map.views}</td>
