@@ -421,6 +421,7 @@ html
             newRow.innerHTML = `
               <td>${mapnumber}</td>
               <td><a href="/mapart/id/${map.id}" style="display: inline-block; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${map.name ? map.name : map.displayName}</a></td>
+              <td>${map.server}</td>
               <td>${new Date(map.createdAt).toLocaleString('en-US').split(",")[0]}</td>
               <td>${map.username}</td>
               ${compact ? "" : `<td><img src="/public/uploads/mapart/${map.imgUrl}" alt="Map Image" style="max-width: 100px; max-height: 100px;"></td>`}
@@ -517,6 +518,7 @@ html
           tr
             th #
             th Name
+            th Server
             th Uploaded
             th Uploader
             th Image
