@@ -36,7 +36,7 @@
   display: block;
 }
 
-.nsfw .blurred {
+.blurred {
   width: 100%;
   filter: blur(100px);
 }
