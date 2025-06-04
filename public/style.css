@@ -41,6 +41,11 @@
   filter: blur(100px);
 }
 
+.smallblurred {
+  width: 100%;
+  filter: blur(20px);
+}
+
 .nsfw .image-wrapper {
   overflow: hidden;
   border: 1px solid #b6b6b6;
