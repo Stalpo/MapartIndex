@@ -408,22 +408,25 @@ html
         // Function to build the table
         function buildTable(maps, compact) {
           const tableContainerBody = document.getElementById('tableContainerBody');
+          let mapnumber = tableContainerBody.childElementCount;
 
           // Check if showNSFW cookie is true
           const showNSFW = getCookie('showNSFW');
 
           // Build table
           maps.forEach(map => {
+            mapnumber++;
             const newRow = document.createElement('tr');
             newRow.className = 'vertical-center';
             newRow.innerHTML = `
+              <td>${mapnumber}</td>
               <td><a href="/mapart/id/${map.id}" style="display: inline-block; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${map.name ? map.name : map.displayName}</a></td>
               <td>${new Date(map.createdAt).toLocaleString('en-US').split(",")[0]}</td>
               <td>${map.username}</td>
               ${compact ? "" : `<td><img src="/public/uploads/mapart/${map.imgUrl}" alt="Map Image" style="max-width: 100px; max-height: 100px;"></td>`}
               <td><a href="/search?query=${map.artist}" style="display: inline-block; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${map.artist}</a></td>
               <td>${map.size} (${map.width} x ${map.height})</td>
-              <td style="max-width: 200px;">${map.tags.map(tag => `<a href="/search?query=${tag}"><span class="badge badge-secondary">${tag}</span></a>`).join(' ')}</td>
+              <td style="max-width: 150px;">${map.tags.map(tag => `<a href="/search?query=${tag}"><span class="badge badge-secondary">${tag}</span></a>`).join(' ')}</td>
               <td>${map.views}</td>
               <td>${map.likes}</td>
             `;
@@ -512,8 +515,9 @@ html
       table#tableContainer.table.table-striped(style="display: 'none';")
         thead
           tr
+            th #
             th Name
-            th Upload On
+            th Uploaded
             th Uploader
             th Image
             th Artist
