@@ -263,7 +263,7 @@ html
               <div class="mb-3 mx-auto ${showNSFW === 'true' ? '' : (map.nsfw ? 'nsfw' : '')}">
                 <div class="image-wrapper">
                   <a href="/mapid/id/${map.id}" class="image-link">
-                    <img src="/public/uploads/${map.imgUrl}" class="pixelated-image ${showNSFW === 'true' ? '' : (map.nsfw ? '' : 'blurred')}" alt="Map Image">
+                    <img src="/public/uploads/${map.imgUrl}" class="pixelated-image ${showNSFW === 'true' ? '' : (map.nsfw ? 'blurred' : '')}" alt="Map Image">
                   </a>
                 </div>
               </div>
