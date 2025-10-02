@@ -23,7 +23,7 @@ const mapIdUpload = multer({
     }
   },
   limits: {
-    fileSize: 1024 * 1024 * 40, // 40 MB limit for mapArt images
+    fileSize: 1024 * 1024 * 80, // 40 MB limit for mapArt images
   },
 });
 
@@ -154,7 +154,7 @@ router.get('/create', async (req, res) => {
   }
 });
 
-router.post('/create', mapIdUpload.array('images', 4000), async (req, res) => {
+router.post('/create', mapIdUpload.array('images', 10000), async (req, res) => {
   try {
     // Check if user is an admin and a moderator
     if (!res.locals.admin && !res.locals.mod) {
