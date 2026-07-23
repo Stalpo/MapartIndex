@@ -67,8 +67,8 @@ nav.navbar.navbar-expand-lg.navbar-custom
               | Login
 
 script.
-  let host = window.location.host;
-  let subdomain = host.split('.')[0];
-  if(!(subdomain === "www") && !(subdomain === "mapartindex")){
+  let hostname = window.location.hostname;
+  let subdomain = hostname.endsWith('.mapartindex.com') ? hostname.slice(0, -'.mapartindex.com'.length) : null;
+  if(subdomain && subdomain !== "www"){
     document.getElementById("home").innerHTML = "MapartIndex Full Collection";
   }

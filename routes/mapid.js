@@ -4,7 +4,7 @@ const validator = require('validator');
 const multer = require('multer');
 const fs = require('fs');
 const crypto = require('crypto');
-const getPixels = require("get-pixels")
+const { PNG } = require("pngjs")
 
 // Required controllers
 const userController = require('../controllers/userController');
@@ -103,18 +103,20 @@ let s = 0;
 
 function loadImg(path) {
   return new Promise((resolve, reject) => {
-    getPixels(path, function(err, data) {
-      if(err) {
-        reject(err)
-      } else {
-        if(data.shape[0] != 128 || data.shape[1] != 128){
+    fs.createReadStream(path)
+      .pipe(new PNG())
+      .on('error', reject)
+      .on('parsed', function() {
+        if(this.width != 128 || this.height != 128){
           resolve([]);
+          return;
         }
         const shortData = [];
         for(let x = 0; x < 128; x++){
           for(let y = 0; y < 128; y++){
             // compress pixel 2d array with 3rd array for RGBA to just array of what color id it is
-            const short = data.get(x, y, 0) + (data.get(x, y, 1) << 8) + (data.get(x, y, 2) << 16) + (data.get(x, y, 3) << 24);
+            const idx = (this.width * y + x) << 2;
+            const short = this.data[idx] + (this.data[idx + 1] << 8) + (this.data[idx + 2] << 16) + (this.data[idx + 3] << 24);
             if(pixelDict[short] == null){
               pixelDict[short] = s;
               s++;
@@ -123,8 +125,7 @@ function loadImg(path) {
           }
         }
         resolve(shortData);
-      }
-    })
+      })
   });
 }
 

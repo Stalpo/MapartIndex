@@ -48,6 +48,16 @@ const getMaps = async (page, perPage, user, artist, sort, server, tag, collected
   }
 };
 
+const getRandomMaps = async (count, server) => {
+  try {
+    const maps = await mapArtModel.getRandomMaps(count, server);
+    return maps;
+  } catch (error) {
+    console.error('Error fetching random maps:', error);
+    throw error;
+  }
+};
+
 const getUniqueUsernames = async () => {
   try {
     const uniqueUsernames = await mapArtModel.getUniqueUsernames();
@@ -279,6 +289,7 @@ const getLatestServerIdByServer = async (server) => {
 module.exports = {
   getAllMapArts,
   getMaps,
+  getRandomMaps,
   getMapById,
   countAllMapArts,
   countMapArts,

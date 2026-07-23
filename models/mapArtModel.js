@@ -191,6 +191,32 @@ const countMapArts = async (user, artist, server, tag, collected, userId) => {
   }
 };
 
+const getRandomMaps = async (count, server) => {
+  try {
+    const match = { nsfw: { $ne: true } };
+    if (server) {
+      match.server = server;
+    }
+
+    const results = await prisma.mapArt.aggregateRaw({
+      pipeline: [
+        { $match: match },
+        { $sample: { size: count } },
+        { $project: { _id: 1, imgUrl: 1, nsfw: 1 } },
+      ],
+    });
+
+    return results.map((doc) => ({
+      id: doc._id,
+      imgUrl: doc.imgUrl,
+      nsfw: doc.nsfw,
+    }));
+  } catch (error) {
+    console.error('Error fetching random maps:', error);
+    throw error;
+  }
+};
+
 const getMapById = async (mapId) => {
   try {
     return await prisma.mapArt.findUnique({
@@ -710,6 +736,7 @@ const deleteMapById = async (mapId) => {
 module.exports = {
   getAllMapArts,
   getMaps,
+  getRandomMaps,
   countAllMapArts,
   countMapArts,
   getMapById,

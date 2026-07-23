@@ -221,6 +221,7 @@ html
             if (!response.ok) {
               if (response.status === 404) {
                 console.error('Likely last page of results');
+                return;
               } else {
                 throw new Error('Network response was not ok');
               }

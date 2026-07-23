@@ -19,13 +19,6 @@ const {
 const app = express();
 const PORT = 3000;
 
-// Controllers
-const userController = require('./controllers/userController');
-const serverController = require('./controllers/serverController');
-const visitController = require('./controllers/visitController');
-const mapIdController = require('./controllers/mapIdController');
-const mapArtController = require('./controllers/mapArtController');
-
 // View engine
 app.set('view engine', 'pug');
 app.locals.pretty = true;
@@ -86,40 +79,15 @@ const system = require('./routes/system');
 app.use('/system', system);
 
 // Index route
-app.get('/', async (req, res) => {
-  try {
-    let server = "";
-    if(req.subdomains.length != 0){
-      server = req.subdomains[0];
-    }
-    if(req.subdomains.length == 0 || server === "www"){
-      const totalMaps = (await mapIdController.countMapIds());
-      const totalMaparts = (await mapArtController.countAllMapArts());
-      const totalServers = (await mapIdController.getUniqueServers()).length;
-      
-      const totalVisits = (await visitController.countVisits());
-      const dailyVisits = (await visitController.countDailyVisits());
-      const totalUsers = (await userController.getAllUsers()).length;
-      const dailyUsers = (await visitController.countDailyUserVisits());
-
-      res.render('index', { totalMaps, totalMaparts, totalServers, totalVisits, dailyVisits, totalUsers, dailyUsers });
-    }else{
-      const totalMaps = (await mapIdController.countMapIdsByServer(server));
-      const totalMaparts = (await mapArtController.countMapIdsByServer(server));
-      const serverObj = (await serverController.getServerByName(server));
-      const { displayName, discord } = serverObj;
-
-      const totalVisits = (await visitController.countVisitsByServer(server));
-      const dailyVisits = (await visitController.countDailyVisitsByServer(server));
-      const totalUsers = (await visitController.countUserVisitsByServer(server));
-      const dailyUsers = (await visitController.countDailyUserVisitsByServer(server));
-
-      res.render('index', { server, displayName, discord, totalMaps, totalMaparts, totalVisits, dailyVisits, totalUsers, dailyUsers });
-    }
-  } catch(error) {
-    console.error('Error fetching statistics:', error);
-    res.render('index');
+app.get('/', (req, res) => {
+  let server = "";
+  if (req.subdomains.length != 0) {
+    server = req.subdomains[0];
   }
+  if (server === "www") {
+    server = "";
+  }
+  res.render('index', { server });
 });
 
 // About route

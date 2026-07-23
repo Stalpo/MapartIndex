@@ -128,6 +128,41 @@ router.get('/mapscount', async (req, res) => {
 
 /**
  * @swagger
+ * /api/mapArt/randomMaps:
+ *   get:
+ *     description: Returns a random sample of maps drawn uniformly from the entire matching set (excluding NSFW maps).
+ *     parameters:
+ *       - in: query
+ *         name: count
+ *         schema:
+ *           type: integer
+ *         description: Number of random maps to return (default 20, max 100).
+ *       - in: query
+ *         name: server
+ *         schema:
+ *           type: string
+ *         description: Filter maps by server.
+ *     responses:
+ *       200:
+ *         description: Returns a random sample of maps.
+ *     tags:
+ *     - Map Art
+ */
+router.get('/randomMaps', async (req, res) => {
+  try {
+    const { count, server } = req.query;
+    const sampleSize = Math.min(Math.max(parseInt(count) || 20, 1), 100);
+
+    const maps = await mapArtController.getRandomMaps(sampleSize, server);
+    res.status(200).json(maps);
+  } catch (error) {
+    console.error('Error fetching random maps:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * @swagger
  * /api/mapArt/{id}:
  *   get:
  *     description: Returns a map defined by the id provided.

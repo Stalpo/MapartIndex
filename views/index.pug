@@ -12,7 +12,7 @@ html
       }
 
     // Image Carousel Background
-    #imageCarousel.carousel.slide(data-ride='carousel', style='position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -1;')
+    #imageCarousel.carousel.slide(data-ride='carousel', data-wrap='false', style='position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -1;')
       .carousel-inner
 
     // Main Content
@@ -45,14 +45,13 @@ html
             span
               a.nav-link(href="/changelog")
                 | Changelog
-        else 
-          h1.display-4 Welcome to the #{displayName} Mapart Index!
+        else
+          h1.display-4 Welcome to the #[span.server-display-name= server] Mapart Index!
           p.lead
             | A collection hosted by the Mapart Index
-            if discord
-              span
-                a.nav-link(href=discord)
-                  | Join the #{displayName} Mapart discord!
+            span#serverDiscordContainer(style='display: none;')
+              a.nav-link#serverDiscordLink(href='#')
+                | Join the #[span.server-display-name= server] Mapart discord!
             span
               a.nav-link(href="https://discord.gg/4qKFjbUFuZ")
                 | Join the Mapart Index discord!
@@ -65,45 +64,43 @@ html
 
       // Stats Section
       .row.justify-content-center
-        if totalMaps
-          .col-md-3.mb-3
-            .card.border-primary.text-center
-              .card-header Total Maps
-              .card-body.text-primary
-                h5.card-title #{totalMaps}
-        if totalMaparts
-          .col-md-3.mb-3
-            .card.border-primary.text-center
-              .card-header Total Maparts
-              .card-body.text-primary
-                h5.card-title #{totalMaparts}
-        if totalServers
+        .col-md-3.mb-3
+          .card.border-primary.text-center
+            .card-header Total Maps
+            .card-body.text-primary
+              h5.card-title#totalMaps ...
+        .col-md-3.mb-3
+          .card.border-primary.text-center
+            .card-header Total Maparts
+            .card-body.text-primary
+              h5.card-title#totalMaparts ...
+        if !server
           .col-md-3.mb-3
             .card.border-primary.text-center
               .card-header Total Servers
               .card-body.text-primary
-                h5.card-title #{totalServers}
+                h5.card-title#totalServers ...
       .row.justify-content-center
         .col-md-3.mb-3
           .card.border-success.text-center
             .card-header Total Visits
             .card-body.text-success
-              h5.card-title #{totalVisits ? `${totalVisits}` : "0"}
+              h5.card-title#totalVisits ...
         .col-md-3.mb-3
           .card.border-success.text-center
             .card-header Daily Visits
             .card-body.text-success
-              h5.card-title #{dailyVisits ? `${dailyVisits}` : "0"}
+              h5.card-title#dailyVisits ...
         .col-md-3.mb-3
           .card.border-success.text-center
             .card-header Total Users
             .card-body.text-success
-              h5.card-title #{totalUsers ? `${totalUsers}` : "0"}
+              h5.card-title#totalUsers ...
         .col-md-3.mb-3
           .card.border-success.text-center
             .card-header Daily Users
             .card-body.text-success
-              h5.card-title #{dailyUsers ? `${dailyUsers}` : "0"}
+              h5.card-title#dailyUsers ...
       if !server
         .jumbotron.text-center
           h1.display-4 Partnered Servers
