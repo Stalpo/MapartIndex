@@ -4,7 +4,6 @@ const validator = require('validator');
 
 // Required controllers
 const userController = require('../controllers/userController');
-const visitController = require('../controllers/visitController');
 
 // Register route
 router.get('/register', (req, res) => {
@@ -57,12 +56,9 @@ router.post('/login', async (req, res) => {
 
   const lowercaseUsername = username.toLowerCase();
   const result = await userController.loginUser(lowercaseUsername, password);
-  
-  // Set cookie and update visit
+
   if (result.token) {
     res.cookie("token", result.token);
-
-    visitController.setVisitUsername(req.cookies.visitId, username);
   }
 
   return res.status(result.error ? 401 : 200).json(result);

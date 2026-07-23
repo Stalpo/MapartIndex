@@ -165,6 +165,22 @@ const updateAvatar = async (userId, avatar) => {
   }
 };
 
+const countDailyActiveUsers = async () => {
+  try {
+    const dayAgo = new Date(new Date().getTime() - 60 * 60 * 24 * 1000);
+    return await prisma.profile.count({
+      where: {
+        lastSeen: {
+          gte: dayAgo,
+        },
+      },
+    });
+  } catch (error) {
+    console.error('Error in countDailyActiveUsers:', error);
+    throw error;
+  }
+};
+
 const updateLinks = async (userId, links) => {
   try {
     return await prisma.profile.update({
@@ -190,4 +206,5 @@ module.exports = {
   updateBio,
   updateAvatar,
   updateLinks,
+  countDailyActiveUsers,
 };

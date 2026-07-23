@@ -143,6 +143,15 @@ const updateLinks = async (userId, links) => {
   }
 };
 
+const countDailyActiveUsers = async () => {
+  try {
+    return await profileModel.countDailyActiveUsers();
+  } catch (error) {
+    console.error('Error in countDailyActiveUsers:', error);
+    throw error;
+  }
+};
+
 const getAllMapsForUserId = async (userId) => {
   try {
     return await mapIdModel.getAllMapsForUserId(userId);
@@ -165,5 +174,6 @@ module.exports = {
   updateBio,
   updateAvatar,
   updateLinks,
+  countDailyActiveUsers,
   getAllMapsForUserId,
 };

@@ -108,8 +108,6 @@ fetch(`/api/stats${!subdomain2 ? "" : `?server=${subdomain2}`}`)
     setText('totalMaps', stats.totalMaps);
     setText('totalMaparts', stats.totalMaparts);
     setText('totalServers', stats.totalServers);
-    setText('totalVisits', stats.totalVisits);
-    setText('dailyVisits', stats.dailyVisits);
     setText('totalUsers', stats.totalUsers);
     setText('dailyUsers', stats.dailyUsers);
 

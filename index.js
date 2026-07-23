@@ -12,7 +12,6 @@ const {
   checkAdminStatus,
   checkModStatus,
   requestLogger,
-  updateVisitStats,
 } = require('./middleware');
 
 // Init express
@@ -36,7 +35,6 @@ app.use(checkUserStatus);
 app.use(checkAdminStatus);
 app.use(checkModStatus);
 app.use(requestLogger);
-app.use(updateVisitStats);
 
 // User Routes
 const userRoutes = require('./routes/user');

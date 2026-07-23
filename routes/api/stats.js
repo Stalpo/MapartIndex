@@ -3,8 +3,8 @@ const router = express.Router();
 const mapIdController = require('../../controllers/mapIdController');
 const mapArtController = require('../../controllers/mapArtController');
 const serverController = require('../../controllers/serverController');
-const visitController = require('../../controllers/visitController');
 const userController = require('../../controllers/userController');
+const profileController = require('../../controllers/profileController');
 
 /**
  * @swagger
@@ -28,43 +28,33 @@ router.get('/', async (req, res) => {
     const { server } = req.query;
 
     if (!server) {
-      const [totalMaps, totalMaparts, servers, totalVisits, dailyVisits, users, dailyUsers] = await Promise.all([
+      const [totalMaps, totalMaparts, servers, users, dailyUsers] = await Promise.all([
         mapIdController.countMapIds(),
         mapArtController.countAllMapArts(),
         mapIdController.getUniqueServers(),
-        visitController.countVisits(),
-        visitController.countDailyVisits(),
         userController.getAllUsers(),
-        visitController.countDailyUserVisits(),
+        profileController.countDailyActiveUsers(),
       ]);
 
       return res.json({
         totalMaps,
         totalMaparts,
         totalServers: servers.length,
-        totalVisits,
-        dailyVisits,
         totalUsers: users.length,
         dailyUsers,
       });
     }
 
-    const [totalMaps, totalMaparts, serverObj, totalVisits, dailyVisits, totalUsers, dailyUsers] = await Promise.all([
+    const [totalMaps, totalMaparts, serverObj, dailyUsers] = await Promise.all([
       mapIdController.countMapIdsByServer(server),
       mapArtController.countMapIdsByServer(server),
       serverController.getServerByName(server),
-      visitController.countVisitsByServer(server),
-      visitController.countDailyVisitsByServer(server),
-      visitController.countUserVisitsByServer(server),
-      visitController.countDailyUserVisitsByServer(server),
+      profileController.countDailyActiveUsers(),
     ]);
 
     res.json({
       totalMaps,
       totalMaparts,
-      totalVisits,
-      dailyVisits,
-      totalUsers,
       dailyUsers,
       displayName: serverObj ? serverObj.displayName : server,
       discord: serverObj ? serverObj.discord : null,
