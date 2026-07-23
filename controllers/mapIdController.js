@@ -183,6 +183,15 @@ const getMapsByOwnerId = async (ownerId) => {
   }
 };
 
+const fetchMapIdsMissingMapArt = async () => {
+  try {
+    return await mapIdModel.fetchMapIdsMissingMapArt();
+  } catch (error) {
+    console.error('Error fetching map ids missing map art:', error);
+    throw error;
+  }
+};
+
 const fetchLatestUpdatedAt = async (limit) => {
   try {
     return await mapIdModel.fetchLatestUpdatedAt(limit);
@@ -220,6 +229,7 @@ module.exports = {
   getUniqueServers,
   getMapIdByHash,
   getMapsByOwnerId,
+  fetchMapIdsMissingMapArt,
   fetchLatestUpdatedAt,
   getLatestServerIdByServer,
 };

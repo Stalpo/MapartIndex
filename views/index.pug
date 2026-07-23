@@ -25,9 +25,11 @@ html
           h4 Welcome back, #{username}!
           if admin || mod
             h6 Notes for moderators and admins
-            p New moderation helper tool for gathering 
+            p New moderation helper tool for gathering
               a(href="/mapart/missingInfo") missing metadata
-            
+            p Moderation helper tool for finding
+              a(href="/mapart/missingRefs") missing cross-references
+
       .jumbotron.text-center
         if logo
           img(src=logo)

@@ -8,6 +8,7 @@ const crypto = require('crypto');
 // Required controllers
 const userController = require('../controllers/userController');
 const mapArtController = require('../controllers/mapArtController');
+const mapIdController = require('../controllers/mapIdController');
 const serverController = require('../controllers/serverController');
 
 // Multer config
@@ -346,6 +347,18 @@ router.get('/missingInfo', async (req, res) => {
     const type = req.query.type;
     const missingInfo = await mapArtController.fetchMapsMissingInfo(type);
     res.render('mapart-missing', { missingInfo, type: type || 'all' });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+router.get('/missingRefs', async (req, res) => {
+  try {
+    const type = req.query.type === 'mapid' ? 'mapid' : 'mapart';
+    const missingRefs = type === 'mapid'
+      ? await mapIdController.fetchMapIdsMissingMapArt()
+      : await mapArtController.fetchMapArtsMissingMapIds();
+    res.render('mapart-missing-refs', { missingRefs, type });
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
   }

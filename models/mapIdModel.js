@@ -336,6 +336,25 @@ const getLatestServerIdByServer = async (server) => {
   }
 };
 
+const fetchMapIdsMissingMapArt = async () => {
+  try {
+    return await prisma.mapId.findMany({
+      where: {
+        OR: [
+          { mapId: null },
+          { mapId: { isSet: false } },
+        ],
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching map ids missing map art:', error);
+    throw error;
+  }
+};
+
 const fetchLatestUpdatedAt = async (limit) => {
   try {
     return await prisma.mapId.findMany({
@@ -377,6 +396,7 @@ module.exports = {
   getUniqueArtists,
   getUniqueServers,
   getLatestServerIdByServer,
+  fetchMapIdsMissingMapArt,
   fetchLatestUpdatedAt,
   deleteMapById,
 };

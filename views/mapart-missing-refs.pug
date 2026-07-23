@@ -1,0 +1,58 @@
+doctype html
+html
+  include includes/head.pug
+  body
+    include includes/navbar.pug
+
+    .container
+      h1.text-center Maps Missing Cross-References
+      hr
+      if !admin && !mod
+        div.alert.alert-danger(role="alert")
+          | You are not an administrator or a moderator
+      else
+        form(method='get', action='/mapart/missingRefs')
+          .form-group.text-center
+            label.sr-only(for='missingRefType') Filter by record type:
+            .input-group.mb-2.mr-sm-2
+              .input-group-prepend
+                .input-group-text Type
+              select#missingRefType.form-control(name='type')
+                option(value='mapart' selected=(type === 'mapart')) MapArts without any linked MapIds
+                option(value='mapid' selected=(type === 'mapid')) MapIds without a linked MapArt
+              .input-group-append
+                button.btn.btn-primary(type='submit') Filter
+
+        if missingRefs.length
+          .row
+            each map in missingRefs
+              .col-md-4
+                .card.mb-4.box-shadow
+                  if type === 'mapid'
+                    img.card-img-top(class=`pixelated-image` src=`/public/uploads/${map.imgUrl}`, alt=`Image for ${map.displayName || 'Unnamed Map'}`)
+                  else
+                    img.card-img-top(class=`pixelated-image` src=`/public/uploads/mapart/${map.imgUrl}`, alt=`Image for ${map.name || 'Unnamed Map'}`)
+                  .card-body
+                    h5.card-title #{map.name || map.displayName || 'No Name'}
+                    p.card-text Artist: #{map.artist || 'N/A'}
+                    p.card-text Server: #{map.server || 'N/A'}
+                    div.d-flex.justify-content-between.align-items-center
+                      div.btn-group
+                        if type === 'mapid'
+                          a.btn.btn-sm.btn-outline-secondary(href=`/mapid/id/${map.id}`) View
+                          if admin || mod
+                            a.btn.btn-sm.btn-outline-secondary(href=`/mapid/edit/${map.id}`) Edit
+                        else
+                          a.btn.btn-sm.btn-outline-secondary(href=`/mapart/id/${map.id}`) View
+                          if admin || mod
+                            a.btn.btn-sm.btn-outline-secondary(href=`/mapart/edit/${map.id}`) Edit
+                      small.text-muted #{new Date(map.createdAt).toLocaleDateString()}
+        else
+          .alert.alert-warning No records with missing cross-references found.
+
+    style.
+      .pixelated-image {
+        image-rendering: pixelated;
+      };
+
+    include includes/scripts.pug

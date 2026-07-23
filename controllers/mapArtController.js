@@ -132,6 +132,15 @@ const countMapIdsByServer = async (server) => {
   }
 };
 
+const fetchMapArtsMissingMapIds = async () => {
+  try {
+    return await mapArtModel.fetchMapArtsMissingMapIds();
+  } catch (error) {
+    console.error('Error fetching map arts missing map ids:', error);
+    throw error;
+  }
+};
+
 const updateMapById = async (mapId, { artist, name, description, nsfw, tags }) => {
   try {
     return await mapArtModel.updateMapById(mapId, {
@@ -312,6 +321,7 @@ module.exports = {
   isMapArtIdLiked,
   generateFilename,
   fetchMapsMissingInfo,
+  fetchMapArtsMissingMapIds,
   fetchLatestUpdatedAt,
   deleteMapById,
   getLatestServerIdByServer,
