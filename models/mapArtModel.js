@@ -651,7 +651,7 @@ const getLatestServerIdByServer = async (server) => {
   }
 };
 
-const fetchMapsMissingInfo = async (type) => {
+const fetchMapsMissingInfo = async (type, page, perPage) => {
   let whereClause = {};
 
   switch (type) {
@@ -697,11 +697,20 @@ const fetchMapsMissingInfo = async (type) => {
   }
 
   try {
+    let skip = 0;
+    let take = Number.MAX_SAFE_INTEGER;
+    if (page && perPage) {
+      skip = (page - 1) * perPage;
+      take = perPage;
+    }
+
     const maps = await prisma.mapArt.findMany({
       where: whereClause,
       orderBy: {
         createdAt: 'desc',
       },
+      skip,
+      take,
     });
     return maps;
   } catch (error) {
@@ -710,8 +719,15 @@ const fetchMapsMissingInfo = async (type) => {
   }
 };
 
-const fetchMapArtsMissingMapIds = async () => {
+const fetchMapArtsMissingMapIds = async (page, perPage) => {
   try {
+    let skip = 0;
+    let take = Number.MAX_SAFE_INTEGER;
+    if (page && perPage) {
+      skip = (page - 1) * perPage;
+      take = perPage;
+    }
+
     const maps = await prisma.mapArt.findMany({
       where: {
         mapIds: { none: {} },
@@ -719,6 +735,8 @@ const fetchMapArtsMissingMapIds = async () => {
       orderBy: {
         createdAt: 'desc',
       },
+      skip,
+      take,
     });
     return maps;
   } catch (error) {

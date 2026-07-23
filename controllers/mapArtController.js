@@ -132,9 +132,9 @@ const countMapIdsByServer = async (server) => {
   }
 };
 
-const fetchMapArtsMissingMapIds = async () => {
+const fetchMapArtsMissingMapIds = async (page, perPage) => {
   try {
-    return await mapArtModel.fetchMapArtsMissingMapIds();
+    return await mapArtModel.fetchMapArtsMissingMapIds(page, perPage);
   } catch (error) {
     console.error('Error fetching map arts missing map ids:', error);
     throw error;
@@ -259,9 +259,9 @@ const generateFilename = async (server) => {
   }
 };
 
-const fetchMapsMissingInfo = async (type) => {
+const fetchMapsMissingInfo = async (type, page, perPage) => {
   try {
-    return await mapArtModel.fetchMapsMissingInfo(type);
+    return await mapArtModel.fetchMapsMissingInfo(type, page, perPage);
   } catch (error) {
     console.error('Error finding maps missing info:', error);
     throw error;

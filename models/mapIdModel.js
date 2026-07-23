@@ -336,8 +336,15 @@ const getLatestServerIdByServer = async (server) => {
   }
 };
 
-const fetchMapIdsMissingMapArt = async () => {
+const fetchMapIdsMissingMapArt = async (page, perPage) => {
   try {
+    let skip = 0;
+    let take = Number.MAX_SAFE_INTEGER;
+    if (page && perPage) {
+      skip = (page - 1) * perPage;
+      take = perPage;
+    }
+
     return await prisma.mapId.findMany({
       where: {
         OR: [
@@ -348,6 +355,8 @@ const fetchMapIdsMissingMapArt = async () => {
       orderBy: {
         createdAt: 'desc',
       },
+      skip,
+      take,
     });
   } catch (error) {
     console.error('Error fetching map ids missing map art:', error);

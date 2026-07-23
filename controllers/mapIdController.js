@@ -183,9 +183,9 @@ const getMapsByOwnerId = async (ownerId) => {
   }
 };
 
-const fetchMapIdsMissingMapArt = async () => {
+const fetchMapIdsMissingMapArt = async (page, perPage) => {
   try {
-    return await mapIdModel.fetchMapIdsMissingMapArt();
+    return await mapIdModel.fetchMapIdsMissingMapArt(page, perPage);
   } catch (error) {
     console.error('Error fetching map ids missing map art:', error);
     throw error;

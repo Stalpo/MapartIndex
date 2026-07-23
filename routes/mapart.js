@@ -8,7 +8,6 @@ const crypto = require('crypto');
 // Required controllers
 const userController = require('../controllers/userController');
 const mapArtController = require('../controllers/mapArtController');
-const mapIdController = require('../controllers/mapIdController');
 const serverController = require('../controllers/serverController');
 
 // Multer config
@@ -40,7 +39,6 @@ router.get('/gallery', async (req, res) => {
   }
 });
 
-// MapArt route
 router.get('/create', async (req, res) => {
   let server = "";
   if(req.subdomains.length != 0){
@@ -120,7 +118,6 @@ router.get('/id/:id', async (req, res) => {
     let mapId = req.params.id;
     let userId = res.locals.userId;
 
-    // Sanitize mapId
     mapId = validator.trim(mapId);
     mapId = validator.escape(mapId);
 
@@ -143,7 +140,6 @@ router.get('/edit/:id', async (req, res) => {
   try {
     let mapId = req.params.id;
 
-    // Sanitize mapId
     mapId = validator.trim(mapId);
     mapId = validator.escape(mapId);
 
@@ -164,22 +160,19 @@ router.get('/edit/:id', async (req, res) => {
 
 router.post('/edit/:id', mapArtUpload.none(), async (req, res) => {
   try {
-    // Check if user is an admin and a moderator
     if (!res.locals.admin && !res.locals.mod) {
       return res.status(403).send('Forbidden');
     }
 
     let mapId = req.params.id;
-    let { artist, nsfw, name, description, tags  /* other fields as needed */ } = req.body;
+    let { artist, nsfw, name, description, tags } = req.body;
 
-    // Sanitize inputs
     const sanitizedArtist = validator.trim(artist);
     const sanitizedNsfw = validator.toBoolean(nsfw);
     const sanitizedName = validator.trim(name);
     const sanitizeDescription = validator.trim(description);
     tags = JSON.parse(tags.toLowerCase());
 
-    // Update map details, including MapArt data
     await mapArtController.updateMapById(mapId, {
       name: sanitizedName,
       artist: sanitizedArtist,
@@ -200,7 +193,6 @@ router.get('/favorite/:id', async (req, res) => {
     const mapId = req.params.id;
     const userId = res.locals.userId;
 
-    // Check if the mapId is a favorite for the user
     const isFavorite = await mapArtController.isMapArtFavorite(userId, mapId);
 
     res.status(200).json({ isFavorite: isFavorite });
@@ -215,10 +207,8 @@ router.post('/favorite/:id', async (req, res) => {
     const mapId = req.params.id;
     const userId = res.locals.userId;
 
-    // Sanitize mapId
     const sanitizedMapId = validator.escape(validator.trim(mapId));
 
-    // Add favorite
     await mapArtController.setFavoriteMapArtId(userId, sanitizedMapId);
 
     res.status(200).send('Favorite added successfully');
@@ -233,10 +223,8 @@ router.delete('/favorite/:id', async (req, res) => {
     const mapId = req.params.id;
     const userId = res.locals.userId;
 
-    // Sanitize mapId
     const sanitizedMapId = validator.escape(validator.trim(mapId));
 
-    // Remove favorite
     await mapArtController.removeFavoriteMapArtId(userId, sanitizedMapId);
 
     res.status(200).send('Favorite removed successfully');
@@ -251,7 +239,6 @@ router.get('/collect/:id', async (req, res) => {
     const mapId = req.params.id;
     const userId = res.locals.userId;
 
-    // Check if the mapId is a collected for the user
     const isCollected = await mapArtController.isMapArtCollected(userId, mapId);
 
     res.status(200).json({ isCollected: isCollected });
@@ -266,10 +253,8 @@ router.post('/collect/:id', async (req, res) => {
     const mapId = req.params.id;
     const userId = res.locals.userId;
 
-    // Sanitize mapId
     const sanitizedMapId = validator.escape(validator.trim(mapId));
 
-    // Add collected
     await mapArtController.setCollectedMapArtId(userId, sanitizedMapId);
 
     res.status(200).send('Collected added successfully');
@@ -284,10 +269,8 @@ router.delete('/collect/:id', async (req, res) => {
     const mapId = req.params.id;
     const userId = res.locals.userId;
 
-    // Sanitize mapId
     const sanitizedMapId = validator.escape(validator.trim(mapId));
 
-    // Remove collected
     await mapArtController.removeCollectedMapArtId(userId, sanitizedMapId);
 
     res.status(200).send('Collected removed successfully');
@@ -302,7 +285,6 @@ router.post('/like/:id', async (req, res) => {
     const mapId = req.params.id;
     const userId = res.locals.userId;
 
-    // Call controller function to add like
     const updatedMapArt = await mapArtController.likeMapArtId(userId, mapId);
 
     res.status(200).json({ message: 'Like added successfully', mapArt: updatedMapArt });
@@ -317,7 +299,6 @@ router.delete('/like/:id', async (req, res) => {
     const mapId = req.params.id;
     const userId = res.locals.userId;
 
-    // Call controller function to remove like
     const updatedMapArt = await mapArtController.unlikeMapArtId(userId, mapId);
 
     res.status(200).json({ message: 'Like removed successfully', mapArt: updatedMapArt });
@@ -332,7 +313,6 @@ router.get('/like/:id', async (req, res) => {
     const mapId = req.params.id;
     const userId = res.locals.userId;
 
-    // Call controller function to check if mapArtId is liked by userId
     const isLiked = await mapArtController.isMapArtIdLiked(userId, mapId);
 
     res.status(200).json({ isLiked });
@@ -345,8 +325,7 @@ router.get('/like/:id', async (req, res) => {
 router.get('/missingInfo', async (req, res) => {
   try {
     const type = req.query.type;
-    const missingInfo = await mapArtController.fetchMapsMissingInfo(type);
-    res.render('mapart-missing', { missingInfo, type: type || 'all' });
+    res.render('mapart-missing', { type: type || 'allbutdesc' });
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
@@ -355,10 +334,7 @@ router.get('/missingInfo', async (req, res) => {
 router.get('/missingRefs', async (req, res) => {
   try {
     const type = req.query.type === 'mapid' ? 'mapid' : 'mapart';
-    const missingRefs = type === 'mapid'
-      ? await mapIdController.fetchMapIdsMissingMapArt()
-      : await mapArtController.fetchMapArtsMissingMapIds();
-    res.render('mapart-missing-refs', { missingRefs, type });
+    res.render('mapart-missing-refs', { type });
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
@@ -400,12 +376,10 @@ router.get('/uniqueTags', async (req, res) => {
   }
 });
 
-// Delete mapArt route
 router.get('/delete', async (req, res) => {
   try {
     let mapId = req.query.mapId || req.body.mapId;
 
-    // Sanitize mapId
     mapId = validator.trim(mapId);
     mapId = validator.escape(mapId);
 
@@ -422,17 +396,14 @@ router.post('/delete', async (req, res) => {
   try {
     let mapId = req.query.mapId || req.body.mapId;
 
-    // Sanitize mapId
     mapId = validator.trim(mapId);
     mapId = validator.escape(mapId);
 
-    // Check if user is an admin and a moderator
     const map = await mapArtController.getMapById(mapId);
     if (!(res.locals.admin || (res.locals.mod && map.userId === res.locals.userId))) {
       return res.status(403).send('Forbidden');
     }
 
-    // Delete the map
     await mapArtController.deleteMapById(mapId);
 
     res.redirect('/admin');

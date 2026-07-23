@@ -78,6 +78,110 @@ router.get('/maps', async (req, res) => {
 
 /**
  * @swagger
+ * /api/mapArt/missingInfo:
+ *   get:
+ *     description: Returns a paginated list of MapArts missing metadata (moderator/admin only).
+ *     parameters:
+ *       - in: query
+ *         name: type
+ *         schema:
+ *           type: string
+ *           enum: [allbutdesc, all, name, artist, description, tags]
+ *         description: Which kind of missing info to filter by.
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Page number for pagination.
+ *       - in: query
+ *         name: perPage
+ *         schema:
+ *           type: integer
+ *         description: Number of maps per page.
+ *     responses:
+ *       200:
+ *         description: Returns a list of MapArts missing metadata.
+ *       401:
+ *         description: Unauthorized.
+ *       404:
+ *         description: Maps not found.
+ *     tags:
+ *     - Map Art
+ */
+router.get('/missingInfo', async (req, res) => {
+  try {
+    if (!res.locals.admin && !res.locals.mod) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const { type, page, perPage } = req.query;
+    const pageNumber = page ? parseInt(page) : undefined;
+    const mapsPerPage = perPage ? parseInt(perPage) : undefined;
+
+    const maps = await mapArtController.fetchMapsMissingInfo(type, pageNumber, mapsPerPage);
+
+    if (maps.length > 0) {
+      return res.status(200).json(maps);
+    } else {
+      return res.status(404).json({ error: 'Maps not found' });
+    }
+  } catch (error) {
+    console.error('Error fetching maps missing info:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * @swagger
+ * /api/mapArt/missingRefs:
+ *   get:
+ *     description: Returns a paginated list of MapArts with no linked MapIds (moderator/admin only).
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Page number for pagination.
+ *       - in: query
+ *         name: perPage
+ *         schema:
+ *           type: integer
+ *         description: Number of maps per page.
+ *     responses:
+ *       200:
+ *         description: Returns a list of MapArts with no linked MapIds.
+ *       401:
+ *         description: Unauthorized.
+ *       404:
+ *         description: Maps not found.
+ *     tags:
+ *     - Map Art
+ */
+router.get('/missingRefs', async (req, res) => {
+  try {
+    if (!res.locals.admin && !res.locals.mod) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const { page, perPage } = req.query;
+    const pageNumber = page ? parseInt(page) : undefined;
+    const mapsPerPage = perPage ? parseInt(perPage) : undefined;
+
+    const maps = await mapArtController.fetchMapArtsMissingMapIds(pageNumber, mapsPerPage);
+
+    if (maps.length > 0) {
+      return res.status(200).json(maps);
+    } else {
+      return res.status(404).json({ error: 'Maps not found' });
+    }
+  } catch (error) {
+    console.error('Error fetching map arts missing map ids:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * @swagger
  * /api/mapArt/mapscount:
  *   get:
  *     description: Returns the count of maps with filtering.
