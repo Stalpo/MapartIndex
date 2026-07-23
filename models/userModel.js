@@ -1,8 +1,8 @@
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID } = require('crypto');
 const db = require('../util/db');
 const prisma = db.prisma;
 
-const generateApiKey = () => uuidv4();
+const generateApiKey = () => randomUUID();
 
 const isAdmin = async (userId) => {
   try {
