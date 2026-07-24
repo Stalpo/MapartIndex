@@ -7,7 +7,10 @@ html
 
     div.container
       h1.text-center= pageTitle
+      h3.text-center= map.displayName
       hr
+      h5.text-center
+        a(href="javascript:void(0);", onclick="history.back()") Back
       if !admin && !mod
         div.alert.alert-danger(role="alert")
           | You are not an administrator or a moderator
