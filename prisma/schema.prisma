@@ -101,4 +101,6 @@ model MapId {
   hash         String
   nsfw         Boolean  @default(false)
   views        Int      @default(0)
+
+  @@index([mapId])
 }

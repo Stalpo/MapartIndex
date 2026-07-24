@@ -726,11 +726,20 @@ const countMapsMissingInfo = async (type) => {
   }
 };
 
+const getLinkedMapArtIds = async () => {
+  const linked = await prisma.mapId.findMany({
+    where: { mapId: { not: null } },
+    select: { mapId: true },
+  });
+  return linked.map((m) => m.mapId);
+};
+
 const countMapArtsMissingMapIds = async () => {
   try {
+    const linkedMapArtIds = await getLinkedMapArtIds();
     return await prisma.mapArt.count({
       where: {
-        mapIds: { none: {} },
+        id: { notIn: linkedMapArtIds },
       },
     });
   } catch (error) {
@@ -748,9 +757,10 @@ const fetchMapArtsMissingMapIds = async (page, perPage) => {
       take = perPage;
     }
 
+    const linkedMapArtIds = await getLinkedMapArtIds();
     const maps = await prisma.mapArt.findMany({
       where: {
-        mapIds: { none: {} },
+        id: { notIn: linkedMapArtIds },
       },
       orderBy: {
         createdAt: 'desc',
