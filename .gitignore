@@ -131,6 +131,7 @@ dist
 
 .idea/
 /prisma/src/
+/backups/
 public/uploads/*.png
 public/uploads/*.jpg
 public/uploads/tmp/*.png
