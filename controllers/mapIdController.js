@@ -192,6 +192,15 @@ const fetchMapIdsMissingMapArt = async (page, perPage) => {
   }
 };
 
+const countMapIdsMissingMapArt = async () => {
+  try {
+    return await mapIdModel.countMapIdsMissingMapArt();
+  } catch (error) {
+    console.error('Error counting map ids missing map art:', error);
+    throw error;
+  }
+};
+
 const fetchLatestUpdatedAt = async (limit) => {
   try {
     return await mapIdModel.fetchLatestUpdatedAt(limit);
@@ -230,6 +239,7 @@ module.exports = {
   getMapIdByHash,
   getMapsByOwnerId,
   fetchMapIdsMissingMapArt,
+  countMapIdsMissingMapArt,
   fetchLatestUpdatedAt,
   getLatestServerIdByServer,
 };

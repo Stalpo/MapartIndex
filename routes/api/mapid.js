@@ -156,6 +156,33 @@ router.get('/missingRefs', async (req, res) => {
 
 /**
  * @swagger
+ * /api/mapId/missingRefsCount:
+ *   get:
+ *     description: Returns the total count of MapIds with no linked MapArt (moderator/admin only).
+ *     responses:
+ *       200:
+ *         description: Returns the total count of matching MapIds.
+ *       401:
+ *         description: Unauthorized.
+ *     tags:
+ *     - Map ID
+ */
+router.get('/missingRefsCount', async (req, res) => {
+  try {
+    if (!res.locals.admin && !res.locals.mod) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const count = await mapIdController.countMapIdsMissingMapArt();
+    return res.status(200).json(count);
+  } catch (error) {
+    console.error('Error counting map ids missing map art:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * @swagger
  * /api/mapId/mapscount:
  *   get:
  *     description: Returns the count of maps with filtering.

@@ -49,6 +49,8 @@ html
               }
             });
 
+        h2#countDisplay.text-center Count: ...
+
         #emptyState.alert.alert-warning(style="display: none;") Maps with complete info or no records found.
 
         .row#gridContainer.mb-4
@@ -148,7 +150,24 @@ html
             }
           }
 
+          async function fetchCount() {
+            const countDisplay = document.getElementById('countDisplay');
+            try {
+              const url = `/api/mapArt/missingInfoCount?type=${encodeURIComponent(missingType)}`;
+              const response = await fetch(url);
+              if (!response.ok) {
+                throw new Error('Network response was not ok');
+              }
+              const count = await response.json();
+              countDisplay.textContent = `Count: ${count}`;
+            } catch (error) {
+              console.error('Error fetching missing info count:', error);
+              countDisplay.textContent = 'Count: unknown';
+            }
+          }
+
           fetchNextPage();
+          fetchCount();
 
     style.
       .pixelated-image {

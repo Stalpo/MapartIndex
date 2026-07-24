@@ -182,6 +182,67 @@ router.get('/missingRefs', async (req, res) => {
 
 /**
  * @swagger
+ * /api/mapArt/missingInfoCount:
+ *   get:
+ *     description: Returns the total count of MapArts missing metadata (moderator/admin only).
+ *     parameters:
+ *       - in: query
+ *         name: type
+ *         schema:
+ *           type: string
+ *           enum: [allbutdesc, all, name, artist, description, tags]
+ *         description: Which kind of missing info to filter by.
+ *     responses:
+ *       200:
+ *         description: Returns the total count of matching MapArts.
+ *       401:
+ *         description: Unauthorized.
+ *     tags:
+ *     - Map Art
+ */
+router.get('/missingInfoCount', async (req, res) => {
+  try {
+    if (!res.locals.admin && !res.locals.mod) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const count = await mapArtController.countMapsMissingInfo(req.query.type);
+    return res.status(200).json(count);
+  } catch (error) {
+    console.error('Error counting maps missing info:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * @swagger
+ * /api/mapArt/missingRefsCount:
+ *   get:
+ *     description: Returns the total count of MapArts with no linked MapIds (moderator/admin only).
+ *     responses:
+ *       200:
+ *         description: Returns the total count of matching MapArts.
+ *       401:
+ *         description: Unauthorized.
+ *     tags:
+ *     - Map Art
+ */
+router.get('/missingRefsCount', async (req, res) => {
+  try {
+    if (!res.locals.admin && !res.locals.mod) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const count = await mapArtController.countMapArtsMissingMapIds();
+    return res.status(200).json(count);
+  } catch (error) {
+    console.error('Error counting map arts missing map ids:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * @swagger
  * /api/mapArt/mapscount:
  *   get:
  *     description: Returns the count of maps with filtering.

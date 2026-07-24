@@ -141,6 +141,15 @@ const fetchMapArtsMissingMapIds = async (page, perPage) => {
   }
 };
 
+const countMapArtsMissingMapIds = async () => {
+  try {
+    return await mapArtModel.countMapArtsMissingMapIds();
+  } catch (error) {
+    console.error('Error counting map arts missing map ids:', error);
+    throw error;
+  }
+};
+
 const updateMapById = async (mapId, { artist, name, description, nsfw, tags }) => {
   try {
     return await mapArtModel.updateMapById(mapId, {
@@ -268,6 +277,15 @@ const fetchMapsMissingInfo = async (type, page, perPage) => {
   }
 }
 
+const countMapsMissingInfo = async (type) => {
+  try {
+    return await mapArtModel.countMapsMissingInfo(type);
+  } catch (error) {
+    console.error('Error counting maps missing info:', error);
+    throw error;
+  }
+}
+
 const fetchLatestUpdatedAt = async (limit) => {
   try {
     return await mapArtModel.fetchLatestUpdatedAt(limit);
@@ -321,7 +339,9 @@ module.exports = {
   isMapArtIdLiked,
   generateFilename,
   fetchMapsMissingInfo,
+  countMapsMissingInfo,
   fetchMapArtsMissingMapIds,
+  countMapArtsMissingMapIds,
   fetchLatestUpdatedAt,
   deleteMapById,
   getLatestServerIdByServer,

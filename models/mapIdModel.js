@@ -336,6 +336,22 @@ const getLatestServerIdByServer = async (server) => {
   }
 };
 
+const countMapIdsMissingMapArt = async () => {
+  try {
+    return await prisma.mapId.count({
+      where: {
+        OR: [
+          { mapId: null },
+          { mapId: { isSet: false } },
+        ],
+      },
+    });
+  } catch (error) {
+    console.error('Error counting map ids missing map art:', error);
+    throw error;
+  }
+};
+
 const fetchMapIdsMissingMapArt = async (page, perPage) => {
   try {
     let skip = 0;
@@ -406,6 +422,7 @@ module.exports = {
   getUniqueServers,
   getLatestServerIdByServer,
   fetchMapIdsMissingMapArt,
+  countMapIdsMissingMapArt,
   fetchLatestUpdatedAt,
   deleteMapById,
 };

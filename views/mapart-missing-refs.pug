@@ -23,6 +23,8 @@ html
               .input-group-append
                 button.btn.btn-primary(type='submit') Filter
 
+        h2#countDisplay.text-center Count: ...
+
         #emptyState.alert.alert-warning(style="display: none;") No records with missing cross-references found.
 
         .row#gridContainer.mb-4
@@ -128,7 +130,24 @@ html
             }
           }
 
+          async function fetchCount() {
+            const countDisplay = document.getElementById('countDisplay');
+            try {
+              const endpoint = missingRefType === 'mapid' ? '/api/mapId/missingRefsCount' : '/api/mapArt/missingRefsCount';
+              const response = await fetch(endpoint);
+              if (!response.ok) {
+                throw new Error('Network response was not ok');
+              }
+              const count = await response.json();
+              countDisplay.textContent = `Count: ${count}`;
+            } catch (error) {
+              console.error('Error fetching missing refs count:', error);
+              countDisplay.textContent = 'Count: unknown';
+            }
+          }
+
           fetchNextPage();
+          fetchCount();
 
     style.
       .pixelated-image {

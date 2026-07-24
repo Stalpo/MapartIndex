@@ -651,29 +651,23 @@ const getLatestServerIdByServer = async (server) => {
   }
 };
 
-const fetchMapsMissingInfo = async (type, page, perPage) => {
-  let whereClause = {};
-
+const buildMissingInfoWhereClause = (type) => {
   switch (type) {
     case 'name':
-      whereClause = { 
+      return {
         OR: [
           { name: "" },
           { name: { isSet: false } },
-        ], 
+        ],
       };
-      break;
     case 'artist':
-      whereClause = { artist: "N/A" };
-      break;
+      return { artist: "N/A" };
     case 'description':
-      whereClause = { description: "" };
-      break;
+      return { description: "" };
     case 'tags':
-      whereClause = { tags: { equals: [] } };
-      break;
+      return { tags: { equals: [] } };
     case 'all':
-      whereClause = { 
+      return {
         OR: [
           { name: "" },
           { name: { isSet: false } },
@@ -682,10 +676,9 @@ const fetchMapsMissingInfo = async (type, page, perPage) => {
           { tags: { equals: [] } },
         ],
       };
-      break;
     default:
       // all but desc
-      whereClause = {
+      return {
         OR: [
           { name: "" },
           { name: { isSet: false } },
@@ -693,8 +686,11 @@ const fetchMapsMissingInfo = async (type, page, perPage) => {
           { tags: { equals: [] } },
         ],
       };
-      break;
   }
+};
+
+const fetchMapsMissingInfo = async (type, page, perPage) => {
+  const whereClause = buildMissingInfoWhereClause(type);
 
   try {
     let skip = 0;
@@ -715,6 +711,30 @@ const fetchMapsMissingInfo = async (type, page, perPage) => {
     return maps;
   } catch (error) {
     console.error('Error fetching maps with missing information:', error);
+    throw error;
+  }
+};
+
+const countMapsMissingInfo = async (type) => {
+  const whereClause = buildMissingInfoWhereClause(type);
+
+  try {
+    return await prisma.mapArt.count({ where: whereClause });
+  } catch (error) {
+    console.error('Error counting maps with missing information:', error);
+    throw error;
+  }
+};
+
+const countMapArtsMissingMapIds = async () => {
+  try {
+    return await prisma.mapArt.count({
+      where: {
+        mapIds: { none: {} },
+      },
+    });
+  } catch (error) {
+    console.error('Error counting map arts missing map ids:', error);
     throw error;
   }
 };
@@ -794,7 +814,9 @@ module.exports = {
   countMapIdsByServer,
   getLatestServerIdByServer,
   fetchMapsMissingInfo,
+  countMapsMissingInfo,
   fetchMapArtsMissingMapIds,
+  countMapArtsMissingMapIds,
   fetchLatestUpdatedAt,
   deleteMapById,
 };
