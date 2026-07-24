@@ -32,6 +32,7 @@ html
               select#viewSelector.form-control
                 option(value='smallGrid' selected='true') Thumbnails
                 option(value='grid') Cards
+                option(value='table') Table
                 option(value='carousel') Carousel
           div.row#carouselSpeedRow(style='display:none')
             div.col
@@ -191,6 +192,9 @@ html
               case 'grid':
                 buildGrid(data);
                 break;
+              case 'table':
+                buildTable(data);
+                break;
               case 'carousel':
                 buildCarousel(data);
                 break;
@@ -254,6 +258,7 @@ html
 
           // Clear the grid before fetching new data
           clearGrid();
+          clearTable(view);
           clearCarousel(view);
 
           // Pass selected view type to fetchMaps
@@ -265,6 +270,15 @@ html
         function clearGrid() {
           const gridContainer = document.getElementById('gridContainer');
           gridContainer.innerHTML = '';
+        }
+
+        // Function to clear the table
+        function clearTable(view) {
+          const tableContainerBody = document.getElementById('tableContainerBody');
+          tableContainerBody.innerHTML = '';
+
+          const tableContainer = document.getElementById('tableContainer');
+          tableContainer.style.display = view === 'table' ? 'table' : 'none';
         }
 
         // Function to clear the carousel
@@ -352,6 +366,37 @@ html
             // only show nsfw if user is logged in
             if(getCookie('token') !== '' || !map.nsfw){
               gridContainer.appendChild(card);
+            }
+          });
+        }
+
+        // Function to build the table
+        function buildTable(maps) {
+          const tableContainerBody = document.getElementById('tableContainerBody');
+          let mapnumber = tableContainerBody.childElementCount;
+
+          // Check if showNSFW cookie is true
+          const showNSFW = getCookie('showNSFW');
+
+          // Build table
+          maps.forEach(map => {
+            mapnumber++;
+            const newRow = document.createElement('tr');
+            newRow.className = 'vertical-center';
+            const mapArtCell = map.mapArt
+              ? `<a href="/mapart/id/${map.mapArt.id}">${map.mapArt.name ? map.mapArt.name : map.mapArt.displayName}</a>`
+              : '';
+            newRow.innerHTML = `
+              <td>${mapnumber}</td>
+              <td>${map.displayName ? map.displayName : ''}</td>
+              <td>${map.server}</td>
+              <td><img src="/public/uploads/${map.imgUrl}" alt="Map Image" style="max-width: 100px; max-height: 100px;" class="pixelated-image ${showNSFW === 'true' ? '' : (map.nsfw ? 'smallblurred' : '')}"></td>
+              <td>${mapArtCell}</td>
+              <td>${map.views}</td>
+            `;
+            // only show nsfw if user is logged in
+            if(getCookie('token') !== '' || !map.nsfw){
+              tableContainerBody.appendChild(newRow);
             }
           });
         }
@@ -458,7 +503,9 @@ html
           });
 
           const lastGridElement = document.getElementById('gridContainer').lastElementChild;
+          const lastTableElement = document.getElementById('tableContainerBody').lastElementChild;
           if (lastGridElement) observer.observe(lastGridElement);
+          else if (lastTableElement) observer.observe(lastTableElement);
         }
 
         async function fetchNextPage() {
@@ -470,7 +517,9 @@ html
           view = document.getElementById('viewSelector').value;
           server = document.getElementById('serverSelector').value;
           const lastGridElement = document.getElementById('gridContainer').lastElementChild;
+          const lastTableElement = document.getElementById('tableContainerBody').lastElementChild;
           if (lastGridElement) observer.unobserve(lastGridElement);
+          else if (lastTableElement) observer.unobserve(lastTableElement);
           await fetchMaps(currentPage, user, artist, sort, view, server, randomSeed);
         }
 
@@ -531,6 +580,18 @@ html
 
       // Grid container for images
       div#gridContainer.row.mb-4
+
+      table#tableContainer.table.table-striped(style='display: none;')
+        thead
+          tr
+            th #
+            th Name
+            th Server
+            th Image
+            th Mapart
+            th Views
+
+        tbody(id='tableContainerBody')
 
       div#carouselContainer.carousel.slide.mb-4(style='display:none; position: relative;')
         .carousel-inner

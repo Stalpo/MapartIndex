@@ -3,15 +3,20 @@ const { sortIdsByRandomSeed } = require('../util/deterministicRandom');
 
 // MapId has no nsfw field of its own - it always mirrors its linked MapArt's nsfw (false if it
 // isn't linked to one). These turn a MapId record fetched with `include: { map: { select: {
-// nsfw: true } } }` into the shape callers/templates expect (a plain `nsfw` boolean, no nested
-// `map` object leaking into API responses that never exposed one before).
+// nsfw: true, id: true, name: true, displayName: true } } }` into the shape callers/templates
+// expect (a plain `nsfw` boolean plus a lightweight `mapArt` summary, no raw `map` object leaking
+// into API responses).
 const withDerivedNsfw = (mapId) => {
   if (!mapId) return mapId;
   const { map, ...rest } = mapId;
-  return { ...rest, nsfw: map ? map.nsfw : false };
+  return {
+    ...rest,
+    nsfw: map ? map.nsfw : false,
+    mapArt: map ? { id: map.id, name: map.name, displayName: map.displayName } : null,
+  };
 };
 const withDerivedNsfwMany = (mapIds) => mapIds.map(withDerivedNsfw);
-const NSFW_SOURCE_INCLUDE = { map: { select: { nsfw: true } } };
+const NSFW_SOURCE_INCLUDE = { map: { select: { nsfw: true, id: true, name: true, displayName: true } } };
 
 const getMapIdById = async (mapId) => {
   try {

@@ -353,7 +353,7 @@ html
           imageColumn.style.display = view === 'compactTable' ? 'none' : 'block';
 
           const tableContainer = document.getElementById('tableContainer');
-          tableContainer.style.display = (view === 'table' || view === 'compactTable') ? 'block' : 'none';
+          tableContainer.style.display = (view === 'table' || view === 'compactTable') ? 'table' : 'none';
         }
 
         // Function to clear the carousel
@@ -681,7 +681,7 @@ html
           span.carousel-control-next-icon(aria-hidden='true')
           span.sr-only Next
 
-      table#tableContainer.table.table-striped(style="display: 'none';")
+      table#tableContainer.table.table-striped(style='display: none;')
         thead
           tr
             th #
