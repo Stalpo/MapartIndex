@@ -1,0 +1,195 @@
+doctype html
+html(lang="en")
+  include includes/head.pug
+  body
+    include includes/navbar.pug
+    div.container
+      h1.text-center Delete MapId Range
+      h5.text-center
+        a(href="javascript:void(0);", onclick="history.back()") Back
+      hr
+
+      if !admin
+        div.alert.alert-danger(role="alert")
+          | You are not an administrator. Only administrators can delete a range of MapIds.
+      else
+        div.row
+          div.col-md-8.offset-md-2
+            p.text-center.text-muted
+              | Enter two MapId display names from the same server. Every MapId with a sequential id
+              |  between and including those two will be found so you can review and confirm deletion.
+
+            div.mb-3.form-group
+              label(for='rangeStart') From (MapId display name)
+              input#rangeStart.form-control(type='text', value=startDisplayName, placeholder='e.g. 2b2t_100')
+
+            div.mb-3.form-group
+              label(for='rangeEnd') To (MapId display name)
+              input#rangeEnd.form-control(type='text', placeholder='e.g. 2b2t_150')
+
+            .text-center.mb-3
+              button#searchBtn.btn.btn-outline-primary(type='button') Find Range
+
+            .alert.alert-danger#searchError(style='display: none; text-align: center;')
+
+            #searchLoadingSpinner.text-center.mt-3(style='display: none;')
+              i.fa.fa-spinner.fa-spin.fa-2x
+
+            #resultsSection(style='display: none;')
+              hr
+              h5.text-center#resultsSummary
+              .alert.alert-warning#blockedNotice(style='display: none;')
+
+              .row#resultsGrid.mb-3
+
+              .alert.alert-warning.text-center
+                | This will permanently delete every MapId listed above (except any noted as blocked).
+                |  This cannot be undone.
+
+              .text-center
+                button#confirmDeleteBtn.btn.btn-danger(type='button') Confirm Delete All
+
+            .alert.alert-success#doneMessage(style='display: none; text-align: center; margin-top: 15px;')
+            .alert.alert-danger#execError(style='display: none; text-align: center; margin-top: 15px;')
+
+      style.
+        .pixelated-thumb {
+          image-rendering: pixelated;
+          max-width: 64px;
+          max-height: 64px;
+        }
+        .range-card {
+          text-align: center;
+          margin-bottom: 10px;
+        }
+        .range-card.blocked {
+          opacity: 0.5;
+        }
+
+    script.
+      var foundMaps = [];
+
+      function escapeHtml(str) {
+        var div = document.createElement('div');
+        div.innerText = str;
+        return div.innerHTML;
+      }
+
+      function hideMessages() {
+        document.getElementById('searchError').style.display = 'none';
+        document.getElementById('execError').style.display = 'none';
+        document.getElementById('doneMessage').style.display = 'none';
+      }
+
+      async function searchRange() {
+        hideMessages();
+        var start = document.getElementById('rangeStart').value.trim();
+        var end = document.getElementById('rangeEnd').value.trim();
+        var resultsSection = document.getElementById('resultsSection');
+        var spinner = document.getElementById('searchLoadingSpinner');
+        var errorBox = document.getElementById('searchError');
+
+        resultsSection.style.display = 'none';
+        foundMaps = [];
+
+        if (!start || !end) {
+          errorBox.innerText = 'Please enter both a start and end MapId display name.';
+          errorBox.style.display = 'block';
+          return;
+        }
+
+        spinner.style.display = 'block';
+        try {
+          var response = await fetch(`/mapid/deleteRange/search?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`);
+          var data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error || 'Failed to search range.');
+          }
+
+          foundMaps = data.maps;
+
+          var summary = document.getElementById('resultsSummary');
+          var blockedCount = foundMaps.filter(function (m) { return m.blocked; }).length;
+          summary.innerText = `Found ${data.count} MapId(s) on server "${data.server}"`;
+
+          var blockedNotice = document.getElementById('blockedNotice');
+          if (blockedCount > 0) {
+            blockedNotice.innerText = `${blockedCount} of these have an associated MapArt and will be skipped (cannot be deleted while linked).`;
+            blockedNotice.style.display = 'block';
+          } else {
+            blockedNotice.style.display = 'none';
+          }
+
+          var grid = document.getElementById('resultsGrid');
+          grid.innerHTML = '';
+          foundMaps.forEach(function (m) {
+            var col = document.createElement('div');
+            col.className = 'col-md-2 col-sm-3 col-4 range-card' + (m.blocked ? ' blocked' : '');
+            col.innerHTML = `
+              <img class="pixelated-thumb" src="/public/uploads/${m.imgUrl}" alt="${escapeHtml(m.displayName)}">
+              <div>${escapeHtml(m.displayName)}</div>
+              ${m.blocked ? '<div class="text-muted small">has MapArt</div>' : ''}
+            `;
+            grid.appendChild(col);
+          });
+
+          var confirmBtn = document.getElementById('confirmDeleteBtn');
+          var deletableCount = foundMaps.length - blockedCount;
+          confirmBtn.innerText = `Confirm Delete All (${deletableCount})`;
+          confirmBtn.disabled = deletableCount === 0;
+
+          resultsSection.style.display = 'block';
+        } catch (error) {
+          errorBox.innerText = error.message || 'Failed to search range.';
+          errorBox.style.display = 'block';
+        } finally {
+          spinner.style.display = 'none';
+        }
+      }
+
+      async function confirmDelete() {
+        hideMessages();
+        var ids = foundMaps.filter(function (m) { return !m.blocked; }).map(function (m) { return m.id; });
+        if (ids.length === 0) return;
+
+        if (!window.confirm(`Are you sure you want to permanently delete ${ids.length} MapId(s)? This cannot be undone.`)) {
+          return;
+        }
+
+        var confirmBtn = document.getElementById('confirmDeleteBtn');
+        confirmBtn.disabled = true;
+
+        try {
+          var response = await fetch('/mapid/deleteRange/execute', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ids: ids }),
+          });
+          var data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error || 'Failed to delete range.');
+          }
+
+          var doneMessage = document.getElementById('doneMessage');
+          doneMessage.innerText = `Deleted ${data.deletedCount} MapId(s).` + (data.blocked.length > 0 ? ` ${data.blocked.length} were skipped.` : '');
+          doneMessage.style.display = 'block';
+
+          setTimeout(function () {
+            window.location.href = '/mapid/gallery/';
+          }, 1500);
+        } catch (error) {
+          document.getElementById('execError').innerText = error.message || 'Failed to delete range.';
+          document.getElementById('execError').style.display = 'block';
+          confirmBtn.disabled = false;
+        }
+      }
+
+      var searchBtn = document.getElementById('searchBtn');
+      if (searchBtn) { searchBtn.addEventListener('click', searchRange); }
+
+      var confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+      if (confirmDeleteBtn) { confirmDeleteBtn.addEventListener('click', confirmDelete); }
+
+    include includes/scripts.pug

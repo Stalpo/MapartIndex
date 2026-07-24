@@ -40,6 +40,8 @@ html
 
               if admin || (mod && map.userId === userId)
                 button#deleteBtn.btn.btn-primary(type='button') Delete
+              if admin
+                a.btn.btn-outline-danger.ml-2(href=`/mapid/deleteRange?mapId=${map.id}`) Delete Range
 
             .alert.alert-success#successMessage(style='text-align: center; display: none; margin-top: 10px;')
             .alert.alert-danger#errorMessage(style='text-align: center; display: none; margin-top: 10px;')

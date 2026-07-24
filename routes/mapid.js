@@ -422,6 +422,108 @@ router.post('/delete', async (req, res) => {
   }
 });
 
+router.get('/deleteRange', async (req, res) => {
+  try {
+    let startDisplayName = '';
+    let mapId = req.query.mapId;
+    if (mapId) {
+      mapId = validator.trim(mapId);
+      mapId = validator.escape(mapId);
+      const startMap = await mapIdController.getMapById(mapId);
+      if (startMap) {
+        startDisplayName = startMap.displayName;
+      }
+    }
+
+    res.render('mapid-delete-range', { pageTitle: 'Delete MapId Range', startDisplayName });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+router.get('/deleteRange/search', async (req, res) => {
+  try {
+    // Bulk cross-uploader deletion is admin-only - a mod's ownership-scoped delete permission
+    // doesn't translate cleanly to a range that may span other users' uploads.
+    if (!res.locals.admin) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+
+    let start = validator.trim(req.query.start || '');
+    let end = validator.trim(req.query.end || '');
+    start = validator.escape(start);
+    end = validator.escape(end);
+
+    if (!start || !end) {
+      return res.status(400).json({ error: 'Both a start and end MapId display name are required.' });
+    }
+
+    const [startMap, endMap] = await Promise.all([
+      mapIdController.getMapByDisplayName(start),
+      mapIdController.getMapByDisplayName(end),
+    ]);
+
+    if (!startMap) {
+      return res.status(404).json({ error: `No MapId found with display name "${start}".` });
+    }
+    if (!endMap) {
+      return res.status(404).json({ error: `No MapId found with display name "${end}".` });
+    }
+    if (!startMap.server || !endMap.server || startMap.server !== endMap.server) {
+      return res.status(400).json({ error: 'Both MapIds must be from the same server.' });
+    }
+    if (startMap.serverId == null || endMap.serverId == null) {
+      return res.status(400).json({ error: 'One of these MapIds has no sequential id and cannot be used to define a range.' });
+    }
+
+    const minServerId = Math.min(startMap.serverId, endMap.serverId);
+    const maxServerId = Math.max(startMap.serverId, endMap.serverId);
+
+    const maps = await mapIdController.getMapsByServerIdRange(startMap.server, minServerId, maxServerId);
+
+    res.json({
+      server: startMap.server,
+      count: maps.length,
+      maps: maps.map((map) => ({
+        id: map.id,
+        displayName: map.displayName,
+        imgUrl: map.imgUrl,
+        serverId: map.serverId,
+        blocked: !!map.mapArt,
+      })),
+    });
+  } catch (error) {
+    console.error('Error searching mapId range:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+router.post('/deleteRange/execute', async (req, res) => {
+  try {
+    if (!res.locals.admin) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+
+    const ids = Array.isArray(req.body.ids) ? req.body.ids : [];
+    if (ids.length === 0) {
+      return res.status(400).json({ error: 'No MapId ids provided.' });
+    }
+
+    const sanitizedIds = ids.map((id) => validator.escape(validator.trim(String(id))));
+
+    const { deletedCount, blocked } = await mapIdController.deleteMapsByIds(sanitizedIds);
+
+    res.json({
+      deletedCount,
+      blocked: blocked.map((map) => ({ id: map.id, displayName: map.displayName })),
+    });
+  } catch (error) {
+    console.error('Error executing mapId range delete:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 router.get('/uniqueUsernames', async (req, res) => {
   try {
     const uniqueUsernames = await mapIdController.getUniqueUsernames();

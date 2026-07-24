@@ -123,6 +123,24 @@ const deleteMapById = async (mapId) => {
   }
 };
 
+const getMapsByServerIdRange = async (server, minServerId, maxServerId) => {
+  try {
+    return await mapIdModel.getMapsByServerIdRange(server, minServerId, maxServerId);
+  } catch (error) {
+    console.error('Error fetching maps by server id range:', error);
+    throw error;
+  }
+};
+
+const deleteMapsByIds = async (ids) => {
+  try {
+    return await mapIdModel.deleteMapsByIds(ids);
+  } catch (error) {
+    console.error('Error deleting maps by ids:', error);
+    throw error;
+  }
+};
+
 const getUniqueUsernames = async () => {
   try {
     const uniqueUsernames = await mapIdModel.getUniqueUsernames();
@@ -210,6 +228,8 @@ module.exports = {
   createMapId,
   incrementMapViews,
   deleteMapById,
+  getMapsByServerIdRange,
+  deleteMapsByIds,
   getUniqueUsernames,
   getUniqueServers,
   getMapIdByHash,

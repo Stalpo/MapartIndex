@@ -450,6 +450,44 @@ const deleteMapById = async (mapId) => {
   }
 };
 
+// serverId is the per-server incrementing counter embedded in displayName (`${server}_${serverId}`)
+// and is the only sequential field MapId has, so it's what "between two mapids" ranges over.
+const getMapsByServerIdRange = async (server, minServerId, maxServerId) => {
+  try {
+    const maps = await prisma.mapId.findMany({
+      where: {
+        server,
+        serverId: { gte: minServerId, lte: maxServerId },
+      },
+      orderBy: { serverId: 'asc' },
+      include: NSFW_SOURCE_INCLUDE,
+    });
+    return withDerivedNsfwMany(maps);
+  } catch (error) {
+    console.error('Error in getMapsByServerIdRange:', error);
+    throw error;
+  }
+};
+
+// Deletes every given MapId except ones with an associated MapArt (same guard as deleteMapById),
+// which are returned as `blocked` instead of being deleted.
+const deleteMapsByIds = async (ids) => {
+  try {
+    const maps = await prisma.mapId.findMany({ where: { id: { in: ids } } });
+    const deletableIds = maps.filter((map) => !map.mapId).map((map) => map.id);
+    const blocked = maps.filter((map) => map.mapId);
+
+    if (deletableIds.length > 0) {
+      await prisma.mapId.deleteMany({ where: { id: { in: deletableIds } } });
+    }
+
+    return { deletedCount: deletableIds.length, blocked };
+  } catch (error) {
+    console.error('Error in deleteMapsByIds:', error);
+    throw error;
+  }
+};
+
 module.exports = {
   getMapIdById,
   getMapIdByHash,
@@ -473,4 +511,6 @@ module.exports = {
   countMapIdsMissingMapArt,
   fetchLatestUpdatedAt,
   deleteMapById,
+  getMapsByServerIdRange,
+  deleteMapsByIds,
 };
