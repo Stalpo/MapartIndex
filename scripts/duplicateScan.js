@@ -92,6 +92,13 @@ const groupBy = (records, keyFn) => {
 
 const byCreatedAtAsc = (a, b) => a.createdAt.getTime() - b.createdAt.getTime();
 
+// `target.push(...source)` blows the call stack once `source` gets into the tens of thousands of
+// entries (V8 caps how many arguments a single call can take) - which a full-DB duplicate report
+// can easily reach. A plain loop has no such limit.
+const pushAll = (target, source) => {
+  for (const item of source) target.push(item);
+};
+
 // Splits a full record set into buckets. `global: true` puts everything in one bucket (used for
 // the report, when --global is passed). `global: false` buckets by each record's own `server`
 // field (used for the report by default, and ALWAYS used for safe-fix classification).
@@ -176,7 +183,7 @@ function buildRawReportForBucket(bucketLabel, mapIds, mapArts, chunks, mapIdCoun
     }
   }
   lines.push(`-- MapArt chunk vs MapId duplicates: ${chunkMatchCount} MapArt(s) with a matching loose/foreign MapId --`);
-  lines.push(...chunkLines);
+  pushAll(lines, chunkLines);
 
   return { mapIdGroups, mapArtGroups };
 }
@@ -266,7 +273,7 @@ function classifyBucket(mapIds, mapArts, chunks, mapIdCountByMapArtId, mapIdGrou
       for (const [hash, chunkList] of neededByHash) {
         const pool = poolByHash.get(hash);
         const taken = pool.splice(0, chunkList.length); // consume so no other MapArt can also claim these
-        mapIdIds.push(...taken.map((m) => m.id));
+        pushAll(mapIdIds, taken.map((m) => m.id));
       }
       actions.case1.push({ mapArt, mapIdIds });
     }
@@ -423,11 +430,11 @@ async function main() {
   const allLines = [...reportLines];
   if (SHOW_FIXES) {
     console.log(`Safe-fix candidates: case1=${totals.case1} link(s), case2=${totals.case2}, case3=${totals.case3}, case4=${totals.case4}, case5=${totals.case5}, case6=${totals.case6}, ambiguous(case1)=${totals.ambiguous}`);
-    allLines.push(...fixLines);
+    pushAll(allLines, fixLines);
   }
   if (APPLY) {
     console.log('Applied safe fixes - see report for details. Run scripts/cleanupOrphanedImages.js afterwards to clean up now-orphaned image files.');
-    allLines.push(...applyLines);
+    pushAll(allLines, applyLines);
   } else if (SHOW_FIXES) {
     console.log('Dry run only - no changes made. Re-run with --apply to perform these fixes.');
   } else {
