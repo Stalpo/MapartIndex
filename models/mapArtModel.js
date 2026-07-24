@@ -1,4 +1,5 @@
 const prisma = require('../util/db').prisma;
+const { sortIdsByRandomSeed } = require('../util/deterministicRandom');
 
 const getAllMapArts = async () => {
   try {
@@ -20,7 +21,7 @@ const getAllMapArts = async () => {
   }
 };
 
-const getMaps = async (page, perPage, user, artist, sort, server, tag, collected, userId) => {
+const getMaps = async (page, perPage, user, artist, sort, server, tag, collected, userId, seed) => {
   try {
     const where = {};
 
@@ -113,6 +114,17 @@ const getMaps = async (page, perPage, user, artist, sort, server, tag, collected
       // If page is provided but perPage is not, use a default value for perPage
       take = 25; // Default value for perPage
       skip = (page - 1) * take;
+    }
+
+    if (sort === 'random') {
+      const idDocs = await prisma.mapArt.findMany({ where, select: { id: true } });
+      const orderedIds = sortIdsByRandomSeed(idDocs.map((doc) => doc.id), seed);
+      const pageIds = orderedIds.slice(skip, skip + take);
+      if (pageIds.length === 0) return [];
+
+      const unorderedMaps = await prisma.mapArt.findMany({ where: { id: { in: pageIds } } });
+      const mapsById = new Map(unorderedMaps.map((map) => [map.id, map]));
+      return pageIds.map((id) => mapsById.get(id)).filter(Boolean);
     }
 
     // Fetch maps with pagination, filtering, and sorting

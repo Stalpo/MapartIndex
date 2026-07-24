@@ -43,8 +43,13 @@ const duplicateCheckController = require('../../controllers/duplicateCheckContro
  *         name: sort
  *         schema:
  *           type: string
- *           enum: [nameAsc, nameDesc, dateAsc, dateDesc, mapIdsAsc, mapIdsDesc]
+ *           enum: [nameAsc, nameDesc, dateAsc, dateDesc, mapIdsAsc, mapIdsDesc, random]
  *         description: Sorting criteria.
+ *       - in: query
+ *         name: seed
+ *         schema:
+ *           type: string
+ *         description: Seed used to keep "random" sort order stable across pages (avoids duplicates when paginating).
  *     responses:
  *       200:
  *         description: Returns a list of maps with pagination, filtering, and sorting options.
@@ -56,7 +61,7 @@ const duplicateCheckController = require('../../controllers/duplicateCheckContro
 router.get('/maps', async (req, res) => {
   try {
     // Extract query parameters
-    const { page, perPage, user, artist, sort, server, tag, collected } = req.query;
+    const { page, perPage, user, artist, sort, server, tag, collected, seed } = req.query;
     const userId = res.locals.userId;
 
     // Convert page and perPage to integers (if provided)
@@ -64,7 +69,7 @@ router.get('/maps', async (req, res) => {
     const mapsPerPage = perPage ? parseInt(perPage) : undefined;
 
     // Fetch maps based on pagination, filtering, and sorting criteria
-    const maps = await mapArtController.getMaps(pageNumber, mapsPerPage, user, artist, sort, server, tag, collected, userId);
+    const maps = await mapArtController.getMaps(pageNumber, mapsPerPage, user, artist, sort, server, tag, collected, userId, seed);
 
     if (maps.length > 0) {
       return res.status(200).json(maps);

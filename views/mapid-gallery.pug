@@ -32,6 +32,15 @@ html
               select#viewSelector.form-control
                 option(value='smallGrid' selected='true') Thumbnails
                 option(value='grid') Cards
+                option(value='carousel') Carousel
+          div.row#carouselSpeedRow(style='display:none')
+            div.col
+              select#carouselSpeedSelector.form-control
+                option(value='2000') Carousel Speed: Fast (2s)
+                option(value='3500' selected='true') Carousel Speed: Normal (3.5s)
+                option(value='6000') Carousel Speed: Slow (6s)
+                option(value='10000') Carousel Speed: Very Slow (10s)
+                option(value='manual') Carousel Speed: Manual (Arrows Only)
       hr
 
       div.row.justify-content-center
@@ -121,7 +130,8 @@ html
             { value: 'nameAsc', label: 'Name (Ascending)' },
             { value: 'nameDesc', label: 'Name (Descending)' },
             { value: 'dateAsc', label: 'Date (Ascending)' },
-            { value: 'dateDesc', label: 'Date (Descending)', selected: true }
+            { value: 'dateDesc', label: 'Date (Descending)', selected: true },
+            { value: 'random', label: 'Random' },
           ];
 
           options.forEach(option => {
@@ -137,9 +147,12 @@ html
         }
 
         // Function to handle API call with updated parameters
-        async function fetchMaps(page = 1, user = "", artist = "", sort = "dateDesc", view, server) {
+        async function fetchMaps(page = 1, user = "", artist = "", sort = "dateDesc", view, server, seed) {
           const perPage = 25;
           let url = `/api/mapId/maps?page=${page}&perPage=${perPage}&sort=${sort}`;
+          if (sort === 'random' && seed) {
+            url += `&seed=${seed}`;
+          }
           // Construct URL based on selected values
           if (user && user !== "All Uploaders") {
             url += `&user=${user}`;
@@ -161,6 +174,7 @@ html
             if (!response.ok) {
               if (response.status === 404) {
                 console.error('Likely last page of results');
+                hasMorePages = false;
                 return;
               } else {
                 throw new Error('Network response was not ok');
@@ -176,6 +190,9 @@ html
                 break;
               case 'grid':
                 buildGrid(data);
+                break;
+              case 'carousel':
+                buildCarousel(data);
                 break;
               default:
                 buildSmallGrid(data);
@@ -214,6 +231,8 @@ html
             }
             const data = await response.json();
             document.getElementById('countDisplay').textContent = `Count: ${data}`;
+            totalCount = data;
+            updateCarouselPositionDisplay();
           } catch (error) {
             console.error('Error fetching map count data:', error);
           }
@@ -222,17 +241,23 @@ html
         // Function to handle selector and view selector change events
         function handleSelectorsChange() {
           currentPage = 1; // Reset currentPage to 1
+          hasMorePages = true;
           const user = document.getElementById('userSelector').value;
           const artist = document.getElementById('artistSelector').value;
           const sort = document.getElementById('sortSelector').value;
           const view = document.getElementById('viewSelector').value;
           const server = document.getElementById('serverSelector').value;
 
+          if (sort === 'random') {
+            randomSeed = generateRandomSeed();
+          }
+
           // Clear the grid before fetching new data
           clearGrid();
+          clearCarousel(view);
 
           // Pass selected view type to fetchMaps
-          fetchMaps(1, user, artist, sort, view, server);
+          fetchMaps(1, user, artist, sort, view, server, randomSeed);
           fetchMapsCount(user, artist, server);
         }
 
@@ -240,6 +265,25 @@ html
         function clearGrid() {
           const gridContainer = document.getElementById('gridContainer');
           gridContainer.innerHTML = '';
+        }
+
+        // Function to clear the carousel
+        function clearCarousel(view) {
+          const carouselInner = document.querySelector('#carouselContainer .carousel-inner');
+          carouselInner.innerHTML = '';
+          nextSlidePosition = 1;
+          updateCarouselPositionDisplay();
+
+          document.getElementById('carouselContainer').style.display = view === 'carousel' ? 'block' : 'none';
+          document.getElementById('carouselSpeedRow').style.display = view === 'carousel' ? 'block' : 'none';
+
+          // Only restart the cycle timer when carousel mode is actually being switched on
+          // (not on every unrelated filter change while already viewing the carousel), so
+          // the countdown to the next auto-advance stays predictable while browsing.
+          if (view === 'carousel' && !carouselActive) {
+            initCarousel(getCarouselInterval());
+          }
+          carouselActive = view === 'carousel';
         }
 
         // Attach event listeners to input selectors
@@ -312,6 +356,44 @@ html
           });
         }
 
+        // Function to build the carousel
+        function buildCarousel(maps) {
+          const carouselInner = document.querySelector('#carouselContainer .carousel-inner');
+
+          // Check if showNSFW cookie is true
+          const showNSFW = getCookie('showNSFW');
+
+          let assignedActive = !!carouselInner.querySelector('.carousel-item.active');
+
+          maps.forEach(map => {
+            // only show nsfw if user is logged in
+            if (!(getCookie('token') !== '' || !map.nsfw)) return;
+
+            const item = document.createElement('div');
+            item.className = assignedActive ? 'carousel-item' : 'carousel-item active';
+            assignedActive = true;
+            item.dataset.position = nextSlidePosition++;
+            item.innerHTML = `
+              <img src="/public/uploads/${map.imgUrl}" class="d-block w-100 pixelated-image ${showNSFW === 'true' ? '' : (map.nsfw ? 'blurred' : '')}" alt="Map Image">
+            `;
+            carouselInner.appendChild(item);
+          });
+
+          pruneCarousel();
+          updateCarouselPositionDisplay();
+        }
+
+        // Function to bound the number of carousel slides kept in the DOM
+        function pruneCarousel() {
+          const carouselInner = document.querySelector('#carouselContainer .carousel-inner');
+          const items = Array.from(carouselInner.children);
+          const activeIndex = items.findIndex(item => item.classList.contains('active'));
+          const keepBehind = 3;
+          if (activeIndex > keepBehind) {
+            items.slice(0, activeIndex - keepBehind).forEach(item => item.remove());
+          }
+        }
+
         // Function to get cookie value by name
         function getCookie(name) {
           const cookies = document.cookie.split(';');
@@ -327,10 +409,42 @@ html
         // Lazy loading
         let observer;
         let currentPage = 1;
+        let hasMorePages = true;
         let user = "";
         let artist = "";
         let server = "#{server}";
         let sort = "dateDesc";
+        let randomSeed = null;
+        let carouselFetchInFlight = false;
+        let carouselActive = false;
+        let totalCount = 0;
+        let nextSlidePosition = 1;
+
+        function generateRandomSeed() {
+          return Math.random().toString(36).slice(2);
+        }
+
+        // 'manual' disables autoplay (interval: false) so only the prev/next arrows move the carousel
+        function getCarouselInterval() {
+          const raw = document.getElementById('carouselSpeedSelector').value;
+          return raw === 'manual' ? false : parseInt(raw);
+        }
+
+        // Each slide gets a permanent sequence number when it's created (data-position), so the
+        // "current / total" display stays correct when navigating backward and wraps cleanly
+        // (via modulo) once the carousel loops back around past the end of the dataset.
+        function updateCarouselPositionDisplay() {
+          const display = document.getElementById('carouselPositionDisplay');
+          const activeItem = document.querySelector('#carouselContainer .carousel-item.active');
+          if (!display) return;
+          if (!activeItem || !totalCount) {
+            display.textContent = '';
+            return;
+          }
+          const rawPosition = parseInt(activeItem.dataset.position, 10);
+          const wrappedPosition = ((rawPosition - 1) % totalCount) + 1;
+          display.textContent = `${wrappedPosition} / ${totalCount}`;
+        }
 
         function startObservingIntersection() {
           observer = new IntersectionObserver(entries => {
@@ -344,10 +458,11 @@ html
           });
 
           const lastGridElement = document.getElementById('gridContainer').lastElementChild;
-          observer.observe(lastGridElement);
+          if (lastGridElement) observer.observe(lastGridElement);
         }
 
         async function fetchNextPage() {
+          if (!hasMorePages) return;
           currentPage++;
           user = document.getElementById('userSelector').value;
           artist = document.getElementById('artistSelector').value;
@@ -355,8 +470,45 @@ html
           view = document.getElementById('viewSelector').value;
           server = document.getElementById('serverSelector').value;
           const lastGridElement = document.getElementById('gridContainer').lastElementChild;
-          observer.unobserve(lastGridElement);
-          fetchMaps(currentPage, user, artist, sort, view, server);
+          if (lastGridElement) observer.unobserve(lastGridElement);
+          await fetchMaps(currentPage, user, artist, sort, view, server, randomSeed);
+        }
+
+        // Fetch more carousel slides as the active slide nears the end of what's loaded, so
+        // browsing forward keeps surfacing fresh content instead of just looping the same
+        // few slides. Once the whole dataset has been fetched, start over from page 1. The
+        // carousel itself also has wrap:true as a fallback so it never stalls even if a
+        // fetch is still in flight when the last loaded slide is reached.
+        function queueMoreCarouselIfNeeded() {
+          if (carouselFetchInFlight) return;
+
+          const carouselInner = document.querySelector('#carouselContainer .carousel-inner');
+          const items = Array.from(carouselInner.children);
+          const activeIndex = items.findIndex(item => item.classList.contains('active'));
+          const remaining = items.length - 1 - activeIndex;
+          if (remaining > 3) return;
+
+          if (!hasMorePages) {
+            currentPage = 0;
+            hasMorePages = true;
+          }
+
+          carouselFetchInFlight = true;
+          fetchNextPage().finally(() => {
+            carouselFetchInFlight = false;
+          });
+        }
+
+        // Initialize (or reinitialize with a new speed) the carousel view. wrap:true so it
+        // loops back to the first loaded slide if it ever catches up to the end of what's
+        // been fetched, rather than stalling.
+        function initCarousel(interval) {
+          const $carousel = $('#carouselContainer');
+          if ($carousel.data('bs.carousel')) {
+            $carousel.carousel('dispose');
+          }
+          $carousel.carousel({ interval, wrap: true });
+          $carousel.carousel('cycle');
         }
 
         // Call the function to populate selectors and fetch initial data when the page loads
@@ -369,10 +521,26 @@ html
           // Initial API call on page load
           fetchMaps();
           fetchMapsCount();
+
+          $('#carouselContainer').on('slid.bs.carousel', queueMoreCarouselIfNeeded);
+          $('#carouselContainer').on('slid.bs.carousel', updateCarouselPositionDisplay);
+          document.getElementById('carouselSpeedSelector').addEventListener('change', () => {
+            initCarousel(getCarouselInterval());
+          });
         });
 
       // Grid container for images
       div#gridContainer.row.mb-4
+
+      div#carouselContainer.carousel.slide.mb-4(style='display:none; position: relative;')
+        .carousel-inner
+        span#carouselPositionDisplay.badge.badge-dark(style='position: absolute; bottom: 10px; right: 10px; z-index: 15; font-size: 1rem;')
+        a.carousel-control-prev(href='#carouselContainer', role='button', data-slide='prev')
+          span.carousel-control-prev-icon(aria-hidden='true')
+          span.sr-only Previous
+        a.carousel-control-next(href='#carouselContainer', role='button', data-slide='next')
+          span.carousel-control-next-icon(aria-hidden='true')
+          span.sr-only Next
 
       // Keep loadingSpinner at bottom of page
       script.

@@ -1,4 +1,5 @@
 const prisma = require('../util/db').prisma;
+const { sortIdsByRandomSeed } = require('../util/deterministicRandom');
 
 // MapId has no nsfw field of its own - it always mirrors its linked MapArt's nsfw (false if it
 // isn't linked to one). These turn a MapId record fetched with `include: { map: { select: {
@@ -134,7 +135,7 @@ const getAllMapsForUserId = async (userId) => {
   }
 };
 
-const getMaps = async (page, perPage, user, artist, sort, server) => {
+const getMaps = async (page, perPage, user, artist, sort, server, seed) => {
   try {
     const where = {};
 
@@ -180,6 +181,21 @@ const getMaps = async (page, perPage, user, artist, sort, server) => {
       // If page is provided but perPage is not, use a default value for perPage
       take = 25; // Default value for perPage
       skip = (page - 1) * take;
+    }
+
+    if (sort === 'random') {
+      const idDocs = await prisma.mapId.findMany({ where, select: { id: true } });
+      const orderedIds = sortIdsByRandomSeed(idDocs.map((doc) => doc.id), seed);
+      const pageIds = orderedIds.slice(skip, skip + take);
+      if (pageIds.length === 0) return [];
+
+      const unorderedMaps = await prisma.mapId.findMany({
+        where: { id: { in: pageIds } },
+        include: NSFW_SOURCE_INCLUDE,
+      });
+      const mapsById = new Map(unorderedMaps.map((map) => [map.id, map]));
+      const orderedMaps = pageIds.map((id) => mapsById.get(id)).filter(Boolean);
+      return withDerivedNsfwMany(orderedMaps);
     }
 
     // Fetch maps with pagination, filtering, and sorting
