@@ -113,7 +113,6 @@ html
           display: none;
         }
 
-    script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js")
     script.
       $(document).ready(function(){
         $('[data-toggle="tooltip"]').tooltip();
@@ -208,7 +207,10 @@ html
       }
 
       document.getElementById('saveBtn').addEventListener('click', saveChanges);
-      document.getElementById('deleteBtn').addEventListener('click', deleteMapart);
+      var deleteBtn = document.getElementById('deleteBtn');
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', deleteMapart);
+      }
 
       function currentMapArtId() {
         var url = window.location.href;

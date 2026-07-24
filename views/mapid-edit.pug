@@ -101,7 +101,6 @@ html
           display: none;
         }
 
-    script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js")
     script.
       $(document).ready(function(){
         $('[data-toggle="tooltip"]').tooltip();
@@ -173,7 +172,10 @@ html
       }
 
       document.getElementById('saveBtn').addEventListener('click', saveChanges);
-      document.getElementById('deleteBtn').addEventListener('click', deleteMap);
+      var deleteBtn = document.getElementById('deleteBtn');
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', deleteMap);
+      }
 
       function currentMapId() {
         var url = window.location.href;
