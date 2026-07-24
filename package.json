@@ -24,11 +24,12 @@
     "prisma": "^5.10.2",
     "pug": "^3.0.2",
     "sanitize-filename": "^1.6.3",
+    "sharp": "^0.35.3",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
     "validator": "^13.11.0"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=20.9.0"
   }
 }

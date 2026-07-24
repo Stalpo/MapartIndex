@@ -1,71 +1,112 @@
-const fs = require('fs');
 const crypto = require('crypto');
-const { PNG } = require('pngjs');
+const sharp = require('sharp');
+
+// Disable sharp's internal operation cache (defaults to retaining up to 50MB / 20 items / 100
+// files of decoded pixel data across calls) and cap decode concurrency to 1. Neither is needed
+// for one-shot sequential hashing, and both can otherwise accumulate memory across a long-running
+// backfill that decodes thousands of distinct images back to back.
+sharp.cache(false);
+sharp.concurrency(1);
 
 const CHUNK_SIZE = 128;
+const CHANNELS = 4; // force RGBA output so hashing is consistent regardless of source alpha/color type
 
-// Decode a PNG file into its raw dimensions + RGBA pixel buffer
-const decodePng = (filePath) => {
-  return new Promise((resolve, reject) => {
-    fs.createReadStream(filePath)
-      .pipe(new PNG())
-      .on('error', reject)
-      .on('parsed', function () {
-        resolve({ width: this.width, height: this.height, data: this.data });
-      });
-  });
-};
+const hashPixelBuffer = (buffer) => crypto.createHash('md5').update(buffer).digest('hex');
 
-// Hash a raw pixel buffer (order/format must already be consistent between callers)
-const hashPixelBuffer = (buffer) => {
-  return crypto.createHash('md5').update(buffer).digest('hex');
+const getDimensions = async (filePath) => {
+  const metadata = await sharp(filePath).metadata();
+  return { width: metadata.width, height: metadata.height };
 };
 
 // Hash a MapId image, validating it is exactly 128x128. Returns null on bad dimensions.
+// Small and fixed-size, so a single buffered read is fine here.
 const hashMapIdImage = async (filePath) => {
-  const { width, height, data } = await decodePng(filePath);
+  const { width, height } = await getDimensions(filePath);
   if (width !== CHUNK_SIZE || height !== CHUNK_SIZE) {
     return null;
   }
-  return hashPixelBuffer(data);
+  const raw = await sharp(filePath).ensureAlpha().raw().toBuffer();
+  return hashPixelBuffer(raw);
 };
 
-// Copy out a single 128x128 RGBA chunk at grid position (chunkX, chunkY) from a full image buffer
-const extractChunkBuffer = (fullData, fullWidth, chunkX, chunkY) => {
-  const chunk = Buffer.alloc(CHUNK_SIZE * CHUNK_SIZE * 4);
-  for (let row = 0; row < CHUNK_SIZE; row++) {
-    const srcStart = ((chunkY * CHUNK_SIZE + row) * fullWidth + chunkX * CHUNK_SIZE) * 4;
-    const destStart = row * CHUNK_SIZE * 4;
-    fullData.copy(chunk, destStart, srcStart, srcStart + CHUNK_SIZE * 4);
-  }
-  return chunk;
-};
-
-// Hash a MapArt image as a whole, and slice+hash it into a gridWidth x gridHeight grid of 128x128 chunks.
-// Validates the decoded image matches the expected grid dimensions. Returns null on mismatch.
+// Hash a MapArt image as a whole, and slice+hash it into a gridWidth x gridHeight grid of
+// 128x128 chunks. Validates the decoded image matches the expected grid dimensions, returning
+// null on mismatch.
+//
+// Decodes via a top-to-bottom sequential pixel stream and only ever holds one 128px-tall row
+// band (the height of a single chunk row) in memory at a time, instead of the whole raster.
+// This matters because some MapArts are large enough (thousands of chunks) that buffering the
+// full decoded image at once can exhaust available memory and get the process OOM-killed.
 const hashMapArtChunks = async (filePath, gridWidth, gridHeight) => {
-  const { width, height, data } = await decodePng(filePath);
+  const { width, height } = await getDimensions(filePath);
   if (width !== gridWidth * CHUNK_SIZE || height !== gridHeight * CHUNK_SIZE) {
     return null;
   }
 
-  const pixelHash = hashPixelBuffer(data);
-  const chunks = [];
-  for (let cy = 0; cy < gridHeight; cy++) {
-    for (let cx = 0; cx < gridWidth; cx++) {
-      const chunkBuffer = extractChunkBuffer(data, width, cx, cy);
-      chunks.push({ x: cx, y: cy, hash: hashPixelBuffer(chunkBuffer) });
-    }
-  }
+  const rowBytes = width * CHANNELS;
+  const bandBytes = rowBytes * CHUNK_SIZE;
 
-  return { pixelHash, chunks };
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    const wholeImageHash = crypto.createHash('md5');
+    let queue = [];
+    let queuedBytes = 0;
+    let bandY = 0;
+    let settled = false;
+
+    const stream = sharp(filePath, { sequentialRead: true }).ensureAlpha().raw();
+
+    const fail = (error) => {
+      if (settled) return;
+      settled = true;
+      stream.destroy();
+      reject(error);
+    };
+
+    const processBand = (band) => {
+      for (let cx = 0; cx < gridWidth; cx++) {
+        const chunkHash = crypto.createHash('md5');
+        const colOffset = cx * CHUNK_SIZE * CHANNELS;
+        for (let row = 0; row < CHUNK_SIZE; row++) {
+          const start = row * rowBytes + colOffset;
+          chunkHash.update(band.subarray(start, start + CHUNK_SIZE * CHANNELS));
+        }
+        chunks.push({ x: cx, y: bandY, hash: chunkHash.digest('hex') });
+      }
+      bandY++;
+    };
+
+    stream.on('data', (data) => {
+      wholeImageHash.update(data);
+      queue.push(data);
+      queuedBytes += data.length;
+
+      // Only concat once we've actually accumulated enough for a full band, and only the bytes
+      // currently queued - not on every single incoming stream chunk - to avoid re-copying the
+      // same pending bytes repeatedly.
+      while (queuedBytes >= bandBytes) {
+        const combined = queue.length === 1 ? queue[0] : Buffer.concat(queue, queuedBytes);
+        processBand(combined.subarray(0, bandBytes));
+
+        const remainder = combined.subarray(bandBytes);
+        queue = remainder.length ? [remainder] : [];
+        queuedBytes = remainder.length;
+      }
+    });
+
+    stream.on('end', () => {
+      if (settled) return;
+      settled = true;
+      resolve({ pixelHash: wholeImageHash.digest('hex'), chunks });
+    });
+
+    stream.on('error', fail);
+  });
 };
 
 module.exports = {
   CHUNK_SIZE,
-  decodePng,
   hashPixelBuffer,
   hashMapIdImage,
-  extractChunkBuffer,
   hashMapArtChunks,
 };
