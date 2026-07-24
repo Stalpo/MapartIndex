@@ -101,18 +101,20 @@ html
               const url = `${endpoint}?page=${currentPage}&perPage=${perPage}`;
               const response = await fetch(url);
 
-              if (response.status === 404) {
+              if (!response.ok) {
+                throw new Error('Network response was not ok');
+              }
+
+              const maps = await response.json();
+
+              if (maps.length === 0) {
                 exhausted = true;
                 if (currentPage === 1) {
                   document.getElementById('emptyState').style.display = 'block';
                 }
                 return;
               }
-              if (!response.ok) {
-                throw new Error('Network response was not ok');
-              }
 
-              const maps = await response.json();
               const gridContainer = document.getElementById('gridContainer');
               maps.forEach(map => gridContainer.appendChild(buildCard(map)));
 

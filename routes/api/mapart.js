@@ -52,9 +52,7 @@ const duplicateCheckController = require('../../controllers/duplicateCheckContro
  *         description: Seed used to keep "random" sort order stable across pages (avoids duplicates when paginating).
  *     responses:
  *       200:
- *         description: Returns a list of maps with pagination, filtering, and sorting options.
- *       404:
- *         description: Maps not found.
+ *         description: Returns a list of maps with pagination, filtering, and sorting options. Empty array if none match.
  *     tags:
  *     - Map Art
  */
@@ -71,11 +69,9 @@ router.get('/maps', async (req, res) => {
     // Fetch maps based on pagination, filtering, and sorting criteria
     const maps = await mapArtController.getMaps(pageNumber, mapsPerPage, user, artist, sort, server, tag, collected, userId, seed);
 
-    if (maps.length > 0) {
-      return res.status(200).json(maps);
-    } else {
-      return res.status(404).json({ error: 'Maps not found' });
-    }
+    // An empty array is a valid, successful response (e.g. requesting a page
+    // past the end of the results) — not an error condition.
+    return res.status(200).json(maps);
   } catch (error) {
     console.error('Error fetching maps:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -106,11 +102,9 @@ router.get('/maps', async (req, res) => {
  *         description: Number of maps per page.
  *     responses:
  *       200:
- *         description: Returns a list of MapArts missing metadata.
+ *         description: Returns a list of MapArts missing metadata. Empty array if none match.
  *       401:
  *         description: Unauthorized.
- *       404:
- *         description: Maps not found.
  *     tags:
  *     - Map Art
  */
@@ -126,11 +120,7 @@ router.get('/missingInfo', async (req, res) => {
 
     const maps = await mapArtController.fetchMapsMissingInfo(type, pageNumber, mapsPerPage);
 
-    if (maps.length > 0) {
-      return res.status(200).json(maps);
-    } else {
-      return res.status(404).json({ error: 'Maps not found' });
-    }
+    return res.status(200).json(maps);
   } catch (error) {
     console.error('Error fetching maps missing info:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -155,11 +145,9 @@ router.get('/missingInfo', async (req, res) => {
  *         description: Number of maps per page.
  *     responses:
  *       200:
- *         description: Returns a list of MapArts with no linked MapIds.
+ *         description: Returns a list of MapArts with no linked MapIds. Empty array if none match.
  *       401:
  *         description: Unauthorized.
- *       404:
- *         description: Maps not found.
  *     tags:
  *     - Map Art
  */
@@ -175,11 +163,7 @@ router.get('/missingRefs', async (req, res) => {
 
     const maps = await mapArtController.fetchMapArtsMissingMapIds(pageNumber, mapsPerPage);
 
-    if (maps.length > 0) {
-      return res.status(200).json(maps);
-    } else {
-      return res.status(404).json({ error: 'Maps not found' });
-    }
+    return res.status(200).json(maps);
   } catch (error) {
     console.error('Error fetching map arts missing map ids:', error);
     res.status(500).json({ error: 'Internal server error' });

@@ -83,9 +83,7 @@ const upload = multer({
  *         description: Seed used to keep "random" sort order stable across pages (avoids duplicates when paginating).
  *     responses:
  *       200:
- *         description: Returns a list of maps with pagination, filtering, and sorting options.
- *       404:
- *         description: Maps not found.
+ *         description: Returns a list of maps with pagination, filtering, and sorting options. Empty array if none match.
  *     tags:
  *     - Map ID
  */
@@ -101,11 +99,9 @@ router.get('/maps', async (req, res) => {
     // Fetch maps based on pagination, filtering, and sorting criteria
     const maps = await mapIdController.getMaps(pageNumber, mapsPerPage, user, artist, sort, server, seed);
 
-    if (maps.length > 0) {
-      return res.status(200).json(maps);
-    } else {
-      return res.status(404).json({ error: 'Maps not found' });
-    }
+    // An empty array is a valid, successful response (e.g. requesting a page
+    // past the end of the results) — not an error condition.
+    return res.status(200).json(maps);
   } catch (error) {
     console.error('Error fetching maps:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -130,11 +126,9 @@ router.get('/maps', async (req, res) => {
  *         description: Number of maps per page.
  *     responses:
  *       200:
- *         description: Returns a list of MapIds with no linked MapArt.
+ *         description: Returns a list of MapIds with no linked MapArt. Empty array if none match.
  *       401:
  *         description: Unauthorized.
- *       404:
- *         description: Maps not found.
  *     tags:
  *     - Map ID
  */
@@ -150,11 +144,7 @@ router.get('/missingRefs', async (req, res) => {
 
     const maps = await mapIdController.fetchMapIdsMissingMapArt(pageNumber, mapsPerPage);
 
-    if (maps.length > 0) {
-      return res.status(200).json(maps);
-    } else {
-      return res.status(404).json({ error: 'Maps not found' });
-    }
+    return res.status(200).json(maps);
   } catch (error) {
     console.error('Error fetching map ids missing map art:', error);
     res.status(500).json({ error: 'Internal server error' });
