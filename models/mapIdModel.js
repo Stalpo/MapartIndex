@@ -439,6 +439,14 @@ const fetchLatestUpdatedAt = async (limit) => {
 
 const deleteMapById = async (mapId) => {
   try {
+    const map = await prisma.mapId.findUnique({ where: { id: mapId } });
+
+    if (map && map.mapId) {
+      const error = new Error('This map id has an associated map art and cannot be deleted.');
+      error.code = 'MAPID_HAS_MAPART';
+      throw error;
+    }
+
     return await prisma.mapId.delete({ where: { id: mapId } });
   } catch (error) {
     console.error('Error in deleteMapId:', error);

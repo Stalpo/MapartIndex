@@ -862,6 +862,12 @@ const fetchLatestUpdatedAt = async (limit) => {
 
 const deleteMapById = async (mapId) => {
   try {
+    await prisma.mapId.updateMany({
+      where: { mapId },
+      data: { mapId: null },
+    });
+    await prisma.mapArtChunk.deleteMany({ where: { mapArtId: mapId } });
+
     return await prisma.mapArt.delete({ where: { id: mapId } });
   } catch (error) {
     console.error('Error in deleteMapId:', error);

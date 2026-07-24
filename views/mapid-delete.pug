@@ -11,6 +11,9 @@ html(lang="en")
             | You are not an administrator or a moderator
         else
           if mapId
+            if errorMessage
+              div.alert.alert-danger(role="alert")
+                | #{errorMessage}
             div.alert.alert-warning.text-center(role="alert")
               p Are you sure you want to delete the file with
               p Map ID: #{mapId}?

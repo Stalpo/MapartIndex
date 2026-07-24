@@ -557,6 +557,11 @@ router.delete('/:id', async (req, res) => {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
+    // Don't allow deletion while a map art is still associated with this map id
+    if (map.mapId) {
+      return res.status(400).json({ error: 'This map id has an associated map art and cannot be deleted.' });
+    }
+
     // Delete the file from the 'public/uploads' directory
     const filePath = `public/uploads/${map.imgUrl}`;
     fs.unlinkSync(filePath);

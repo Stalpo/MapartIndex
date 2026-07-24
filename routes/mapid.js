@@ -436,7 +436,14 @@ router.post('/delete', async (req, res) => {
     }
 
     // Delete the map
-    await mapIdController.deleteMapById(mapId);
+    try {
+      await mapIdController.deleteMapById(mapId);
+    } catch (error) {
+      if (error.code === 'MAPID_HAS_MAPART') {
+        return res.status(400).render('mapid-delete', { mapId, map, errorMessage: error.message });
+      }
+      throw error;
+    }
 
     res.redirect('/admin');
   } catch (error) {
