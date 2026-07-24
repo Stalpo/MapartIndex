@@ -66,6 +66,31 @@ html
             .alert.alert-success#successMessage(style='text-align: center; display: none; margin-top: 10px;')
             .alert.alert-danger#errorMessage(style='text-align: center; display: none; margin-top: 10px;')
 
+        div.row.mt-4
+          div.col-md-8.offset-md-2
+            h3.text-center Duplicate Check
+            .form-group.text-center
+              label.fancy-checkbox
+                input#dupGlobal.form-check-input(type='checkbox')
+                i.fas.fa-fw.fa-check-square.checked
+                i.fas.fa-fw.fa-square.unchecked
+                |  Check all servers (default: this server only)
+            .text-center.mb-3
+              button#dupCheckMapArts.btn.btn-outline-primary.m-1(type='button') Check vs MapArts
+              button#dupCheckChunks.btn.btn-outline-primary.m-1(type='button') Check vs MapId Chunks
+              button#dupCheckAll.btn.btn-primary.m-1(type='button') Check All
+
+            #dupLoadingSpinner.text-center.mt-3(style='display: none;')
+              i.fa.fa-spinner.fa-spin.fa-2x
+              p Checking...
+
+            #dupBackfillNotice.alert.alert-info(style='display: none;')
+              | This record hasn't been hashed for duplicate checking yet. Run the backfill script (scripts/backfillDuplicateHashes.js) to enable this.
+
+            #dupEmptyState.alert.alert-warning(style='display: none;') No duplicates found.
+
+            .row#dupResults.mb-4
+
       style.
         .icon-prepend {
           width: 40px;
@@ -184,5 +209,89 @@ html
 
       document.getElementById('saveBtn').addEventListener('click', saveChanges);
       document.getElementById('deleteBtn').addEventListener('click', deleteMapart);
-      
+
+      function currentMapArtId() {
+        var url = window.location.href;
+        return url.substring(url.lastIndexOf('/') + 1);
+      }
+
+      function buildDupCard(match) {
+        var record = match.record;
+        var isMapId = match.type === 'mapid' || match.type === 'mapid-chunk';
+        var imgSrc = isMapId ? `/public/uploads/${record.imgUrl}` : `/public/uploads/mapart/${record.imgUrl}`;
+        var title = record.name || record.displayName || 'No Name';
+        var viewHref = isMapId ? `/mapid/id/${record.id}` : `/mapart/id/${record.id}`;
+        var editHref = isMapId ? `/mapid/edit/${record.id}` : `/mapart/edit/${record.id}`;
+        var typeLabel = {
+          mapart: 'Duplicate MapArt',
+          'mapid-chunk': 'MapId found matching a chunk of this MapArt'
+        }[match.type] || match.type;
+        var positionLabel = match.position ? ` @ (${match.position.x}, ${match.position.y})` : '';
+
+        var col = document.createElement('div');
+        col.className = 'col-md-4';
+        col.innerHTML = `
+          <div class="card mb-4 box-shadow">
+            <img class="card-img-top pixelated-image" src="${imgSrc}" alt="Image for ${title}">
+            <div class="card-body">
+              <h5 class="card-title">${title}</h5>
+              <p class="card-text">${typeLabel}${positionLabel}</p>
+              <p class="card-text">Server: ${record.server || 'N/A'}</p>
+              <div class="btn-group">
+                <a class="btn btn-sm btn-outline-secondary" href="${viewHref}">View</a>
+                <a class="btn btn-sm btn-outline-secondary" href="${editHref}">Edit</a>
+              </div>
+            </div>
+          </div>
+        `;
+        return col;
+      }
+
+      async function runDupCheck(mode) {
+        var mapArtId = currentMapArtId();
+        var global = document.getElementById('dupGlobal').checked;
+
+        var spinner = document.getElementById('dupLoadingSpinner');
+        var backfillNotice = document.getElementById('dupBackfillNotice');
+        var emptyState = document.getElementById('dupEmptyState');
+        var results = document.getElementById('dupResults');
+
+        spinner.style.display = 'block';
+        backfillNotice.style.display = 'none';
+        emptyState.style.display = 'none';
+        results.innerHTML = '';
+
+        try {
+          var url = `/api/mapArt/duplicates/${mapArtId}?mode=${mode}&global=${global}`;
+          var response = await fetch(url);
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          var data = await response.json();
+
+          if (data.needsBackfill) {
+            backfillNotice.style.display = 'block';
+          } else if (!data.matches || data.matches.length === 0) {
+            emptyState.style.display = 'block';
+          } else {
+            data.matches.forEach(match => results.appendChild(buildDupCard(match)));
+          }
+        } catch (error) {
+          console.error('Error running duplicate check:', error);
+          emptyState.textContent = 'Error running duplicate check. Please try again.';
+          emptyState.style.display = 'block';
+        } finally {
+          spinner.style.display = 'none';
+        }
+      }
+
+      document.getElementById('dupCheckMapArts').addEventListener('click', () => runDupCheck('maparts'));
+      document.getElementById('dupCheckChunks').addEventListener('click', () => runDupCheck('chunks'));
+      document.getElementById('dupCheckAll').addEventListener('click', () => runDupCheck('all'));
+
+    style.
+      .pixelated-image {
+        image-rendering: pixelated;
+      }
+
     include includes/scripts.pug

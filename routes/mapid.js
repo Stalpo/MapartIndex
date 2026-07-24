@@ -5,6 +5,7 @@ const multer = require('multer');
 const fs = require('fs');
 const crypto = require('crypto');
 const { PNG } = require("pngjs")
+const imageHash = require('../util/imageHash');
 
 // Required controllers
 const userController = require('../controllers/userController');
@@ -222,7 +223,10 @@ router.post('/create', mapIdUpload.array('images', 10000), async (req, res) => {
 
       // Calculate a hash of the base64 data
       const hash = crypto.createHash('md5').update(base64).digest('hex');
-      
+
+      // Hash of the raw decoded pixels, used by the duplicate-check tooling on the edit pages
+      const pixelHash = await imageHash.hashMapIdImage(newFilepath);
+
       // Check if the image already exists in the database based on the hash
       if(req.body.maxWrong >= 0){
         const existingMap = await mapIdController.getMapIdByHash(hash, req.body.server);
@@ -244,6 +248,7 @@ router.post('/create', mapIdUpload.array('images', 10000), async (req, res) => {
         imgUrl: newFilename,
         displayName: displayName,
         hash: hash,
+        pixelHash: pixelHash,
         server: req.body.server,
         serverId: serverId,
         nsfw: nsfw,
@@ -266,6 +271,8 @@ router.post('/create', mapIdUpload.array('images', 10000), async (req, res) => {
         const base642 = fs.readFileSync(newFilepath2, { encoding: 'base64' });
         const hash2 = crypto.createHash('md5').update(base642).digest('hex');
 
+        const chunkResult = await imageHash.hashMapArtChunks(newFilepath2, 1, 1);
+
         const result = await mapArtController.createMapId({
           userId: res.locals.userId,
           username: res.locals.username,
@@ -276,10 +283,15 @@ router.post('/create', mapIdUpload.array('images', 10000), async (req, res) => {
           height: 1,
           displayName: displayName2,
           hash: hash2,
+          pixelHash: chunkResult ? chunkResult.pixelHash : null,
           server: req.body.server,
           serverId: serverId2,
           nsfw: nsfw,
         });
+
+        if (chunkResult) {
+          await mapArtController.replaceMapArtChunks(result.id, req.body.server, chunkResult.chunks);
+        }
       }
 
       uploadedFiles.push({

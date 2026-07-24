@@ -98,7 +98,7 @@ const getUniqueTags = async () => {
   }
 };
 
-const createMapId = async ({ userId, username, artist, name, description, mapIds, width, height, tags, imgUrl, displayName, hash, server, serverId, nsfw }) => {
+const createMapId = async ({ userId, username, artist, name, description, mapIds, width, height, tags, imgUrl, displayName, hash, pixelHash, server, serverId, nsfw }) => {
   try {
     return await mapArtModel.createMapId({
       userId,
@@ -113,12 +113,22 @@ const createMapId = async ({ userId, username, artist, name, description, mapIds
       imgUrl,
       displayName,
       hash,
+      pixelHash,
       server,
       serverId,
       nsfw,
     });
   } catch (error) {
     console.error('Error creating map ID:', error);
+    throw error;
+  }
+};
+
+const replaceMapArtChunks = async (mapArtId, server, chunks) => {
+  try {
+    return await mapArtModel.replaceMapArtChunks(mapArtId, server, chunks);
+  } catch (error) {
+    console.error('Error replacing map art chunks:', error);
     throw error;
   }
 };
@@ -325,6 +335,7 @@ module.exports = {
   getUniqueServers,
   getUniqueTags,
   createMapId,
+  replaceMapArtChunks,
   countMapIdsByServer,
   updateMapById,
   incrementMapViews,

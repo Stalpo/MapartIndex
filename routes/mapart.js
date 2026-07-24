@@ -4,6 +4,7 @@ const validator = require('validator');
 const multer = require('multer');
 const fs = require('fs');
 const crypto = require('crypto');
+const imageHash = require('../util/imageHash');
 
 // Required controllers
 const userController = require('../controllers/userController');
@@ -82,11 +83,15 @@ router.post('/create', mapArtUpload.single('file'), async (req, res) => {
 
     const parsedMapIds = JSON.parse(mapIds);
     const parsedTags = JSON.parse(tags.toLowerCase());
+    const parsedWidth = parseInt(width);
+    const parsedHeight = parseInt(height);
 
     let nsfwBool = false;
     if(nsfw === "true"){
       nsfwBool = true;
     }
+
+    const chunkResult = await imageHash.hashMapArtChunks(newFilepath, parsedWidth, parsedHeight);
 
     const result = await mapArtController.createMapId({
       userId: res.locals.userId,
@@ -95,16 +100,21 @@ router.post('/create', mapArtUpload.single('file'), async (req, res) => {
       name,
       description,
       mapIds: parsedMapIds,
-      width: parseInt(width),
-      height: parseInt(height),
+      width: parsedWidth,
+      height: parsedHeight,
       tags: parsedTags,
       artist,
       displayName,
       hash,
+      pixelHash: chunkResult ? chunkResult.pixelHash : null,
       server,
       serverId,
       nsfw: nsfwBool,
     });
+
+    if (chunkResult) {
+      await mapArtController.replaceMapArtChunks(result.id, server, chunkResult.chunks);
+    }
 
     res.send(result);
   } catch (error) {

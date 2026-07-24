@@ -5,6 +5,8 @@ const userController = require('../../controllers/userController');
 const fs = require("fs");
 const crypto = require("crypto");
 const multer = require('multer');
+const imageHash = require('../../util/imageHash');
+const duplicateCheckController = require('../../controllers/duplicateCheckController');
 
 // Set up the storage for multer
 const storage = multer.diskStorage({
@@ -177,6 +179,68 @@ router.get('/missingRefsCount', async (req, res) => {
     return res.status(200).json(count);
   } catch (error) {
     console.error('Error counting map ids missing map art:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * @swagger
+ * /api/mapId/duplicates/{id}:
+ *   get:
+ *     description: Runs duplicate-image checking for a MapId (moderator/admin only).
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The MapId to check.
+ *       - in: query
+ *         name: mode
+ *         schema:
+ *           type: string
+ *           enum: [mapids, chunks, all]
+ *         description: mapids = case 1 (vs all MapIds), chunks = case 3 (vs MapArt chunks), all = case 5 (combined). Defaults to all.
+ *       - in: query
+ *         name: global
+ *         schema:
+ *           type: boolean
+ *         description: If true, checks across all servers instead of just this MapId's own server.
+ *     responses:
+ *       200:
+ *         description: Returns the duplicate-check results.
+ *       401:
+ *         description: Unauthorized.
+ *       404:
+ *         description: MapId not found.
+ *     tags:
+ *     - Map ID
+ */
+router.get('/duplicates/:id', async (req, res) => {
+  try {
+    if (!res.locals.admin && !res.locals.mod) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const { id } = req.params;
+    const mode = req.query.mode || 'all';
+    const global = req.query.global === 'true';
+
+    let result;
+    if (mode === 'mapids') {
+      result = await duplicateCheckController.checkMapIdVsMapIds(id, { global });
+    } else if (mode === 'chunks') {
+      result = await duplicateCheckController.checkMapIdVsMapArtChunks(id, { global });
+    } else {
+      result = await duplicateCheckController.checkMapIdAll(id, { global });
+    }
+
+    return res.status(200).json(result);
+  } catch (error) {
+    if (error.message === 'MapId not found') {
+      return res.status(404).json({ error: 'MapId not found' });
+    }
+    console.error('Error checking mapid duplicates:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -411,12 +475,16 @@ router.post('/create', upload.single('image'), async (req, res) => {
     // Calculate a hash of the base64 data
     const hash = crypto.createHash('md5').update(base64).digest('hex');
 
+    // Hash of the raw decoded pixels, used by the duplicate-check tooling on the edit pages
+    const pixelHash = await imageHash.hashMapIdImage(newFilepath);
+
     // Add metadata to the db
     const map = await mapIdController.createMapId({
       userId: user.id,
       username: user.username,
       imgUrl: newFilename,
       hash: hash,
+      pixelHash: pixelHash,
       server: server,
       serverId: serverId,
     });

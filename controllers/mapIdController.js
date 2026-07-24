@@ -86,7 +86,7 @@ const generateFilename = async (server) => {
   }
 };
 
-const createMapId = async ({ userId, username, mapId, imgUrl, displayName, hash, server, serverId, nsfw }) => {
+const createMapId = async ({ userId, username, mapId, imgUrl, displayName, hash, pixelHash, server, serverId, nsfw }) => {
   try {
     return await mapIdModel.createMapId({
       userId,
@@ -95,6 +95,7 @@ const createMapId = async ({ userId, username, mapId, imgUrl, displayName, hash,
       imgUrl,
       displayName,
       hash,
+      pixelHash,
       server,
       serverId,
       nsfw,

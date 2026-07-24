@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const mapArtController = require('../../controllers/mapArtController');
+const duplicateCheckController = require('../../controllers/duplicateCheckController');
 
 /**
  * @swagger
@@ -237,6 +238,68 @@ router.get('/missingRefsCount', async (req, res) => {
     return res.status(200).json(count);
   } catch (error) {
     console.error('Error counting map arts missing map ids:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * @swagger
+ * /api/mapArt/duplicates/{id}:
+ *   get:
+ *     description: Runs duplicate-image checking for a MapArt (moderator/admin only).
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The MapArt to check.
+ *       - in: query
+ *         name: mode
+ *         schema:
+ *           type: string
+ *           enum: [maparts, chunks, all]
+ *         description: maparts = case 2 (vs all MapArts), chunks = case 4 (vs MapId chunks), all = case 6 (combined). Defaults to all.
+ *       - in: query
+ *         name: global
+ *         schema:
+ *           type: boolean
+ *         description: If true, checks across all servers instead of just this MapArt's own server.
+ *     responses:
+ *       200:
+ *         description: Returns the duplicate-check results.
+ *       401:
+ *         description: Unauthorized.
+ *       404:
+ *         description: MapArt not found.
+ *     tags:
+ *     - Map Art
+ */
+router.get('/duplicates/:id', async (req, res) => {
+  try {
+    if (!res.locals.admin && !res.locals.mod) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const { id } = req.params;
+    const mode = req.query.mode || 'all';
+    const global = req.query.global === 'true';
+
+    let result;
+    if (mode === 'maparts') {
+      result = await duplicateCheckController.checkMapArtVsMapArts(id, { global });
+    } else if (mode === 'chunks') {
+      result = await duplicateCheckController.checkMapArtVsMapIdChunks(id, { global });
+    } else {
+      result = await duplicateCheckController.checkMapArtAll(id, { global });
+    }
+
+    return res.status(200).json(result);
+  } catch (error) {
+    if (error.message === 'MapArt not found') {
+      return res.status(404).json({ error: 'MapArt not found' });
+    }
+    console.error('Error checking mapart duplicates:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

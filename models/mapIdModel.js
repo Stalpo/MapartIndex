@@ -22,6 +22,48 @@ const getMapIdByHash = async (hash, server) => {
   }
 };
 
+const getMapIdsByPixelHash = async (pixelHash, { excludeId, server } = {}) => {
+  try {
+    return await prisma.mapId.findMany({
+      where: {
+        pixelHash,
+        ...(excludeId ? { id: { not: excludeId } } : {}),
+        ...(server ? { server } : {}),
+      },
+    });
+  } catch (error) {
+    console.error('Error in getMapIdsByPixelHash:', error);
+    throw error;
+  }
+};
+
+const getMapIdsByPixelHashes = async (pixelHashes, { server } = {}) => {
+  try {
+    if (!pixelHashes || pixelHashes.length === 0) return [];
+    return await prisma.mapId.findMany({
+      where: {
+        pixelHash: { in: pixelHashes },
+        ...(server ? { server } : {}),
+      },
+    });
+  } catch (error) {
+    console.error('Error in getMapIdsByPixelHashes:', error);
+    throw error;
+  }
+};
+
+const setPixelHash = async (id, pixelHash) => {
+  try {
+    return await prisma.mapId.update({
+      where: { id },
+      data: { pixelHash },
+    });
+  } catch (error) {
+    console.error('Error in setPixelHash:', error);
+    throw error;
+  }
+};
+
 const getMapByDisplayName = async (displayName) => {
   try {
     return await prisma.mapId.findFirst({
@@ -203,7 +245,7 @@ const countMapIds = async () => {
   }
 };
 
-const createMapId = async ({ userId, username, mapId, imgUrl, displayName, hash, server, serverId, nsfw }) => {
+const createMapId = async ({ userId, username, mapId, imgUrl, displayName, hash, pixelHash, server, serverId, nsfw }) => {
   try {
     return await prisma.mapId.create({
       data: {
@@ -217,6 +259,7 @@ const createMapId = async ({ userId, username, mapId, imgUrl, displayName, hash,
         imgUrl: imgUrl,
         displayName: displayName,
         hash: hash,
+        pixelHash: pixelHash,
         server: server,
         serverId: serverId,
         nsfw: nsfw,
@@ -406,6 +449,9 @@ const deleteMapById = async (mapId) => {
 module.exports = {
   getMapIdById,
   getMapIdByHash,
+  getMapIdsByPixelHash,
+  getMapIdsByPixelHashes,
+  setPixelHash,
   getMapByDisplayName,
   getAllMaps,
   getAllMapsForUserId,

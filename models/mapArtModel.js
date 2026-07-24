@@ -228,6 +228,76 @@ const getMapById = async (mapId) => {
   }
 };
 
+const getMapArtsByPixelHash = async (pixelHash, { excludeId, server } = {}) => {
+  try {
+    return await prisma.mapArt.findMany({
+      where: {
+        pixelHash,
+        ...(excludeId ? { id: { not: excludeId } } : {}),
+        ...(server ? { server } : {}),
+      },
+    });
+  } catch (error) {
+    console.error('Error in getMapArtsByPixelHash:', error);
+    throw error;
+  }
+};
+
+const setPixelHash = async (id, pixelHash) => {
+  try {
+    return await prisma.mapArt.update({
+      where: { id },
+      data: { pixelHash },
+    });
+  } catch (error) {
+    console.error('Error in setPixelHash:', error);
+    throw error;
+  }
+};
+
+const replaceMapArtChunks = async (mapArtId, server, chunks) => {
+  try {
+    await prisma.mapArtChunk.deleteMany({ where: { mapArtId } });
+    if (!chunks || chunks.length === 0) return [];
+    await prisma.mapArtChunk.createMany({
+      data: chunks.map((chunk) => ({
+        mapArtId,
+        server,
+        x: chunk.x,
+        y: chunk.y,
+        hash: chunk.hash,
+      })),
+    });
+  } catch (error) {
+    console.error('Error in replaceMapArtChunks:', error);
+    throw error;
+  }
+};
+
+const getMapArtChunks = async (mapArtId) => {
+  try {
+    return await prisma.mapArtChunk.findMany({ where: { mapArtId } });
+  } catch (error) {
+    console.error('Error in getMapArtChunks:', error);
+    throw error;
+  }
+};
+
+const getMapArtChunksByHash = async (hash, { server } = {}) => {
+  try {
+    return await prisma.mapArtChunk.findMany({
+      where: {
+        hash,
+        ...(server ? { server } : {}),
+      },
+      include: { mapArt: true },
+    });
+  } catch (error) {
+    console.error('Error in getMapArtChunksByHash:', error);
+    throw error;
+  }
+};
+
 const getUniqueUsernames = async () => {
   try {
     const uniqueUsernames = await prisma.mapArt.findMany({
@@ -295,7 +365,7 @@ const getUniqueTags = async () => {
   }
 };
 
-const createMapId = async ({ userId, username, artist, name, description, mapIds, width, height, tags, imgUrl, displayName, hash, server, serverId, nsfw }) => {
+const createMapId = async ({ userId, username, artist, name, description, mapIds, width, height, tags, imgUrl, displayName, hash, pixelHash, server, serverId, nsfw }) => {
   try {
     const size = width * height;
     return await prisma.mapArt.create({
@@ -319,6 +389,7 @@ const createMapId = async ({ userId, username, artist, name, description, mapIds
         imgUrl,
         displayName,
         hash,
+        pixelHash,
         server,
         serverId,
         nsfw,
@@ -805,6 +876,11 @@ module.exports = {
   countAllMapArts,
   countMapArts,
   getMapById,
+  getMapArtsByPixelHash,
+  setPixelHash,
+  replaceMapArtChunks,
+  getMapArtChunks,
+  getMapArtChunksByHash,
   getUniqueArtists,
   getUniqueUsernames,
   getUniqueServers,
