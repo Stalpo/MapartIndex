@@ -29,13 +29,16 @@ html
                       i.fas.fa-upload
                   input#user.form-control(type='text', name='user', value=map.username, readonly, placeholder='Uploader')
 
-              div.mb-3.form-group(data-toggle='tooltip', title='NSFW')
+              div.mb-3.form-group(data-toggle='tooltip', title='NSFW is controlled by this MapId\'s MapArt, not editable here')
                 div.input-group
-                  label.fancy-checkbox
-                    input#nsfw.form-check-input(type='checkbox', name='nsfw', checked=map.nsfw)
-                    i.fas.fa-fw.fa-check-square.checked
-                    i.fas.fa-fw.fa-square.unchecked
-                    | NSFW
+                  span.input-group-text.icon-prepend
+                    i.fas.fa-fw.fa-eye-slash
+                  span.form-control= map.nsfw ? 'NSFW' : 'Not NSFW'
+                small.form-text.text-muted
+                  if map.mapId
+                    | Controlled by its MapArt - #[a(href=`/mapart/edit/${map.mapId}`) edit there] to change it.
+                  else
+                    | This MapId isn't linked to a MapArt, so it can't be marked NSFW.
 
               // Submit button
               button#saveBtn.btn.btn-primary(type='button') Save Changes
@@ -106,12 +109,10 @@ html
 
       function saveChanges() {
           var artist = document.getElementById('artist').value;
-          var nsfw = document.getElementById('nsfw').checked;
           var user = document.getElementById('user').value;
 
           var formData = new FormData();
           formData.append('artist', artist);
-          formData.append('nsfw', nsfw);
 
           // Get mapId from the current URL
           var url = window.location.href;

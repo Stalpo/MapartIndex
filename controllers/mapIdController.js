@@ -86,7 +86,7 @@ const generateFilename = async (server) => {
   }
 };
 
-const createMapId = async ({ userId, username, mapId, imgUrl, displayName, hash, pixelHash, server, serverId, nsfw }) => {
+const createMapId = async ({ userId, username, mapId, imgUrl, displayName, hash, pixelHash, server, serverId }) => {
   try {
     return await mapIdModel.createMapId({
       userId,
@@ -98,7 +98,6 @@ const createMapId = async ({ userId, username, mapId, imgUrl, displayName, hash,
       pixelHash,
       server,
       serverId,
-      nsfw,
     });
   } catch (error) {
     console.error('Error creating map ID:', error);
@@ -106,11 +105,11 @@ const createMapId = async ({ userId, username, mapId, imgUrl, displayName, hash,
   }
 };
 
-const updateMapById = async (mapId, { artist, nsfw }) => {
+// nsfw isn't accepted here - it's derived from the linked MapArt, not settable per-MapId.
+const updateMapById = async (mapId, { artist }) => {
   try {
     return await mapIdModel.updateMapById(mapId, {
       artist,
-      nsfw,
     });
   } catch (error) {
     console.error('Error updating map by ID:', error);

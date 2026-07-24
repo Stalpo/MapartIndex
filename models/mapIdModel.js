@@ -1,10 +1,24 @@
 const prisma = require('../util/db').prisma;
 
+// MapId has no nsfw field of its own - it always mirrors its linked MapArt's nsfw (false if it
+// isn't linked to one). These turn a MapId record fetched with `include: { map: { select: {
+// nsfw: true } } }` into the shape callers/templates expect (a plain `nsfw` boolean, no nested
+// `map` object leaking into API responses that never exposed one before).
+const withDerivedNsfw = (mapId) => {
+  if (!mapId) return mapId;
+  const { map, ...rest } = mapId;
+  return { ...rest, nsfw: map ? map.nsfw : false };
+};
+const withDerivedNsfwMany = (mapIds) => mapIds.map(withDerivedNsfw);
+const NSFW_SOURCE_INCLUDE = { map: { select: { nsfw: true } } };
+
 const getMapIdById = async (mapId) => {
   try {
-    return await prisma.mapId.findUnique({
-      where: { id: mapId }
+    const result = await prisma.mapId.findUnique({
+      where: { id: mapId },
+      include: NSFW_SOURCE_INCLUDE,
     });
+    return withDerivedNsfw(result);
   } catch (error) {
     console.error('Error in getMapIdById:', error);
     throw error;
@@ -13,9 +27,11 @@ const getMapIdById = async (mapId) => {
 
 const getMapIdByHash = async (hash, server) => {
   try {
-    return await prisma.mapId.findFirst({
-      where: { hash, server }
+    const result = await prisma.mapId.findFirst({
+      where: { hash, server },
+      include: NSFW_SOURCE_INCLUDE,
     });
+    return withDerivedNsfw(result);
   } catch (error) {
     console.error('Error in getMapIdByHash:', error);
     throw error;
@@ -66,9 +82,11 @@ const setPixelHash = async (id, pixelHash) => {
 
 const getMapByDisplayName = async (displayName) => {
   try {
-    return await prisma.mapId.findFirst({
-      where: { displayName }
+    const result = await prisma.mapId.findFirst({
+      where: { displayName },
+      include: NSFW_SOURCE_INCLUDE,
     });
+    return withDerivedNsfw(result);
   } catch (error) {
     console.error('Error in getMapIdByHash:', error);
     throw error;
@@ -85,14 +103,14 @@ const getAllMaps = async () => {
         },
       },
       include: {
-        Map: true,
+        map: true,
       },
       orderBy: {
         createdAt: 'desc',
       },
     });
 
-    return maps;
+    return withDerivedNsfwMany(maps);
   } catch (error) {
     console.error('Error fetching all maps:', error);
     throw error;
@@ -101,7 +119,7 @@ const getAllMaps = async () => {
 
 const getAllMapsForUserId = async (userId) => {
   try {
-    return await prisma.mapId.findMany({
+    const maps = await prisma.mapId.findMany({
       where: {
         userId: userId,
       },
@@ -109,6 +127,7 @@ const getAllMapsForUserId = async (userId) => {
         map: true,
       },
     });
+    return withDerivedNsfwMany(maps);
   } catch (error) {
     console.error('Error fetching maps for user:', error);
     throw error;
@@ -169,9 +188,10 @@ const getMaps = async (page, perPage, user, artist, sort, server) => {
       orderBy,
       skip,
       take,
+      include: NSFW_SOURCE_INCLUDE,
     });
 
-    return maps;
+    return withDerivedNsfwMany(maps);
   } catch (error) {
     console.error('Error fetching maps:', error);
     throw error;
@@ -245,7 +265,7 @@ const countMapIds = async () => {
   }
 };
 
-const createMapId = async ({ userId, username, mapId, imgUrl, displayName, hash, pixelHash, server, serverId, nsfw }) => {
+const createMapId = async ({ userId, username, mapId, imgUrl, displayName, hash, pixelHash, server, serverId }) => {
   try {
     return await prisma.mapId.create({
       data: {
@@ -262,7 +282,6 @@ const createMapId = async ({ userId, username, mapId, imgUrl, displayName, hash,
         pixelHash: pixelHash,
         server: server,
         serverId: serverId,
-        nsfw: nsfw,
       }
     });
   } catch (error) {
@@ -271,7 +290,9 @@ const createMapId = async ({ userId, username, mapId, imgUrl, displayName, hash,
   }
 };
 
-const updateMapById = async (mapId, { artist, nsfw, tags }) => {
+// nsfw is intentionally not settable here - a MapId's nsfw always mirrors its linked MapArt's
+// nsfw (see withDerivedNsfw above), so it's controlled by editing the MapArt, not the MapId.
+const updateMapById = async (mapId, { artist, tags }) => {
   try {
     let uniqueTags = tags;
     if (uniqueTags) {
@@ -282,7 +303,6 @@ const updateMapById = async (mapId, { artist, nsfw, tags }) => {
       where: { id: mapId },
       data: {
         artist,
-        nsfw,
         tags: uniqueTags,
       },
     });
@@ -404,6 +424,8 @@ const fetchMapIdsMissingMapArt = async (page, perPage) => {
       take = perPage;
     }
 
+    // Loose MapIds - by definition not linked to a MapArt, so nsfw is trivially false; no need
+    // to include/derive it here.
     return await prisma.mapId.findMany({
       where: {
         OR: [
@@ -425,12 +447,14 @@ const fetchMapIdsMissingMapArt = async (page, perPage) => {
 
 const fetchLatestUpdatedAt = async (limit) => {
   try {
-    return await prisma.mapId.findMany({
+    const maps = await prisma.mapId.findMany({
       orderBy: {
         updatedAt: 'desc'
       },
-      take: limit
+      take: limit,
+      include: NSFW_SOURCE_INCLUDE,
     });
+    return withDerivedNsfwMany(maps);
   } catch (error) {
     console.error('Error in fetchLatestUpdatedAt:', error);
     throw error;

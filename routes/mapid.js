@@ -237,11 +237,6 @@ router.post('/create', mapIdUpload.array('images', 10000), async (req, res) => {
       }
 
       // Add metadata to the db
-      let nsfw = false;
-      if(req.body.nsfw === "on"){
-        nsfw = true;
-      }
-
       const mapid = await mapIdController.createMapId({
         userId: res.locals.userId,
         username: res.locals.username,
@@ -251,11 +246,13 @@ router.post('/create', mapIdUpload.array('images', 10000), async (req, res) => {
         pixelHash: pixelHash,
         server: req.body.server,
         serverId: serverId,
-        nsfw: nsfw,
       });
 
-      // upload also as maparts if all 1x1s
+      // upload also as maparts if all 1x1s. The nsfw checkbox only has an effect here - it seeds
+      // the auto-generated MapArt's nsfw, which each linked MapId then inherits when read (MapId
+      // no longer has its own nsfw field - see withDerivedNsfw in models/mapIdModel.js).
       if(req.body.singles === "on"){
+        const nsfw = req.body.nsfw === "on";
         const newFilename2 = await mapArtController.generateFilename(req.body.server);
         const serverId2 = await mapArtController.getLatestServerIdByServer(req.body.server) + 1;
         const newFilepath2 = `${res.locals.filepath}/public/uploads/mapart/${newFilename2}`;
@@ -385,16 +382,14 @@ router.post('/edit/:id', mapIdUpload.none(), async (req, res) => {
     }
 
     const mapId = req.params.id;
-    const { artist, nsfw /* Add other fields as needed */ } = req.body;
+    const { artist /* Add other fields as needed */ } = req.body;
 
     // Sanitize inputs
     const sanitizedArtist = validator.trim(artist);
-    const sanitizedNsfw = validator.toBoolean(nsfw);
 
-    // Update map details, including MapArt data
+    // Update map details. nsfw isn't editable here - it's derived from the linked MapArt.
     await mapIdController.updateMapById(mapId, {
       artist: sanitizedArtist,
-      nsfw: sanitizedNsfw,
     });
     
     res.redirect(`/admin`);

@@ -100,6 +100,15 @@ The current `public/uploads` folder (if any) is renamed to `public/uploads.pre-r
 
 Extra flags after a bare `--` are forwarded as-is to the underlying `mongodump`/`mongorestore` call, e.g. `node scripts/backupData.js -- --oplog` or `node scripts/restoreData.js <path> --yes -- --noIndexRestore`.
 
+#### `removeMapIdNsfwField.js`
+One-time cleanup for the `MapId.nsfw` -> derived-from-`MapArt` refactor. `MapId` no longer has its own `nsfw` field in `prisma/schema.prisma` - a MapId's nsfw is always read live from its linked MapArt (`withDerivedNsfw` in `models/mapIdModel.js`), controlled by editing the MapArt (mark a MapArt nsfw/not-nsfw and every MapId linked to it picks that up automatically, no sync step involved). Loose MapIds with no MapArt are just never nsfw.
+
+Removing a field from `schema.prisma` only makes Prisma stop reading/writing it - MongoDB is schemaless, so any `nsfw` key already stored on existing `MapId` documents from before this change is left behind as harmless dead data. This script clears it out with a raw `$unset`, purely for tidiness:
+```
+node --env-file .env scripts/removeMapIdNsfwField.js
+```
+Safe to re-run - documents that no longer have the field just don't match and are skipped. Run it once after deploying this change and running `npx prisma generate`/`npx prisma db push`.
+
 #### `cleanupOrphanedImages.js`
 Deletes image files under `public/uploads/` and `public/uploads/mapart/` that aren't referenced by any `MapId`/`MapArt` record in the DB. Does **not** touch `public/uploads/tmp`, `public/uploads/mapart/tmp`, or `public/uploads/server` - those are upload staging directories that are never DB-referenced by design, so cleaning them up is a separate concern.
 
