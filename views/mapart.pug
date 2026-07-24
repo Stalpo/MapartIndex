@@ -143,9 +143,9 @@ html
               const mapInfo = `
                 <div class="jumbotron">
                   <div class="row">
-                    <div class="col-md-8 ${showNSFW === 'true' ? '' : (map.nsfw ? 'nsfw' : '')}">
+                    <div class="col-md-8 ${showNSFW === 'true' ? '' : (map.nsfw ? 'nsfw nsfw-clickable' : '')}">
                       <div class="image-wrapper">
-                        <img src="${imageUrl}" alt="${mapId}" class="${map.width > 4 ? '' : 'pixelated-image'} ${showNSFW === 'true' ? '' : (map.nsfw ? 'blurred' : '')}" style="width: 80%; max-width: none; height: auto; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); image-rendering: ${map.width > 4 ? '' : 'pixelated'};">
+                        <img src="${imageUrl}" alt="${mapId}" class="${map.width > 4 ? '' : 'pixelated-image'} ${showNSFW === 'true' ? '' : (map.nsfw ? 'blurred' : '')}" style="width: 80%; max-width: none; height: auto; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); image-rendering: ${map.width > 4 ? '' : 'pixelated'};" ${map.nsfw && showNSFW !== 'true' ? `onclick="this.closest('.nsfw').classList.remove('nsfw'); this.classList.remove('blurred');"` : ''}>
                       </div>
                     </div>
                     <div class="col-md-4">

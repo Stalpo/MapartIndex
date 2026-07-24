@@ -52,6 +52,26 @@
   border-radius: 5px;
 }
 
+.nsfw.nsfw-clickable .image-wrapper {
+  position: relative;
+  cursor: pointer;
+}
+
+.nsfw.nsfw-clickable .image-wrapper::after {
+  content: "NSFW - Click to reveal";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 5px;
+  font-weight: bold;
+  text-align: center;
+  pointer-events: none;
+}
+
 .nsfw .image-wrapper img {
   width: 100%;
   filter: blur(100px);
