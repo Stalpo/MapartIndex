@@ -66,8 +66,9 @@ html
                           <li class="list-group-item">Uploaded: ${dateUploaded}</li>
                           <li class="list-group-item">NSFW: ${map.nsfw}</li>
                           <li class="list-group-item">Views: ${map.views}</li>
+                          ${map.mapId ? `<li class="list-group-item">MapArt: <a href="/mapart/id/${map.mapId}">View associated MapArt</a></li>` : ''}
                         </ul>
-                        <br> 
+                        <br>
                         <h5><a href="javascript:void(0);" onclick="history.back()">Back</a></h5>
                       </div>
                     </div>
