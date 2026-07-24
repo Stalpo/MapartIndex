@@ -41,18 +41,33 @@ html
           let exhausted = false;
           let observer;
 
+          function getCookie(name) {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+              const [cookieName, cookieValue] = cookie.split('=');
+              if (cookieName.trim() === name) {
+                return decodeURIComponent(cookieValue);
+              }
+            }
+            return '';
+          }
+
           function buildCard(map) {
             const isMapId = missingRefType === 'mapid';
             const imgSrc = isMapId ? `/public/uploads/${map.imgUrl}` : `/public/uploads/mapart/${map.imgUrl}`;
             const title = map.name || map.displayName || 'No Name';
             const viewHref = isMapId ? `/mapid/id/${map.id}` : `/mapart/id/${map.id}`;
             const editHref = isMapId ? `/mapid/edit/${map.id}` : `/mapart/edit/${map.id}`;
+            const showNSFW = getCookie('showNSFW');
+            const isNsfw = !!map.nsfw && showNSFW !== 'true';
 
             const col = document.createElement('div');
             col.className = 'col-md-4';
             col.innerHTML = `
-              <div class="card mb-4 box-shadow">
-                <img class="card-img-top pixelated-image" src="${imgSrc}" alt="Image for ${title}">
+              <div class="card mb-4 box-shadow ${isNsfw ? 'nsfw nsfw-clickable' : ''}">
+                <div class="image-wrapper">
+                  <img class="card-img-top pixelated-image ${isNsfw ? 'blurred' : ''}" src="${imgSrc}" alt="Image for ${title}" ${isNsfw ? `onclick="this.closest('.nsfw').classList.remove('nsfw'); this.classList.remove('blurred');"` : ''}>
+                </div>
                 <div class="card-body">
                   <h5 class="card-title">${title}</h5>
                   <p class="card-text">Artist: ${map.artist || 'N/A'}</p>
