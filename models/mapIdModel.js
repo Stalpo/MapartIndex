@@ -140,19 +140,13 @@ const getAllMapsForUserId = async (userId) => {
   }
 };
 
-const getMaps = async (page, perPage, user, artist, sort, server, seed) => {
+const getMaps = async (page, perPage, user, sort, server, seed) => {
   try {
     const where = {};
 
     // Apply filtering criteria
     if (user) {
       where.username = user;
-    }
-    if (artist) {
-      where.artist = {
-        contains: artist,
-        mode: 'insensitive'
-      };
     }
     if (server) {
       where.server = server;
@@ -162,10 +156,10 @@ const getMaps = async (page, perPage, user, artist, sort, server, seed) => {
     let orderBy = [{}, { createdAt: 'desc' }];
     switch (sort) {
       case 'nameAsc':
-        orderBy[0] = { artist: 'asc' };
+        orderBy[0] = { displayName: 'asc' };
         break;
       case 'nameDesc':
-        orderBy[0] = { artist: 'desc' };
+        orderBy[0] = { displayName: 'desc' };
         break;
       case 'dateAsc':
         orderBy = { createdAt: 'asc' };
@@ -219,19 +213,13 @@ const getMaps = async (page, perPage, user, artist, sort, server, seed) => {
   }
 };
 
-const countMaps = async (user, artist, server) => {
+const countMaps = async (user, server) => {
   try {
     const where = {};
 
     // Apply filtering criteria
     if (user) {
       where.username = user;
-    }
-    if (artist) {
-      where.artist = {
-        contains: artist,
-        mode: 'insensitive'
-      };
     }
     if (server) {
       where.server = server;
@@ -311,28 +299,6 @@ const createMapId = async ({ userId, username, mapId, imgUrl, displayName, hash,
   }
 };
 
-// nsfw is intentionally not settable here - a MapId's nsfw always mirrors its linked MapArt's
-// nsfw (see withDerivedNsfw above), so it's controlled by editing the MapArt, not the MapId.
-const updateMapById = async (mapId, { artist, tags }) => {
-  try {
-    let uniqueTags = tags;
-    if (uniqueTags) {
-      uniqueTags = [...new Set(uniqueTags)];
-    }
-
-    return await prisma.mapId.update({
-      where: { id: mapId },
-      data: {
-        artist,
-        tags: uniqueTags,
-      },
-    });
-  } catch (error) {
-    console.error('Error in updateMapById:', error);
-    throw error;
-  }
-};
-
 const incrementMapViews = async (mapId) => {
   try {
     const map = await prisma.mapId.findUnique({
@@ -362,21 +328,6 @@ const getUniqueUsernames = async () => {
     return uniqueUsernames.map(({ username }) => username);
   } catch (error) {
     console.error('Error fetching unique usernames:', error);
-    throw error;
-  }
-};
-
-const getUniqueArtists = async () => {
-  try {
-    const uniqueArtists = await prisma.mapId.findMany({
-      distinct: ['artist'],
-      select: {
-        artist: true,
-      },
-    });
-    return uniqueArtists.map(({ artist }) => artist);
-  } catch (error) {
-    console.error('Error fetching unique artists:', error);
     throw error;
   }
 };
@@ -514,10 +465,8 @@ module.exports = {
   countMapIdsByUserId,
   countMapIds,
   createMapId,
-  updateMapById,
   incrementMapViews,
   getUniqueUsernames,
-  getUniqueArtists,
   getUniqueServers,
   getLatestServerIdByServer,
   fetchMapIdsMissingMapArt,

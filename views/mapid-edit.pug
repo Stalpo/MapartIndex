@@ -3,11 +3,13 @@ html
   include includes/head.pug
   body
     include includes/navbar.pug
-
     div.container
-      h1.text-center= pageTitle
+      h1.text-center Map Id Edit
       h3.text-center= map.displayName
+      .text-center.mb-3
+        img.pixelated-image(src=`/public/uploads/${map.imgUrl}`, alt=map.displayName, style='max-width: 150px; max-height: 150px; border: 1px solid #ddd; border-radius: 5px;')
       hr
+
       h5.text-center
         a(href="javascript:void(0);", onclick="history.back()") Back
       if !admin && !mod
@@ -16,14 +18,7 @@ html
       else
         div.row
           div.col-md-8.offset-md-2.text-center
-            form#editForm.text-center
-
-              div.mb-3.form-group(data-toggle='tooltip', title='Artist')
-                div.input-group
-                  div.input-group-prepend
-                    span.input-group-text.icon-prepend(data-toggle='tooltip', title='Artist')
-                      i.fas.fa-paint-brush
-                  input#artist.form-control(type='text', name='artist', value=map.artist, placeholder='Artist')
+            div#editForm.text-center
 
               div.mb-3.form-group(data-toggle='tooltip', title='Uploader')
                 div.input-group
@@ -43,8 +38,6 @@ html
                   else
                     | This MapId isn't linked to a MapArt, so it can't be marked NSFW.
 
-              // Submit button
-              button#saveBtn.btn.btn-primary(type='button') Save Changes
               if admin || (mod && map.userId === userId)
                 button#deleteBtn.btn.btn-primary(type='button') Delete
 
@@ -109,45 +102,6 @@ html
         $('[data-toggle="tooltip"]').tooltip();
       });
 
-      function saveChanges() {
-          var artist = document.getElementById('artist').value;
-          var user = document.getElementById('user').value;
-
-          var formData = new FormData();
-          formData.append('artist', artist);
-
-          // Get mapId from the current URL
-          var url = window.location.href;
-          var mapId = url.substring(url.lastIndexOf('/') + 1);
-
-          var xhr = new XMLHttpRequest();
-          xhr.open('POST', `/mapid/edit/${mapId}`, true);
-          xhr.onreadystatechange = function () {
-              if (xhr.readyState === XMLHttpRequest.DONE) {
-                  if (xhr.status === 200) {
-                      // Show success message
-                      var successMessage = document.getElementById('successMessage');
-                      successMessage.style.display = 'block';
-                      successMessage.innerText = 'Changes saved successfully';
-
-                      // Hide error message if it's shown
-                      var errorMessage = document.getElementById('errorMessage');
-                      errorMessage.style.display = 'none';
-                  } else {
-                      // Show error message
-                      var errorMessage = document.getElementById('errorMessage');
-                      errorMessage.style.display = 'block';
-                      errorMessage.innerText = 'Failed to save changes. Please try again.';
-
-                      // Hide success message if it's shown
-                      var successMessage = document.getElementById('successMessage');
-                      successMessage.style.display = 'none';
-                  }
-              }
-          };
-          xhr.send(formData);
-      }
-
       function deleteMap(){
           var url = window.location.href;
           var mapId = url.substring(url.lastIndexOf('/') + 1);
@@ -174,7 +128,6 @@ html
           xhr.send();
       }
 
-      document.getElementById('saveBtn').addEventListener('click', saveChanges);
       var deleteBtn = document.getElementById('deleteBtn');
       if (deleteBtn) {
         deleteBtn.addEventListener('click', deleteMap);

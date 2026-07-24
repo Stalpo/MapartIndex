@@ -1,8 +1,8 @@
 const mapIdModel = require('../models/mapIdModel');
 
-const getMaps = async (page, perPage, user, artist, sort, server, seed) => {
+const getMaps = async (page, perPage, user, sort, server, seed) => {
   try {
-    const maps = await mapIdModel.getMaps(page, perPage, user, artist, sort, server, seed);
+    const maps = await mapIdModel.getMaps(page, perPage, user, sort, server, seed);
     return maps;
   } catch (error) {
     console.error('Error fetching maps:', error);
@@ -37,9 +37,9 @@ const getMapByDisplayName = async (displayName) => {
   }
 };
 
-const countMaps = async (user, artist, server) => {
+const countMaps = async (user, server) => {
   try {
-    return await mapIdModel.countMaps(user, artist, server);
+    return await mapIdModel.countMaps(user, server);
   } catch (error) {
     console.error('Error counting map IDs:', error);
     throw error;
@@ -105,18 +105,6 @@ const createMapId = async ({ userId, username, mapId, imgUrl, displayName, hash,
   }
 };
 
-// nsfw isn't accepted here - it's derived from the linked MapArt, not settable per-MapId.
-const updateMapById = async (mapId, { artist }) => {
-  try {
-    return await mapIdModel.updateMapById(mapId, {
-      artist,
-    });
-  } catch (error) {
-    console.error('Error updating map by ID:', error);
-    throw error;
-  }
-};
-
 const incrementMapViews = async (mapId) => {
   try {
     return await mapIdModel.incrementMapViews(mapId);
@@ -141,16 +129,6 @@ const getUniqueUsernames = async () => {
     return uniqueUsernames;
   } catch (error) {
     console.error('Error fetching unique usernames:', error);
-    throw error;
-  }
-};
-
-const getUniqueArtists = async () => {
-  try {
-    const uniqueArtists = await mapIdModel.getUniqueArtists();
-    return uniqueArtists;
-  } catch (error) {
-    console.error('Error fetching unique artists:', error);
     throw error;
   }
 };
@@ -230,11 +208,9 @@ module.exports = {
   countMapIds,
   generateFilename,
   createMapId,
-  updateMapById,
   incrementMapViews,
   deleteMapById,
   getUniqueUsernames,
-  getUniqueArtists,
   getUniqueServers,
   getMapIdByHash,
   getMapsByOwnerId,

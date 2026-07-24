@@ -374,31 +374,6 @@ router.get('/edit/:id', async (req, res) => {
   }
 });
 
-router.post('/edit/:id', mapIdUpload.none(), async (req, res) => {
-  try {
-    // Check if user is an admin and a moderator
-    if (!res.locals.admin && !res.locals.mod) {
-      return res.status(403).send('Forbidden');
-    }
-
-    const mapId = req.params.id;
-    const { artist /* Add other fields as needed */ } = req.body;
-
-    // Sanitize inputs
-    const sanitizedArtist = validator.trim(artist);
-
-    // Update map details. nsfw isn't editable here - it's derived from the linked MapArt.
-    await mapIdController.updateMapById(mapId, {
-      artist: sanitizedArtist,
-    });
-    
-    res.redirect(`/admin`);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Internal Server Error');
-  }
-});
-
 router.get('/delete', async (req, res) => {
   try {
     let mapId = req.query.mapId || req.body.mapId;
@@ -451,15 +426,6 @@ router.get('/uniqueUsernames', async (req, res) => {
   try {
     const uniqueUsernames = await mapIdController.getUniqueUsernames();
     res.json(uniqueUsernames);
-  } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
-router.get('/uniqueArtists', async (req, res) => {
-  try {
-    const uniqueArtists = await mapIdController.getUniqueArtists();
-    res.json(uniqueArtists);
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
   }

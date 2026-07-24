@@ -1,11 +1,10 @@
 doctype html
 html
-  - const pageTitle = "Map: " + mapId
   include includes/head.pug
   body
     include includes/navbar.pug
     div.container
-      h1.text-center Map
+      h1.text-center Map Id
       hr
 
       div#mapContainer.text-center
@@ -52,21 +51,11 @@ html
                         <h3>${map.displayName}</h3>
                         <br> 
                         <ul class="list-group">
-                          <li class="list-group-item">Artist: ${
-                            map.artist
-                              ? map.artist.split(',')
-                                .map(artist => artist.trim())
-                                .filter(artist => artist)
-                                .map(artist => `<a href="/search?query=${artist}">${artist}</a>`)
-                                .join(', ')
-                              : 'N/A'
-                          }</li>
-                          <li class="list-group-item">Description: ${map.description || 'N/A'}</li>
                           <li class="list-group-item">Uploader: <a href="/profile/user/${map.username}">${map.username}</a></li>
                           <li class="list-group-item">Uploaded: ${dateUploaded}</li>
                           <li class="list-group-item">NSFW: ${map.nsfw}</li>
                           <li class="list-group-item">Views: ${map.views}</li>
-                          ${map.mapId ? `<li class="list-group-item">MapArt: <a href="/mapart/id/${map.mapId}">View associated MapArt</a></li>` : ''}
+                          ${map.mapId ? `<li class="list-group-item">MapArt: <a href="/mapart/id/${map.mapId}">${(map.mapArt && (map.mapArt.name || map.mapArt.displayName)) || 'View associated MapArt'}</a></li>` : ''}
                         </ul>
                         <br>
                         <h5><a href="javascript:void(0);" onclick="history.back()">Back</a></h5>

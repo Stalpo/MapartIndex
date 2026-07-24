@@ -1,14 +1,16 @@
 doctype html
 html
-  - const pageTitle = "MapArt Edit"
   include includes/head.pug
   body
     include includes/navbar.pug
 
     div.container
-      h1.text-center= pageTitle
+      h1.text-center Map Art Edit
       h3.text-center= map.displayName
+      .text-center.mb-3
+        img.pixelated-image(src=`/public/uploads/mapart/${map.imgUrl}`, alt=map.displayName, style='max-width: 150px; max-height: 150px; border: 1px solid #ddd; border-radius: 5px;')
       hr
+      
       h5.text-center
         a(href="javascript:void(0);", onclick="history.back()") Back
       if !admin && !mod

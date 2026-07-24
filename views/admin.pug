@@ -78,15 +78,13 @@ html
             }
           }
 
-          // Function to populate artist selector
+          // Function to populate artist selector. MapId has no artist field of its own (only
+          // MapArt does), so this only pulls from the MapArt endpoint.
           async function populateArtistSelector() {
             try {
-              const uniqueArtistsMapId = await fetchData('/mapid/uniqueArtists');
               const uniqueArtistsMapArt = await fetchData('/mapart/uniqueArtists');
-              
-              const combinedUniqueArtists = [...new Set([...uniqueArtistsMapId, ...uniqueArtistsMapArt])];
 
-              let uniqueArtists = combinedUniqueArtists.reduce((acc, artistString) => {
+              let uniqueArtists = uniqueArtistsMapArt.reduce((acc, artistString) => {
                 return acc.concat(artistString.split(',').map(artist => artist.trim()).filter(artist => artist !== ''));
               }, []);
 
@@ -156,13 +154,13 @@ html
             let mapIdData = [];
             let mapArtData = [];
 
-            // Fetch data for mapId endpoint if not encountered 404 status
+            // Fetch data for mapId endpoint if not encountered 404 status. MapId has no artist
+            // field of its own, so the artist filter isn't applied here (only to MapArt below).
             if (!mapId404) {
               let mapIdUrl = `/api/mapId/maps?page=${page}&perPage=${perPage}&sort=${sort}`;
-              // Construct user and artist parameters conditionally
+              // Construct user parameter conditionally
               const userParam = (user && user !== "All Users") ? `&user=${user}` : "";
-              const artistParam = (artist && artist !== "All Artists") ? `&artist=${artist}` : "";
-              mapIdUrl += userParam + artistParam;
+              mapIdUrl += userParam;
               // Fetch data
               const mapIdResponse = await fetchData(mapIdUrl);
 
@@ -257,11 +255,11 @@ html
               const editUrl = map.displayName.includes("MAPART") ? `/mapart/edit/${map.id}` : `/mapid/edit/${map.id}`;
               const deleteUrl = map.displayName.includes("MAPART") ? `/mapart/delete?mapId=${map.id}` : `/mapid/delete?mapId=${map.id}`;
 
-              // Clean up artist names
-              const cleanedArtists = map.artist.split(',')
-                .map(artist => artist.trim())
-                .filter(artist => artist.length > 0)
-                .join(', ');
+              // Clean up artist names. MapId has no artist field of its own (only MapArt does),
+              // so MapId rows just show 'N/A' here.
+              const cleanedArtists = map.artist
+                ? map.artist.split(',').map(artist => artist.trim()).filter(artist => artist.length > 0).join(', ')
+                : 'N/A';
 
               newRow.innerHTML = `
                 <td>${map.displayName}</td>

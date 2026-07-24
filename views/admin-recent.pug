@@ -103,11 +103,11 @@ html
               const editUrl = map.displayName.includes("MAPART") ? `/mapart/edit/${map.id}` : `/mapid/edit/${map.id}`;
               const deleteUrl = map.displayName.includes("MAPART") ? `/mapart/delete?mapId=${map.id}` : `/mapid/delete?mapId=${map.id}`;
 
-              // Clean up artist names
-              const cleanedArtists = map.artist.split(',')
-                .map(artist => artist.trim())
-                .filter(artist => artist.length > 0)
-                .join(', ');
+              // Clean up artist names. MapId has no artist field of its own (only MapArt does),
+              // so MapId rows just show 'N/A' here.
+              const cleanedArtists = map.artist
+                ? map.artist.split(',').map(artist => artist.trim()).filter(artist => artist.length > 0).join(', ')
+                : 'N/A';
 
               newRow.innerHTML = `
                 <td>${map.displayName}</td>

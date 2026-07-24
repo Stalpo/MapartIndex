@@ -61,11 +61,6 @@ const upload = multer({
  *           type: string
  *         description: Filter maps by username.
  *       - in: query
- *         name: artist
- *         schema:
- *           type: string
- *         description: Filter maps by artist.
-*       - in: query
  *         name: server
  *         schema:
  *           type: string
@@ -90,14 +85,14 @@ const upload = multer({
 router.get('/maps', async (req, res) => {
   try {
     // Extract query parameters
-    const { page, perPage, user, artist, sort, server, seed } = req.query;
+    const { page, perPage, user, sort, server, seed } = req.query;
 
     // Convert page and perPage to integers (if provided)
     const pageNumber = page ? parseInt(page) : undefined;
     const mapsPerPage = perPage ? parseInt(perPage) : undefined;
 
     // Fetch maps based on pagination, filtering, and sorting criteria
-    const maps = await mapIdController.getMaps(pageNumber, mapsPerPage, user, artist, sort, server, seed);
+    const maps = await mapIdController.getMaps(pageNumber, mapsPerPage, user, sort, server, seed);
 
     // An empty array is a valid, successful response (e.g. requesting a page
     // past the end of the results) — not an error condition.
@@ -252,11 +247,6 @@ router.get('/duplicates/:id', async (req, res) => {
  *           type: string
  *         description: Filter maps by username.
  *       - in: query
- *         name: artist
- *         schema:
- *           type: string
- *         description: Filter maps by artist.
-*       - in: query
  *         name: server
  *         schema:
  *           type: string
@@ -272,10 +262,10 @@ router.get('/duplicates/:id', async (req, res) => {
 router.get('/mapscount', async (req, res) => {
   try {
     // Extract query parameters
-    const { user, artist, server } = req.query;
+    const { user, server } = req.query;
 
     // Fetch maps based on pagination, filtering, and sorting criteria
-    const maps = await mapIdController.countMaps(user, artist, server);
+    const maps = await mapIdController.countMaps(user, server);
 
     return res.status(200).json(maps);
   } catch (error) {

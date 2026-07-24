@@ -1,15 +1,15 @@
 doctype html
 html
-  - const pageTitle = "Map Arts"
   include includes/head.pug
   body
     include includes/navbar.pug
     div.container
       if !server
-        h1.text-center #{pageTitle}
+        h1.text-center Map Arts
       else 
-        h1.text-center #{displayName} #{pageTitle}
+        h1.text-center #{displayName} Map Arts
       hr
+      
       div.row.justify-content-center
         div.col-auto
           button#toggleSelectorsButton.btn.btn-primary.btn-sm.mb-3 Filtering and Sorting

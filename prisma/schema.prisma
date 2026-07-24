@@ -96,7 +96,6 @@ model MapId {
   user         User?    @relation(fields: [userId], references: [id])
   userId       String?
   username     String?
-  artist       String?  @default("N/A")
   server       String?
   serverId     Int?
   displayName  String?

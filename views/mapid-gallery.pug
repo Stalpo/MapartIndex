@@ -1,15 +1,15 @@
 doctype html
 html
-  - const pageTitle = "Maps"
   include includes/head.pug
   body
     include includes/navbar.pug
     div.container
       if !server
-        h1.text-center #{pageTitle}
+        h1.text-center Map Ids
       else 
-        h1.text-center #{displayName} #{pageTitle}
+        h1.text-center #{displayName} Map Ids
       hr
+
       div.row.justify-content-center
         div.col-auto
           button#toggleSelectorsButton.btn.btn-primary.btn-sm.mb-3 Filtering and Sorting
@@ -18,9 +18,6 @@ html
           div.row
             div.col
               select#userSelector.form-control(data-live-search='true')
-          div.row
-            div.col
-              select#artistSelector.form-control(data-live-search='true')
           div.row(style=`${!server ? '' : 'display:none'}`)
             div.col
               select#serverSelector.form-control(data-live-search='true')
@@ -88,25 +85,6 @@ html
           }
         }
 
-        // Function to populate artist selector
-        async function populateArtistSelector() {
-          try {
-            const artistArray = await fetchData('/mapid/uniqueArtists');
-            
-            let uniqueArtists = artistArray.reduce((acc, artistString) => {
-              return acc.concat(artistString.split(',').map(artist => artist.trim()).filter(artist => artist !== ''));
-            }, []);
-
-            uniqueArtists = [...new Set(uniqueArtists)];
-            uniqueArtists.unshift("All Artists");
-            uniqueArtists.sort();
-
-            populateSelect('artistSelector', uniqueArtists, "All Artists");
-          } catch (error) {
-            console.error('Error fetching artist data:', error);
-          }
-        }
-
         // Function to populate server selector
         async function populateServerSelector() {
           try {
@@ -148,7 +126,7 @@ html
         }
 
         // Function to handle API call with updated parameters
-        async function fetchMaps(page = 1, user = "", artist = "", sort = "dateDesc", view, server, seed) {
+        async function fetchMaps(page = 1, user = "", sort = "dateDesc", view, server, seed) {
           const perPage = 25;
           let url = `/api/mapId/maps?page=${page}&perPage=${perPage}&sort=${sort}`;
           if (sort === 'random' && seed) {
@@ -157,9 +135,6 @@ html
           // Construct URL based on selected values
           if (user && user !== "All Uploaders") {
             url += `&user=${user}`;
-          }
-          if (artist && artist !== "All Artists") {
-            url += `&artist=${artist}`;
           }
           if ("#{server}") {
             url += `&server=#{server}`;
@@ -213,14 +188,11 @@ html
           }
         }
 
-        async function fetchMapsCount(user = "", artist = "", server) {
+        async function fetchMapsCount(user = "", server) {
           let url = `/api/mapId/mapscount?temp=1`;
           // Construct URL based on selected values
           if (user && user !== "All Uploaders") {
             url += `&user=${user}`;
-          }
-          if (artist && artist !== "All Artists") {
-            url += `&artist=${artist}`;
           }
           if ("#{server}") {
             url += `&server=#{server}`;
@@ -247,7 +219,6 @@ html
           currentPage = 1; // Reset currentPage to 1
           hasMorePages = true;
           const user = document.getElementById('userSelector').value;
-          const artist = document.getElementById('artistSelector').value;
           const sort = document.getElementById('sortSelector').value;
           const view = document.getElementById('viewSelector').value;
           const server = document.getElementById('serverSelector').value;
@@ -262,8 +233,8 @@ html
           clearCarousel(view);
 
           // Pass selected view type to fetchMaps
-          fetchMaps(1, user, artist, sort, view, server, randomSeed);
-          fetchMapsCount(user, artist, server);
+          fetchMaps(1, user, sort, view, server, randomSeed);
+          fetchMapsCount(user, server);
         }
 
         // Function to clear the grid
@@ -302,7 +273,6 @@ html
 
         // Attach event listeners to input selectors
         document.getElementById('userSelector').addEventListener('change', handleSelectorsChange);
-        document.getElementById('artistSelector').addEventListener('change', handleSelectorsChange);
         document.getElementById('sortSelector').addEventListener('change', handleSelectorsChange);
         document.getElementById('viewSelector').addEventListener('change', handleSelectorsChange);
         document.getElementById('serverSelector').addEventListener('change', handleSelectorsChange);
@@ -355,11 +325,10 @@ html
                   <h5 class="card-title">${map.displayName}</h5>
                 </div>
                 <ul class="list-group list-group-flush">
-                  <li class="list-group-item">Artist: <a href="/search?query=${map.artist}">${map.artist}</a></li>
                   <li class="list-group-item">Uploaded by: <a href="/profile/user/${map.username}">${map.username}</a></li>
                 </ul>
                 <div class="card-body">
-                  <a href="/mapid/id/${map.id}" class="card-link">View Map</a>
+                  <a href="/mapid/id/${map.id}" class="card-link">View Map Id</a>
                 </div>
               </div>
             `;
@@ -456,7 +425,6 @@ html
         let currentPage = 1;
         let hasMorePages = true;
         let user = "";
-        let artist = "";
         let server = "#{server}";
         let sort = "dateDesc";
         let randomSeed = null;
@@ -512,7 +480,6 @@ html
           if (!hasMorePages) return;
           currentPage++;
           user = document.getElementById('userSelector').value;
-          artist = document.getElementById('artistSelector').value;
           sort = document.getElementById('sortSelector').value;
           view = document.getElementById('viewSelector').value;
           server = document.getElementById('serverSelector').value;
@@ -520,7 +487,7 @@ html
           const lastTableElement = document.getElementById('tableContainerBody').lastElementChild;
           if (lastGridElement) observer.unobserve(lastGridElement);
           else if (lastTableElement) observer.unobserve(lastTableElement);
-          await fetchMaps(currentPage, user, artist, sort, view, server, randomSeed);
+          await fetchMaps(currentPage, user, sort, view, server, randomSeed);
         }
 
         // Fetch more carousel slides as the active slide nears the end of what's loaded, so
@@ -564,7 +531,6 @@ html
         document.addEventListener('DOMContentLoaded', () => {
           $('select').selectpicker();
           populateUserSelector();
-          populateArtistSelector();
           populateSortSelector();
           populateServerSelector();
           // Initial API call on page load
