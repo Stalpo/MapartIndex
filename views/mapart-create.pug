@@ -74,7 +74,7 @@ html
 
         // catch vars for server and if nsfw
         let idsServer;
-        let idsNsfw;
+        let idsNsfw = false;
 
         // Function to generate text input boxes based on selected dimensions
         function generateInputs() {
@@ -149,7 +149,7 @@ html
                   })
                   .then(data => {
                     idsServer = data.server;
-                    idsNsfw = data.nsfw;
+                    idsNsfw = idsNsfw || !!data.nsfw;
                     if (data && data.id && data.imgUrl) {
                       return { id: data.id, imgUrl: `/public/uploads/${data.imgUrl}`, rotation };
                     } else {
@@ -276,6 +276,19 @@ html
               tagsInput.placeholder = 'Tags (comma-seperated)';
               tagsInputGroup.appendChild(tagsInput);
 
+              const nsfwInputGroup = document.createElement('div');
+              nsfwInputGroup.classList.add('form-group', 'text-left');
+              const nsfwLabel = document.createElement('label');
+              nsfwLabel.setAttribute('for', 'nsfwToggle');
+              nsfwLabel.classList.add('mr-2');
+              nsfwLabel.textContent = 'NSFW: ';
+              const nsfwInput = document.createElement('input');
+              nsfwInput.type = 'checkbox';
+              nsfwInput.id = 'nsfwToggle';
+              nsfwInput.checked = idsNsfw;
+              nsfwLabel.appendChild(nsfwInput);
+              nsfwInputGroup.appendChild(nsfwLabel);
+
               fetch(resultImageUrl)
                 .then(response => response.blob())
                 .then(resultBlob => {
@@ -300,6 +313,7 @@ html
               formContainer.appendChild(descriptionInputGroup);
               formContainer.appendChild(artistInputGroup);
               formContainer.appendChild(tagsInputGroup);
+              formContainer.appendChild(nsfwInputGroup);
               formContainer.appendChild(fileInput);
 
               const addButton = document.createElement('button');
@@ -312,7 +326,7 @@ html
                 formData.append('description', descriptionInput.value);
                 formData.append('artist', artistInput.value);
                 formData.append('server', idsServer);
-                formData.append('nsfw', idsNsfw);
+                formData.append('nsfw', nsfwInput.checked);
                 formData.append('file', blobObj);
                 formData.append('mapIds', JSON.stringify(mapIds));
                 formData.append('width', parseInt(widthSelector.value));
