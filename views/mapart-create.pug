@@ -141,6 +141,11 @@ html
                     break;
                   }
                 }
+                // write the inferred name back into the input so it has a real value to
+                // swap/reorganize in the grid preview instead of staying blank
+                if (displayName) {
+                  input.value = displayName;
+                }
               }
 
               const rotation = rotations[index].value;
@@ -302,22 +307,71 @@ html
             imageArea.appendChild(resultImage);
           }
 
+          // tile size in px - adjustable live via the zoom slider, independent of re-renders
+          let tileSize = 64;
+          let gridEl; // holds just the tiles, kept separate from the zoom controls so they survive re-renders
+
+          function applyGridDims() {
+            gridEl.style.display = 'grid';
+            gridEl.style.gridTemplateColumns = `repeat(${width}, ${tileSize}px)`;
+            gridEl.style.gridTemplateRows = `repeat(${height}, ${tileSize}px)`;
+            gridEl.style.gap = '2px';
+            gridEl.style.justifyContent = 'center';
+            gridEl.style.margin = '10px auto';
+          }
+
           function renderGrid() {
-            imageArea.innerHTML = '';
-            imageArea.style.display = 'grid';
-            imageArea.style.gridTemplateColumns = `repeat(${width}, 48px)`;
-            imageArea.style.gridTemplateRows = `repeat(${height}, 48px)`;
-            imageArea.style.gap = '2px';
-            imageArea.style.justifyContent = 'center';
-            imageArea.style.margin = '10px auto';
+            if (!gridEl) {
+              // build the zoom controls and tile container once; later calls only redraw tiles
+              imageArea.innerHTML = '';
+              imageArea.style.display = '';
+
+              const zoomRow = document.createElement('div');
+              zoomRow.classList.add('form-group');
+              zoomRow.style.display = 'flex';
+              zoomRow.style.alignItems = 'center';
+              zoomRow.style.justifyContent = 'center';
+              zoomRow.style.gap = '8px';
+
+              const zoomLabel = document.createElement('label');
+              zoomLabel.textContent = 'Tile size:';
+              zoomLabel.classList.add('mb-0');
+
+              const zoomInput = document.createElement('input');
+              zoomInput.type = 'range';
+              zoomInput.min = '24';
+              zoomInput.max = '160';
+              zoomInput.step = '4';
+              zoomInput.value = tileSize;
+              zoomInput.style.width = '200px';
+              zoomInput.addEventListener('input', () => {
+                tileSize = parseInt(zoomInput.value);
+                applyGridDims();
+                gridEl.querySelectorAll('.mapart-tile').forEach(tile => {
+                  tile.style.width = `${tileSize}px`;
+                  tile.style.height = `${tileSize}px`;
+                });
+              });
+
+              zoomRow.appendChild(zoomLabel);
+              zoomRow.appendChild(zoomInput);
+              imageArea.appendChild(zoomRow);
+
+              gridEl = document.createElement('div');
+              imageArea.appendChild(gridEl);
+            }
+
+            gridEl.innerHTML = '';
+            applyGridDims();
 
             currentMapData.forEach((map, i) => {
               const { x, y } = tilePosition(i, width, height, vertfirst, flipx, flipy);
               const tile = document.createElement('div');
+              tile.classList.add('mapart-tile');
               tile.style.gridColumn = x + 1;
               tile.style.gridRow = y + 1;
-              tile.style.width = '48px';
-              tile.style.height = '48px';
+              tile.style.width = `${tileSize}px`;
+              tile.style.height = `${tileSize}px`;
               tile.style.overflow = 'hidden';
               tile.style.border = '1px solid #999';
               tile.style.cursor = 'grab';
@@ -351,7 +405,7 @@ html
                 }
               });
 
-              imageArea.appendChild(tile);
+              gridEl.appendChild(tile);
             });
           }
 
