@@ -44,6 +44,10 @@ html
               div.form-group
                 label(for='flipy', class='mb-2') read bottom to top:
                 input(type='checkbox', name='flipy', id='flipy')
+            .col
+              div.form-group
+                label(for='gridPreview', class='mb-2') Show separate tiles (drag to swap):
+                input(type='checkbox', name='gridPreview', id='gridPreview')
 
           div#inputContainer
 
@@ -65,6 +69,7 @@ html
         const vertfirstSelector = document.getElementById('vertfirst');
         const flipxSelector = document.getElementById('flipx');
         const flipySelector = document.getElementById('flipy');
+        const gridPreviewSelector = document.getElementById('gridPreview');
 
         let blobObj = undefined;
 
@@ -204,8 +209,6 @@ html
         }
 
         fetchButton.addEventListener('click', () => {
-          const mapIds = []; // Array to store map IDs
-          
           fetchImages()
             .then(mapData => {
               // Ensure mapData is an array
@@ -213,36 +216,176 @@ html
                 throw new Error('Map data is not in expected format');
               }
 
-              // Extract map IDs and push them into the array
-              mapData.forEach(map => {
-                if (map && map.id) {
-                  mapIds.push(map.id);
-                }
-              });
-
-              // console.log(mapIds);
-
-              if (mapIds.length === 0) {
+              if (mapData.length === 0) {
                 throw new Error('No map data fetched or map IDs found');
               }
-              
+
               const width = parseInt(widthSelector.value);
               const height = parseInt(heightSelector.value);
               const vertfirst = vertfirstSelector.checked;
               const flipx = flipxSelector.checked;
               const flipy = flipySelector.checked;
-              
-              return joinImages(width, height, mapData.map(map => map.imgUrl), mapData.map(map => map.rotation), vertfirst, flipx, flipy);
-            })
-            .then(resultImageUrl => {
-              const outputContainer = document.getElementById('outputContainer');
-              outputContainer.innerHTML = ""; // Clear output
-              const resultImage = document.createElement('img');
-              resultImage.src = resultImageUrl;
-              outputContainer.appendChild(resultImage);
+              const showGrid = gridPreviewSelector.checked;
 
-              const formContainer = document.createElement('div');
-              formContainer.classList.add('mt-3');
+              // mutable working copy - swaps in grid mode reorder this in place
+              let currentMapData = mapData;
+
+              return joinImages(width, height, currentMapData.map(map => map.imgUrl), currentMapData.map(map => map.rotation), vertfirst, flipx, flipy)
+                .then(resultImageUrl => buildResultView({
+                  currentMapData, width, height, vertfirst, flipx, flipy, showGrid, resultImageUrl
+                }));
+            })
+            .catch(error => {
+              console.error('Error fetching images:', error);
+            });
+        });
+
+        // swap the map name / rotation values of two input rows above so a later
+        // real refetch reproduces whatever arrangement the grid preview ends up with
+        function swapInputRows(i, j) {
+          const inputs = document.querySelectorAll('#inputContainer input');
+          const rotations = document.querySelectorAll('#inputContainer select');
+          if (inputs[i] && inputs[j]) {
+            const tmpVal = inputs[i].value;
+            inputs[i].value = inputs[j].value;
+            inputs[j].value = tmpVal;
+          }
+          if (rotations[i] && rotations[j]) {
+            const tmpRot = rotations[i].value;
+            rotations[i].value = rotations[j].value;
+            rotations[j].value = tmpRot;
+          }
+        }
+
+        // mirrors the placement math in joinImages.js, in grid cells instead of pixels
+        function tilePosition(i, width, height, vertfirst, flipx, flipy) {
+          let x, y;
+          if (vertfirst) {
+            x = Math.floor(i / height);
+            y = i % height;
+          } else {
+            x = i % width;
+            y = Math.floor(i / width);
+          }
+          if (flipx) {
+            x = width - 1 - x;
+          }
+          if (flipy) {
+            y = height - 1 - y;
+          }
+          return { x, y };
+        }
+
+        function buildResultView({ currentMapData, width, height, vertfirst, flipx, flipy, showGrid, resultImageUrl }) {
+          const outputContainer = document.getElementById('outputContainer');
+          outputContainer.innerHTML = ""; // Clear output
+
+          const imageArea = document.createElement('div');
+          outputContainer.appendChild(imageArea);
+
+          function setResultUrl(url) {
+            return fetch(url)
+              .then(response => response.blob())
+              .then(resultBlob => {
+                blobObj = resultBlob;
+              })
+              .catch(error => {
+                console.error('Error fetching blob:', error);
+              });
+          }
+
+          function renderSingleImage(url) {
+            imageArea.innerHTML = '';
+            imageArea.style.display = '';
+            const resultImage = document.createElement('img');
+            resultImage.src = url;
+            imageArea.appendChild(resultImage);
+          }
+
+          function renderGrid() {
+            imageArea.innerHTML = '';
+            imageArea.style.display = 'grid';
+            imageArea.style.gridTemplateColumns = `repeat(${width}, 48px)`;
+            imageArea.style.gridTemplateRows = `repeat(${height}, 48px)`;
+            imageArea.style.gap = '2px';
+            imageArea.style.justifyContent = 'center';
+            imageArea.style.margin = '10px auto';
+
+            currentMapData.forEach((map, i) => {
+              const { x, y } = tilePosition(i, width, height, vertfirst, flipx, flipy);
+              const tile = document.createElement('div');
+              tile.style.gridColumn = x + 1;
+              tile.style.gridRow = y + 1;
+              tile.style.width = '48px';
+              tile.style.height = '48px';
+              tile.style.overflow = 'hidden';
+              tile.style.border = '1px solid #999';
+              tile.style.cursor = 'grab';
+              tile.draggable = true;
+              tile.title = `map id ${map.id}`;
+
+              const img = document.createElement('img');
+              img.src = map.imgUrl;
+              img.draggable = false;
+              img.style.width = '100%';
+              img.style.height = '100%';
+              img.style.transform = `rotate(${map.rotation * 90}deg)`;
+              tile.appendChild(img);
+
+              tile.addEventListener('dragstart', event => {
+                event.dataTransfer.setData('text/plain', String(i));
+                tile.style.opacity = '0.5';
+              });
+              tile.addEventListener('dragend', () => {
+                tile.style.opacity = '1';
+              });
+              tile.addEventListener('dragover', event => {
+                event.preventDefault();
+              });
+              tile.addEventListener('drop', event => {
+                event.preventDefault();
+                const fromIndex = parseInt(event.dataTransfer.getData('text/plain'));
+                const toIndex = i;
+                if (!isNaN(fromIndex) && fromIndex !== toIndex) {
+                  swapTiles(fromIndex, toIndex);
+                }
+              });
+
+              imageArea.appendChild(tile);
+            });
+          }
+
+          // swap two tiles, keep the inputs above in sync, then redo the stitch
+          // so publish always uploads the image matching the current arrangement
+          function swapTiles(i, j) {
+            const tmp = currentMapData[i];
+            currentMapData[i] = currentMapData[j];
+            currentMapData[j] = tmp;
+
+            swapInputRows(i, j);
+            renderGrid();
+
+            addButton.disabled = true;
+            joinImages(width, height, currentMapData.map(map => map.imgUrl), currentMapData.map(map => map.rotation), vertfirst, flipx, flipy)
+              .then(setResultUrl)
+              .then(() => {
+                addButton.disabled = false;
+              })
+              .catch(error => {
+                console.error('Error redoing stitch after swap:', error);
+                addButton.disabled = false;
+              });
+          }
+
+          if (showGrid) {
+            renderGrid();
+          } else {
+            renderSingleImage(resultImageUrl);
+          }
+          setResultUrl(resultImageUrl);
+
+          const formContainer = document.createElement('div');
+          formContainer.classList.add('mt-3');
 
               const nameInputGroup = document.createElement('div');
               nameInputGroup.classList.add('form-group');
@@ -289,15 +432,6 @@ html
               nsfwLabel.appendChild(nsfwInput);
               nsfwInputGroup.appendChild(nsfwLabel);
 
-              fetch(resultImageUrl)
-                .then(response => response.blob())
-                .then(resultBlob => {
-                  blobObj = resultBlob;
-                })
-                .catch(error => {
-                  console.error('Error fetching blob:', error);
-                });
-
               const fileInput = document.createElement('input');
               fileInput.style.display = 'none';
               fileInput.type = 'file';
@@ -328,9 +462,9 @@ html
                 formData.append('server', idsServer);
                 formData.append('nsfw', nsfwInput.checked);
                 formData.append('file', blobObj);
-                formData.append('mapIds', JSON.stringify(mapIds));
-                formData.append('width', parseInt(widthSelector.value));
-                formData.append('height', parseInt(heightSelector.value));
+                formData.append('mapIds', JSON.stringify(currentMapData.map(map => map.id)));
+                formData.append('width', width);
+                formData.append('height', height);
                 // Convert comma-separated values into a JSON array
                 const tagsArray = tagsInput.value.split(',').map(tag => tag.trim());
                 formData.append('tags', JSON.stringify(tagsArray));
@@ -393,12 +527,7 @@ html
 
               formContainer.appendChild(addButton);
               outputContainer.appendChild(formContainer);
-
-            })
-            .catch(error => {
-              console.error('Error fetching images:', error);
-            });
-        });
+        }
 
         generateInputs();
 
